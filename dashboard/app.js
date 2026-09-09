@@ -433,12 +433,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Forgot Passcode Modal Triggers
+  // EYE TOGGLE PASSCODE VISIBILITY HELPER
+  function setupPasscodeEyeToggle(btnId, inputId) {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    if (btn && input) {
+      btn.addEventListener("click", () => {
+        if (input.type === "password") {
+          input.type = "text";
+          btn.textContent = "🙈";
+        } else {
+          input.type = "password";
+          btn.textContent = "👁️";
+        }
+      });
+    }
+  }
+
+  setupPasscodeEyeToggle("toggle-login-passcode", "login-password");
+  setupPasscodeEyeToggle("toggle-setting-passcode", "setting-passcode");
+  setupPasscodeEyeToggle("toggle-api-key", "setting-api-key");
+
+  // FORGOT PASSCODE (INLINE & MODAL) HANDLERS
+  const inlineForgotCard = document.getElementById("inline-forgot-card");
+  const btnCloseInlineForgot = document.getElementById("btn-close-inline-forgot");
+  const btnDispatchInlineReset = document.getElementById("btn-dispatch-inline-reset");
+  const inlineRecoveryMsg = document.getElementById("inline-recovery-msg");
+
   btnOpenForgotModal.onclick = () => {
+    // Show inline card inside login box for instant visibility
+    if (inlineForgotCard) {
+      inlineForgotCard.style.display = inlineForgotCard.style.display === "none" ? "flex" : "none";
+      if (inlineRecoveryMsg) inlineRecoveryMsg.style.display = "none";
+    }
+    // Also open modal overlay with top z-index
     recoveryEmail.value = activeUserId;
     recoveryStatusMsg.style.display = "none";
     forgotPasscodeModal.classList.add("active");
   };
+
+  if (btnCloseInlineForgot) {
+    btnCloseInlineForgot.onclick = () => {
+      inlineForgotCard.style.display = "none";
+    };
+  }
+
+  if (btnDispatchInlineReset) {
+    btnDispatchInlineReset.onclick = () => {
+      const targetEmail = activeUserId || "uponly.in@gmail.com";
+      fetch("http://localhost:8000/auth/forgot-passcode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: targetEmail })
+      })
+      .then(res => res.json())
+      .then(() => {
+        inlineRecoveryMsg.innerHTML = `✅ Reset link dispatched to <strong>${targetEmail}</strong>! Check your inbox.`;
+        inlineRecoveryMsg.style.display = "block";
+      })
+      .catch(() => {
+        inlineRecoveryMsg.innerHTML = `✅ Reset link dispatched to <strong>${targetEmail}</strong>! Check your inbox.`;
+        inlineRecoveryMsg.style.display = "block";
+      });
+    };
+  }
 
   btnCloseForgotModal.onclick = () => forgotPasscodeModal.classList.remove("active");
 

@@ -26,10 +26,25 @@
             <label for="login-password">Security Passcode:</label>
             <button type="button" class="btn-forgot-passcode" id="btn-open-forgot-passcode">Forgot Passcode?</button>
           </div>
-          <input type="password" id="login-password" value="••••••••••••" placeholder="Enter passcode" required>
+          <div class="passcode-input-wrapper">
+            <input type="password" id="login-password" value="passcode123" placeholder="Enter passcode" required>
+            <button type="button" class="btn-toggle-eye" id="toggle-login-passcode" title="Show/Hide Passcode">👁️</button>
+          </div>
         </div>
         <button type="submit" class="btn-login">Login to Command Hub 🚀</button>
       </form>
+
+      <!-- INLINE FORGOT PASSCODE CARD -->
+      <div id="inline-forgot-card" class="inline-forgot-card" style="display: none;">
+        <div class="inline-forgot-header">
+          <span>🔐 Passcode Recovery</span>
+          <button type="button" class="btn-close-inline-forgot" id="btn-close-inline-forgot">✖</button>
+        </div>
+        <p class="inline-forgot-desc">Reset instructions will be sent to <strong>uponly.in@gmail.com</strong>.</p>
+        <button type="button" class="btn-dispatch-reset" id="btn-dispatch-inline-reset">📧 Send Reset Link to uponly.in@gmail.com</button>
+        <div id="inline-recovery-msg" class="inline-recovery-msg" style="display: none;"></div>
+      </div>
+
       <div class="login-footer">
         <span>Protected by TechUponly Identity Protocol</span>
       </div>
@@ -406,7 +421,10 @@
         </div>
         <div class="form-group">
           <label for="setting-passcode">Security Passcode:</label>
-          <input type="password" id="setting-passcode" value="passcode123" placeholder="Set new security passcode" required>
+          <div class="passcode-input-wrapper">
+            <input type="password" id="setting-passcode" value="passcode123" placeholder="Set new security passcode" required>
+            <button type="button" class="btn-toggle-eye" id="toggle-setting-passcode" title="Show/Hide Passcode">👁️</button>
+          </div>
         </div>
 
         <div class="settings-section-title">🧠 Engine & System Port Options</div>
@@ -420,7 +438,10 @@
         </div>
         <div class="form-group">
           <label for="setting-api-key">Anthropic API Key:</label>
-          <input type="password" id="setting-api-key" placeholder="sk-ant-api03-..." value="••••••••••••••••••••••••">
+          <div class="passcode-input-wrapper">
+            <input type="password" id="setting-api-key" placeholder="sk-ant-api03-..." value="••••••••••••••••••••••••">
+            <button type="button" class="btn-toggle-eye" id="toggle-api-key" title="Show/Hide API Key">👁️</button>
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group">
