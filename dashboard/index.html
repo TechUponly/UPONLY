@@ -231,9 +231,12 @@
         <div class="add-context-container">
           <button class="btn-add-context" id="btn-context-menu" title="Add Context">+</button>
           
-          <!-- Context Popup Menu -->
+          <!-- Context Popup Menu (Includes Live Camera / Selfie Option) -->
           <div class="context-popup-menu" id="context-menu-popup">
             <div class="menu-title">Add Context</div>
+            <button class="menu-item" id="menu-item-camera">
+              <span class="item-icon">📷</span> Live Camera & Selfie
+            </button>
             <button class="menu-item" id="menu-item-media">
               <span class="item-icon">🖼️</span> Media / Upload File
             </button>
@@ -257,7 +260,7 @@
 
         <textarea id="chat-input" rows="1" placeholder="Message Business Head..." required></textarea>
 
-        <button type="button" class="btn-mic" id="btn-audio-record" title="Record Audio Voice Memo">🎤</button>
+        <button type="button" class="btn-mic" id="btn-camera-shortcut" title="Take Live Selfie or Record Video">📷</button>
         <button type="submit" class="btn-send-chat" id="btn-send-message" title="Send Message">🚀</button>
       </div>
     </main>
@@ -332,6 +335,33 @@
 
     </aside>
 
+  </div>
+
+  <!-- LIVE PHONE-STYLE CAMERA & SELFIE / VIDEO RECORDER MODAL -->
+  <div class="modal-overlay" id="camera-modal">
+    <div class="modal-content modal-camera-box">
+      <div class="modal-header">
+        <h2>📷 Live Phone Camera & Video Recorder</h2>
+        <button class="btn-close-modal" id="btn-close-camera-modal">✖ Close</button>
+      </div>
+
+      <div class="camera-viewfinder-container">
+        <!-- Live Video Element -->
+        <video id="camera-video-feed" autoplay playsinline muted></video>
+
+        <!-- Recording Timer & Dot -->
+        <div class="rec-timer-badge" id="camera-rec-badge" style="display: none;">
+          <span class="rec-dot-live"></span> <span id="camera-timer-text">00:00</span>
+        </div>
+
+        <canvas id="camera-snapshot-canvas" style="display: none;"></canvas>
+      </div>
+
+      <div class="camera-controls-bar">
+        <button type="button" class="btn-cam-action" id="btn-take-selfie">📸 Take Selfie</button>
+        <button type="button" class="btn-cam-action record" id="btn-record-video-live">🔴 Record Video</button>
+      </div>
+    </div>
   </div>
 
   <!-- SETTINGS MODAL -->

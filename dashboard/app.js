@@ -18,7 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let activeAgentKey = "business_head";
   const agentHistories = new Map();
   const currentAttachments = [];
-  let isAudioRecording = false;
+  
+  // Camera & MediaRecorder State
+  let cameraStream = null;
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isLiveRecordingVideo = false;
+  let videoTimerInterval = null;
+  let videoSecondsCount = 0;
 
   // DOM Elements
   const loginScreen = document.getElementById("login-screen");
@@ -27,29 +34,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const userDisplayName = document.getElementById("user-display-name");
 
   const agentSearchInput = document.getElementById("agent-search-input");
-  const fleetList = document.getElementById("agent-fleet-list");
-  
   const chatHeaderAvatar = document.getElementById("chat-header-avatar");
   const chatHeaderTitle = document.getElementById("chat-header-title");
   const chatHeaderRole = document.getElementById("chat-header-role");
-  const currentEngineTag = document.getElementById("current-engine-tag");
   const chatThread = document.getElementById("chat-thread");
   const attachmentPreviewBar = document.getElementById("attachment-preview-bar");
 
   const chatInput = document.getElementById("chat-input");
   const btnSendMessage = document.getElementById("btn-send-message");
+  const btnCameraShortcut = document.getElementById("btn-camera-shortcut");
 
   // Context Menu Elements
   const btnContextMenu = document.getElementById("btn-context-menu");
   const contextMenuPopup = document.getElementById("context-menu-popup");
   const fileUploadInput = document.getElementById("file-upload-input");
 
+  const menuItemCamera = document.getElementById("menu-item-camera");
   const menuItemMedia = document.getElementById("menu-item-media");
   const menuItemAudio = document.getElementById("menu-item-audio");
   const menuItemVideo = document.getElementById("menu-item-video");
   const menuItemMentions = document.getElementById("menu-item-mentions");
   const menuItemBrowser = document.getElementById("menu-item-browser");
-  const btnAudioRecord = document.getElementById("btn-audio-record");
+
+  // Camera Modal Elements
+  const cameraModal = document.getElementById("camera-modal");
+  const btnCloseCameraModal = document.getElementById("btn-close-camera-modal");
+  const cameraVideoFeed = document.getElementById("camera-video-feed");
+  const cameraRecBadge = document.getElementById("camera-rec-badge");
+  const cameraTimerText = document.getElementById("camera-timer-text");
+  const cameraSnapshotCanvas = document.getElementById("camera-snapshot-canvas");
+  const btnTakeSelfie = document.getElementById("btn-take-selfie");
+  const btnRecordVideoLive = document.getElementById("btn-record-video-live");
 
   // Right Pane Elements
   const monitorTitle = document.getElementById("monitor-title");
@@ -74,9 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const expandModal = document.getElementById("expand-modal");
   const btnCloseModal = document.getElementById("btn-close-modal");
 
-  // --- INITIALIZE AGENT HISTORIES (Matching Reference Screenshot) ---
+  // --- INITIALIZE AGENT HISTORIES ---
   function initHistories() {
-    // Populate Business Head history as seen in reference screenshot
     agentHistories.set("business_head", [
       {
         role: "agent",
@@ -101,13 +115,98 @@ document.addEventListener("DOMContentLoaded", () => {
         content: "v2 in progress: text over real B-roll (not empty black) + both brand logos on open and close. I'll send the new file when it's ready."
       }
     ]);
-
-    // Populate Video Creator history
-    agentHistories.set("video", [
-      { role: "agent", content: "v2 is building on the bank B-roll with audio track synced." },
-      { role: "user", content: "Ensure logo is crisp on startup." }
-    ]);
   }
+
+  // --- CAMERA & SELFIE / VIDEO RECORDING ENGINE ---
+  async function openCameraModal() {
+    cameraModal.classList.add("active");
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      cameraVideoFeed.srcObject = cameraStream;
+    } catch (err) {
+      console.warn("WebRTC Camera access fallback:", err);
+      // Fallback simulation if camera permissions are blocked
+    }
+  }
+
+  function stopCameraStream() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+    if (isLiveRecordingVideo) {
+      stopVideoRecording();
+    }
+    cameraModal.classList.remove("active");
+  }
+
+  // Take Snapshot / Selfie
+  btnTakeSelfie.addEventListener("click", () => {
+    const context = cameraSnapshotCanvas.getContext("2d");
+    cameraSnapshotCanvas.width = cameraVideoFeed.videoWidth || 640;
+    cameraSnapshotCanvas.height = cameraVideoFeed.videoHeight || 480;
+    context.drawImage(cameraVideoFeed, 0, 0, cameraSnapshotCanvas.width, cameraSnapshotCanvas.height);
+
+    const timestamp = new Date().toLocaleTimeString().replace(/:/g, "-");
+    addAttachment({ type: "image", name: `Selfie_Snapshot_${timestamp}.jpg`, size: "1.2MB" });
+    
+    stopCameraStream();
+  });
+
+  // Record Live Video Memo
+  btnRecordVideoLive.addEventListener("click", () => {
+    if (!isLiveRecordingVideo) {
+      startVideoRecording();
+    } else {
+      stopVideoRecording();
+      stopCameraStream();
+    }
+  });
+
+  function startVideoRecording() {
+    isLiveRecordingVideo = true;
+    btnRecordVideoLive.textContent = "⏹ Stop & Attach Video";
+    btnRecordVideoLive.style.background = "#ef4444";
+    cameraRecBadge.style.display = "flex";
+    
+    videoSecondsCount = 0;
+    videoTimerInterval = setInterval(() => {
+      videoSecondsCount++;
+      const mins = String(Math.floor(videoSecondsCount / 60)).padStart(2, '0');
+      const secs = String(videoSecondsCount % 60).padStart(2, '0');
+      cameraTimerText.textContent = `${mins}:${secs}`;
+    }, 1000);
+
+    recordedChunks = [];
+    if (cameraStream) {
+      try {
+        mediaRecorder = new MediaRecorder(cameraStream);
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+        mediaRecorder.start();
+      } catch (err) {}
+    }
+  }
+
+  function stopVideoRecording() {
+    isLiveRecordingVideo = false;
+    btnRecordVideoLive.textContent = "🔴 Record Video";
+    btnRecordVideoLive.style.background = "#ef4444";
+    cameraRecBadge.style.display = "none";
+    clearInterval(videoTimerInterval);
+
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
+
+    const timestamp = new Date().toLocaleTimeString().replace(/:/g, "-");
+    addAttachment({ type: "video", name: `Live_Video_Memo_${timestamp}.webm`, size: `${videoSecondsCount * 180}KB` });
+  }
+
+  menuItemCamera.addEventListener("click", openCameraModal);
+  btnCameraShortcut.addEventListener("click", openCameraModal);
+  btnCloseCameraModal.addEventListener("click", stopCameraStream);
 
   // Render Thread Messages for Active Agent
   function renderThread(agentKey) {
@@ -128,7 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         let htmlContent = `<div class="bubble">${msg.content}</div>`;
         
-        // Add Rich Video Card if present (matching screenshot)
         if (msg.hasVideo) {
           htmlContent += `
             <div class="media-card-widget">
@@ -148,7 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
     chatThread.scrollTop = chatThread.scrollHeight;
   }
 
-  // Switch Active Agent Selection
   function selectAgent(agentKey) {
     activeAgentKey = agentKey;
     const info = AGENT_REGISTRY[agentKey] || { name: agentKey, avatar: "🤖", role: "AI Specialist" };
@@ -172,14 +269,12 @@ document.addEventListener("DOMContentLoaded", () => {
     renderThread(agentKey);
   }
 
-  // Bind Agent Fleet Card Clicks
   function bindFleetClicks() {
     document.querySelectorAll(".agent-card").forEach(card => {
       card.onclick = () => selectAgent(card.dataset.agent);
     });
   }
 
-  // Agent Search Filtering
   agentSearchInput.addEventListener("input", (e) => {
     const q = e.target.value.toLowerCase();
     document.querySelectorAll(".agent-card").forEach(card => {
@@ -192,7 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Toggle Context Popup Menu (Add Context + button)
   btnContextMenu.addEventListener("click", (e) => {
     e.stopPropagation();
     contextMenuPopup.classList.toggle("active");
@@ -202,7 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
     contextMenuPopup.classList.remove("active");
   });
 
-  // Context Menu Item Handlers
   menuItemMedia.addEventListener("click", () => {
     fileUploadInput.accept = "image/*,video/*,*/*";
     fileUploadInput.click();
@@ -215,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   menuItemAudio.addEventListener("click", () => {
-    addAttachment({ type: "audio", name: "Voice_Memo_Audio.mp4" });
+    addAttachment({ type: "audio", name: "Voice_Memo_Audio.wav" });
   });
 
   menuItemVideo.addEventListener("click", () => {
@@ -242,7 +335,8 @@ document.addEventListener("DOMContentLoaded", () => {
     currentAttachments.forEach((item, idx) => {
       const chip = document.createElement("div");
       chip.className = "attach-chip";
-      chip.innerHTML = `<span>📎 ${item.name}</span><span class="remove-chip" onclick="removeAttach(${idx})">✖</span>`;
+      const icon = item.type === "image" ? "📸" : item.type === "audio" ? "🎤" : item.type === "video" ? "📹" : item.type === "url" ? "🌐" : "📄";
+      chip.innerHTML = `<span>${icon} ${item.name}</span><span class="remove-chip" onclick="removeAttach(${idx})">✖</span>`;
       attachmentPreviewBar.appendChild(chip);
     });
   }
@@ -252,26 +346,23 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAttachments();
   };
 
-  // Send Chat Message Handler
   function sendMessage() {
     const text = chatInput.value.trim();
     if (!text && currentAttachments.length === 0) return;
 
     const list = agentHistories.get(activeAgentKey) || [];
-    list.push({ role: "user", content: text });
+    let attachNote = currentAttachments.length > 0 ? ` [Attached ${currentAttachments.map(a => a.name).join(', ')}]` : "";
+    list.push({ role: "user", content: text + attachNote });
 
-    // Render immediately
     renderThread(activeAgentKey);
     chatInput.value = "";
     chatInput.style.height = "auto";
     currentAttachments.length = 0;
     renderAttachments();
 
-    // Trigger Screen Monitor Animation
-    canvasBodyText.innerHTML = `> Executing Claude 3.5 Sonnet step for ${activeAgentKey}...<br>> Directing parameters & tool calls.`;
+    canvasBodyText.innerHTML = `> Executing Claude 3.5 Sonnet step for ${activeAgentKey}...<br>> Processing parameters & attached media.`;
     gridProgressFill.style.width = "40%";
 
-    // Backend Execution Call
     fetch("http://localhost:8000/agents/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -310,7 +401,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Session Login/Logout
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const email = loginEmail.value || "uponly.in@gmail.com";
@@ -324,7 +414,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loginScreen.classList.add("active");
   };
 
-  // Modals & Settings
   btnOpenSettings.onclick = () => settingsModal.classList.add("active");
   btnCloseSettingsModal.onclick = () => settingsModal.classList.remove("active");
 
@@ -337,7 +426,6 @@ document.addEventListener("DOMContentLoaded", () => {
   btnExpandScreen.onclick = () => expandModal.classList.add("active");
   btnCloseModal.onclick = () => expandModal.classList.remove("active");
 
-  // Init
   initHistories();
   bindFleetClicks();
   selectAgent("business_head");
