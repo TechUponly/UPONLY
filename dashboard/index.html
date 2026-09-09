@@ -22,7 +22,10 @@
           <input type="text" id="login-email" value="uponly.in@gmail.com" placeholder="e.g. uponly.in@gmail.com" required>
         </div>
         <div class="form-group">
-          <label for="login-password">Security Passcode:</label>
+          <div class="label-with-action">
+            <label for="login-password">Security Passcode:</label>
+            <button type="button" class="btn-forgot-passcode" id="btn-open-forgot-passcode">Forgot Passcode?</button>
+          </div>
           <input type="password" id="login-password" value="••••••••••••" placeholder="Enter passcode" required>
         </div>
         <button type="submit" class="btn-login">Login to Command Hub 🚀</button>
@@ -30,6 +33,27 @@
       <div class="login-footer">
         <span>Protected by TechUponly Identity Protocol</span>
       </div>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSCODE MODAL -->
+  <div class="modal-overlay" id="forgot-passcode-modal">
+    <div class="modal-content modal-form-box">
+      <div class="modal-header">
+        <h2>🔐 Executive Passcode Recovery</h2>
+        <button class="btn-close-modal" id="btn-close-forgot-modal">✖ Close</button>
+      </div>
+      <div class="recovery-info-banner">
+        <p>Enter your Executive User ID below. Passcode reset instructions will be dispatched to <strong>uponly.in@gmail.com</strong>.</p>
+      </div>
+      <form id="forgot-passcode-form" class="settings-form">
+        <div class="form-group">
+          <label for="recovery-email">Executive Recovery Email:</label>
+          <input type="email" id="recovery-email" value="uponly.in@gmail.com" required>
+        </div>
+        <button type="submit" class="btn-dispatch" id="btn-send-reset-email">📧 Dispatch Reset Link to uponly.in@gmail.com</button>
+      </form>
+      <div id="recovery-status-msg" class="recovery-status-msg" style="display: none;"></div>
     </div>
   </div>
 
@@ -368,10 +392,21 @@
   <div class="modal-overlay" id="settings-modal">
     <div class="modal-content modal-form-box">
       <div class="modal-header">
-        <h2>⚙️ Platform Settings & Configurations</h2>
+        <h2>⚙️ Platform Settings & Security</h2>
         <button class="btn-close-modal" id="btn-close-settings-modal">✖ Close</button>
       </div>
       <form id="settings-form" class="settings-form">
+        <div class="settings-section-title">🔐 Executive Identity & Credentials</div>
+        <div class="form-group">
+          <label for="setting-user-id">Executive User ID / Email:</label>
+          <input type="text" id="setting-user-id" value="uponly.in@gmail.com" placeholder="e.g. uponly.in@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label for="setting-passcode">Security Passcode:</label>
+          <input type="password" id="setting-passcode" value="passcode123" placeholder="Set new security passcode" required>
+        </div>
+
+        <div class="settings-section-title">🧠 Engine & System Port Options</div>
         <div class="form-group">
           <label for="setting-llm-provider">Primary LLM Provider Engine:</label>
           <select id="setting-llm-provider">
@@ -394,7 +429,7 @@
             <input type="number" id="setting-dashboard-port" value="8090">
           </div>
         </div>
-        <button type="submit" class="btn-dispatch">Save Settings ✓</button>
+        <button type="submit" class="btn-dispatch">Save Credentials & Settings ✓</button>
       </form>
     </div>
   </div>

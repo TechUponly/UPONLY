@@ -1,0 +1,48 @@
+# Azure DevOps Pipeline for UPONLY AI OS
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: 'Azure-Production-Service-Connection'
+  appName: 'uponly-ai-os'
+  containerRegistry: 'acruponlyai.azurecr.io'
+  imageRepository: 'uponly-ai-os'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build & Push Docker Image
+  jobs:
+  - job: Build
+    displayName: Build Job
+    steps:
+    - task: Docker@2
+      displayName: Build and Push Docker image to ACR
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(containerRegistry)
+        tags: |
+          $(tag)
+          latest
+
+- stage: Deploy
+  displayName: Deploy to Azure App Service
+  dependsOn: Build
+  jobs:
+  - job: Deploy
+    displayName: Deploy Job
+    steps:
+    - task: AzureWebAppContainer@1
+      displayName: Azure Web App Container Deploy
+      inputs:
+        azureSubscription: $(azureSubscription)
+        appName: $(appName)
+        containers: '$(containerRegistry)/$(imageRepository):$(tag)'

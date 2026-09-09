@@ -4,6 +4,7 @@ from config.settings import settings
 from api.routes_agents import router as agents_router
 from api.routes_workflows import router as workflows_router
 from api.routes_plugins import router as plugins_router
+from api.routes_auth import router as auth_router
 from api.websocket_server import ws_manager
 
 app = FastAPI(
@@ -25,6 +26,7 @@ app.add_middleware(
 app.include_router(agents_router)
 app.include_router(workflows_router)
 app.include_router(plugins_router)
+app.include_router(auth_router)
 
 @app.get("/")
 def root():

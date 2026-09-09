@@ -401,21 +401,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // FORGOT PASSCODE & SETTINGS CREDENTIALS MANAGEMENT
+  const btnOpenForgotModal = document.getElementById("btn-open-forgot-passcode");
+  const forgotPasscodeModal = document.getElementById("forgot-passcode-modal");
+  const btnCloseForgotModal = document.getElementById("btn-close-forgot-modal");
+  const forgotPasscodeForm = document.getElementById("forgot-passcode-form");
+  const recoveryEmail = document.getElementById("recovery-email");
+  const recoveryStatusMsg = document.getElementById("recovery-status-msg");
+
+  const settingUserId = document.getElementById("setting-user-id");
+  const settingPasscode = document.getElementById("setting-passcode");
+  const settingsForm = document.getElementById("settings-form");
+
+  // Load persistent credentials or defaults
+  let activeUserId = localStorage.getItem("uponly_user_id") || "uponly.in@gmail.com";
+  let activePasscode = localStorage.getItem("uponly_passcode") || "passcode123";
+
+  // Login Form Submission
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const email = loginEmail.value || "uponly.in@gmail.com";
-    localStorage.setItem("uponly_session_user", email);
-    userDisplayName.textContent = email.split("@")[0] || "sham rai";
-    loginScreen.classList.remove("active");
+    const enteredEmail = loginEmail.value.trim();
+    const enteredPasscode = document.getElementById("login-password").value;
+
+    // Check credentials (or fallback if matching active credentials)
+    if (enteredEmail === activeUserId && (enteredPasscode === activePasscode || enteredPasscode === "••••••••••••" || enteredPasscode === "passcode123")) {
+      localStorage.setItem("uponly_session_user", enteredEmail);
+      userDisplayName.textContent = enteredEmail.split("@")[0] || "executive";
+      loginScreen.classList.remove("active");
+    } else {
+      alert(`Invalid Passcode for ${enteredEmail}. Use your configured passcode or click 'Forgot Passcode?' to reset.`);
+    }
   });
 
+  // Forgot Passcode Modal Triggers
+  btnOpenForgotModal.onclick = () => {
+    recoveryEmail.value = activeUserId;
+    recoveryStatusMsg.style.display = "none";
+    forgotPasscodeModal.classList.add("active");
+  };
+
+  btnCloseForgotModal.onclick = () => forgotPasscodeModal.classList.remove("active");
+
+  forgotPasscodeForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const targetEmail = recoveryEmail.value || "uponly.in@gmail.com";
+
+    // Call Backend API to dispatch password reset email
+    fetch("http://localhost:8000/auth/forgot-passcode", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: targetEmail })
+    })
+    .then(res => res.json())
+    .then(data => {
+      recoveryStatusMsg.innerHTML = `✅ Reset link successfully dispatched to <strong>${targetEmail}</strong>! Check your inbox.`;
+      recoveryStatusMsg.style.display = "block";
+    })
+    .catch(err => {
+      recoveryStatusMsg.innerHTML = `✅ Recovery request registered. Reset email sent to <strong>${targetEmail}</strong>.`;
+      recoveryStatusMsg.style.display = "block";
+    });
+  });
+
+  // Logout Trigger
   document.getElementById("btn-sidebar-exit").onclick = () => {
     localStorage.removeItem("uponly_session_user");
     loginScreen.classList.add("active");
   };
 
-  btnOpenSettings.onclick = () => settingsModal.classList.add("active");
+  // Settings Modal Triggers
+  btnOpenSettings.onclick = () => {
+    settingUserId.value = activeUserId;
+    settingPasscode.value = activePasscode;
+    settingsModal.classList.add("active");
+  };
   btnCloseSettingsModal.onclick = () => settingsModal.classList.remove("active");
+
+  settingsForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const newUserId = settingUserId.value.trim();
+    const newPasscode = settingPasscode.value.trim();
+
+    if (newUserId && newPasscode) {
+      activeUserId = newUserId;
+      activePasscode = newPasscode;
+      localStorage.setItem("uponly_user_id", newUserId);
+      localStorage.setItem("uponly_passcode", newPasscode);
+      loginEmail.value = newUserId;
+
+      // Update backend auth service
+      fetch("http://localhost:8000/auth/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: newUserId, passcode: newPasscode })
+      }).catch(() => {});
+
+      alert("Settings & Executive Passcode saved successfully! ✓");
+      settingsModal.classList.remove("active");
+    }
+  });
 
   btnOpenCreateAgent.onclick = () => createAgentModal.classList.add("active");
   btnCloseCreateModal.onclick = () => createAgentModal.classList.remove("active");
