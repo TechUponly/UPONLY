@@ -10,12 +10,27 @@ from agents.sales_agent import SalesAgent
 from agents.operations_agent import OperationsAgent
 from agents.support_agent import SupportAgent
 from agents.analytics_agent import AnalyticsAgent
+from agents.finance_agent import FinanceAgent
+from agents.content_agent import ContentAgent
+from agents.video_agent import VideoAgent
+from agents.recruiting_agent import RecruitingAgent
+from agents.analyst_agent import AnalystAgent
+from agents.risk_agent import RiskAgent
+from agents.business_head_agent import BusinessHeadAgent
 
 def main():
     parser = argparse.ArgumentParser(description="UPONLY AI Agent CLI Runner")
-    parser.add_argument("--agent", choices=["sales", "operations", "support", "analytics"], default="sales", help="Target AI agent")
-    parser.add_argument("--task", type=str, default="Execute standard business process automation", help="Task description or query")
-    parser.add_argument("--dry-run", action="store_true", help="Simulate execution without external API calls")
+    parser.add_argument(
+        "--agent",
+        choices=[
+            "sales", "operations", "support", "analytics",
+            "finance", "content", "video", "recruiting",
+            "analyst", "risk", "business_head"
+        ],
+        default="business_head",
+        help="Target AI agent to execute"
+    )
+    parser.add_argument("--task", type=str, default="Execute standard business directive", help="Task description or query")
 
     args = parser.parse_args()
 
@@ -23,13 +38,20 @@ def main():
         "sales": SalesAgent(),
         "operations": OperationsAgent(),
         "support": SupportAgent(),
-        "analytics": AnalyticsAgent()
+        "analytics": AnalyticsAgent(),
+        "finance": FinanceAgent(),
+        "content": ContentAgent(),
+        "video": VideoAgent(),
+        "recruiting": RecruitingAgent(),
+        "analyst": AnalystAgent(),
+        "risk": RiskAgent(),
+        "business_head": BusinessHeadAgent()
     }
 
     target_agent = agents_map[args.agent]
     print(f"🤖 Selected Agent: {target_agent.name} ({target_agent.role})")
     
-    result = target_agent.execute_task({"query": args.task, "lead_name": "Acme Lead", "company": "Acme Corp"})
+    result = target_agent.execute_task({"query": args.task, "lead_name": "Enterprise Client", "company": "Global Tech"})
     print("\n✅ Execution Result:")
     print("--------------------")
     print(f"Status: {result.get('status')}")

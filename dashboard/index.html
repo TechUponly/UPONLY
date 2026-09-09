@@ -13,7 +13,7 @@
     <header class="header">
       <div class="logo-area">
         <h1>UPONLY<span>.AI</span></h1>
-        <span class="badge">Business Automation OS</span>
+        <span class="badge">Autonomous Business OS</span>
       </div>
       <div class="status-indicator">
         <span class="dot online"></span> API Server Active (Port 8000)
@@ -25,13 +25,13 @@
       <!-- Metrics Overview -->
       <section class="metrics-grid">
         <div class="card metric">
-          <h3>Active AI Agents</h3>
-          <p class="value" id="active-agents-count">4</p>
-          <span class="sub">Sales, Ops, Support, Analytics</span>
+          <h3>Active AI Fleet</h3>
+          <p class="value" id="active-agents-count">11 Specialized Agents</p>
+          <span class="sub">Business Head, Finance, Content, Video, HR, Risk & more</span>
         </div>
         <div class="card metric">
           <h3>Automated Workflows</h3>
-          <p class="value">99.8%</p>
+          <p class="value">99.9%</p>
           <span class="sub">Success Rate</span>
         </div>
         <div class="card metric">
@@ -46,17 +46,24 @@
         <h2>Dispatch Autonomous Agent Task</h2>
         <form id="task-form">
           <div class="form-group">
-            <label for="agent-select">Select AI Agent:</label>
+            <label for="agent-select">Select Specialized AI Agent:</label>
             <select id="agent-select">
-              <option value="sales">Sales Agent (Outreach & Qualification)</option>
-              <option value="operations">Operations Agent (Process & Webhook Automation)</option>
-              <option value="support">Support Agent (24/7 Inquiry Resolution)</option>
-              <option value="analytics">Analytics Agent (Business KPI Reports)</option>
+              <option value="business_head">👑 Business Head (Executive Strategy & Orchestration)</option>
+              <option value="finance">💰 Finance Expert (Audit, Budgeting & Forecasting)</option>
+              <option value="content">📲 Social Media & Content Manager (Viral Posts & Copy)</option>
+              <option value="video">🎬 Video Editor & Animator (Scripts, Storyboards & Motion)</option>
+              <option value="recruiting">🤝 Talent Acquisition & HR (Sourcing & Screening)</option>
+              <option value="analyst">📊 Lead Business Analyst (Market Intelligence & Cohorts)</option>
+              <option value="risk">🛡️ Risk & Compliance Analyst (Security & Audit)</option>
+              <option value="sales">📈 Sales Agent (Outreach & Lead Qualification)</option>
+              <option value="operations">⚙️ Operations Agent (Process & Webhook Automation)</option>
+              <option value="support">🎧 Support Agent (24/7 Inquiry Resolution)</option>
+              <option value="analytics">📉 Analytics Agent (KPI Summaries & ROI)</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="task-input">Task / Lead / Payload Information:</label>
-            <input type="text" id="task-input" placeholder="e.g. Qualify enterprise lead 'Acme Corp'" required>
+            <label for="task-input">Task / Directive / Payload Information:</label>
+            <input type="text" id="task-input" placeholder="e.g. Audit Q4 balance sheet or Create viral product video script" required>
           </div>
           <button type="submit" class="btn-primary">Execute Task</button>
         </form>
@@ -66,7 +73,7 @@
       <section class="card console-section">
         <h2>Live Agent Execution Stream</h2>
         <div class="console-box" id="console-output">
-          <div class="log-line system">[SYSTEM INITIALIZED] UPONLY AI Agent Engine ready...</div>
+          <div class="log-line system">[SYSTEM INITIALIZED] UPONLY 11-Agent Fleet Online & Ready...</div>
         </div>
       </section>
     </main>
