@@ -417,19 +417,24 @@ document.addEventListener("DOMContentLoaded", () => {
   let activeUserId = localStorage.getItem("uponly_user_id") || "uponly.in@gmail.com";
   let activePasscode = localStorage.getItem("uponly_passcode") || "passcode123";
 
-  // Login Form Submission
+  // Pre-fill active email & passcode in login inputs
+  if (loginEmail) loginEmail.value = activeUserId;
+  const loginPasswordInput = document.getElementById("login-password");
+  if (loginPasswordInput) loginPasswordInput.value = activePasscode;
+
+  // Login Form Submission (Strict Match Verification)
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const enteredEmail = loginEmail.value.trim();
     const enteredPasscode = document.getElementById("login-password").value;
 
-    // Check credentials (or fallback if matching active credentials)
-    if (enteredEmail === activeUserId && (enteredPasscode === activePasscode || enteredPasscode === "••••••••••••" || enteredPasscode === "passcode123")) {
+    // Strict credential check: must match activeUserId and activePasscode EXACTLY
+    if (enteredEmail === activeUserId && enteredPasscode === activePasscode) {
       localStorage.setItem("uponly_session_user", enteredEmail);
       userDisplayName.textContent = enteredEmail.split("@")[0] || "executive";
       loginScreen.classList.remove("active");
     } else {
-      alert(`Invalid Passcode for ${enteredEmail}. Use your configured passcode or click 'Forgot Passcode?' to reset.`);
+      alert(`Access Denied: Invalid Passcode for '${enteredEmail}'. Please enter your exact configured passcode or click 'Forgot Passcode?' to reset.`);
     }
   });
 

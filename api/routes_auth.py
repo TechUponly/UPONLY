@@ -21,6 +21,21 @@ class CredentialUpdateRequest(BaseModel):
 class ForgotPasscodeRequest(BaseModel):
     email: str = "uponly.in@gmail.com"
 
+class LoginRequest(BaseModel):
+    user_id: str
+    passcode: str
+
+@router.post("/login")
+def login(req: LoginRequest) -> Dict[str, Any]:
+    """Validate executive user ID and passcode strictly."""
+    if req.user_id == DEFAULT_CREDENTIALS["user_id"] and req.passcode == DEFAULT_CREDENTIALS["passcode"]:
+        return {
+            "status": "authenticated",
+            "message": "Login successful.",
+            "user_id": req.user_id
+        }
+    raise HTTPException(status_code=401, detail="Access Denied: Invalid User ID or Security Passcode.")
+
 @router.get("/credentials")
 def get_credentials() -> Dict[str, Any]:
     """Retrieve active executive User ID & mask passcode."""
