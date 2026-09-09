@@ -288,15 +288,38 @@ body {
   background: #0e0f14;
 }
 
+.footer-btn-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.footer-btn-row .footer-btn {
+  flex: 1;
+  text-align: center;
+}
+
 .footer-btn {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.footer-btn.primary-admin {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.footer-btn.primary-admin:hover {
+  background: rgba(59, 130, 246, 0.25);
 }
 
 .footer-btn:hover {

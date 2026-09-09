@@ -470,11 +470,15 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Settings Modal Triggers
-  btnOpenSettings.onclick = () => {
+  const btnOpenAdminSettings = document.getElementById("btn-open-admin-settings");
+  const openSettingsHandler = () => {
     settingUserId.value = activeUserId;
     settingPasscode.value = activePasscode;
     settingsModal.classList.add("active");
   };
+
+  btnOpenSettings.onclick = openSettingsHandler;
+  if (btnOpenAdminSettings) btnOpenAdminSettings.onclick = openSettingsHandler;
   btnCloseSettingsModal.onclick = () => settingsModal.classList.remove("active");
 
   settingsForm.addEventListener("submit", (e) => {
