@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional
 class WorkflowStep(BaseModel):
     step_id: str
     agent_name: str
-    action_type: str
+    action_type: str = "execute"
     params: Dict[str, Any] = {}
     depends_on: List[str] = []
 
