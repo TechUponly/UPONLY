@@ -3,11 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UPONLY - Executive Chat & Autonomous Business OS</title>
+  <title>UPONLY - Executive Command Center & Autonomous OS</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- 1. LOGIN SCREEN OVERLAY -->
+  <div class="login-overlay active" id="login-screen">
+    <div class="login-box">
+      <div class="login-header">
+        <h1>UPONLY<span>.AI</span></h1>
+        <p>Enterprise Autonomous Business OS</p>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email">Executive Email / Username:</label>
+          <input type="text" id="login-email" value="uponly.in@gmail.com" placeholder="e.g. uponly.in@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Security Password / Passcode:</label>
+          <input type="password" id="login-password" value="••••••••••••" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn-login">Login to Command Center 🚀</button>
+      </form>
+      <div class="login-footer">
+        <span>Protected by TechUponly Identity Protocol</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
   <div class="layout-wrapper">
     <!-- LEFT NAVIGATION SIDEBAR -->
     <aside class="sidebar">
@@ -143,6 +169,18 @@
           <span class="status-badge idle" id="badge-analytics">IDLE</span>
         </button>
       </nav>
+
+      <!-- SIDEBAR FOOTER PROFILE & EXIT -->
+      <div class="sidebar-user-footer">
+        <div class="user-profile">
+          <span class="user-avatar">👤</span>
+          <div class="user-text">
+            <span class="user-name" id="user-display-name">TechUponly</span>
+            <span class="user-role">Administrator</span>
+          </div>
+        </div>
+        <button class="btn-exit-sidebar" id="btn-sidebar-exit" title="Exit Platform Session">🚪 Exit</button>
+      </div>
     </aside>
 
     <!-- MAIN CONTENT AREA -->
@@ -151,10 +189,12 @@
       <header class="top-header">
         <div class="header-title">
           <h1>Executive Command Hub</h1>
-          <span class="engine-tag">Powered by Claude 3.5 Sonnet Engine</span>
+          <span class="engine-tag" id="current-engine-tag">Powered by Claude 3.5 Sonnet Engine</span>
         </div>
         <div class="header-right">
-          <button class="btn-header-plugin" id="btn-open-plugins">🔌 3rd Party Plugins Hub</button>
+          <button class="btn-header-plugin" id="btn-open-plugins">🔌 Plugins</button>
+          <button class="btn-header-settings" id="btn-open-settings">⚙️ Settings</button>
+          <button class="btn-header-exit" id="btn-header-exit">🚪 Exit</button>
           <span class="live-pulse"></span>
           <span class="api-status">API Port 8000 Active</span>
         </div>
@@ -201,10 +241,45 @@
           <h3>Live Executive Action Stream</h3>
         </div>
         <div class="console-box" id="console-output">
-          <div class="log-line system">[SYSTEM INITIALIZED] Business Head Ready to Direct Fleet & Custom Agents...</div>
+          <div class="log-line system">[SYSTEM INITIALIZED] Session Authenticated. Business Head Ready...</div>
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- 2. SETTINGS MODAL -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content modal-form-box">
+      <div class="modal-header">
+        <h2>⚙️ Platform Settings & Configurations</h2>
+        <button class="btn-close-modal" id="btn-close-settings-modal">✖ Close</button>
+      </div>
+      <form id="settings-form" class="settings-form">
+        <div class="form-group">
+          <label for="setting-llm-provider">Primary LLM Provider Engine:</label>
+          <select id="setting-llm-provider">
+            <option value="anthropic">Anthropic Claude 3.5 Sonnet (Peak Reasoning - Recommended)</option>
+            <option value="gemini">Google Gemini 1.5 Pro</option>
+            <option value="openai">OpenAI GPT-4o</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="setting-api-key">Anthropic API Key:</label>
+          <input type="password" id="setting-api-key" placeholder="sk-ant-api03-..." value="••••••••••••••••••••••••">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="setting-api-port">Backend API Port:</label>
+            <input type="number" id="setting-api-port" value="8000">
+          </div>
+          <div class="form-group">
+            <label for="setting-dashboard-port">Dashboard Port:</label>
+            <input type="number" id="setting-dashboard-port" value="8090">
+          </div>
+        </div>
+        <button type="submit" class="btn-dispatch">Save Settings ✓</button>
+      </form>
+    </div>
   </div>
 
   <!-- EXPANDABLE FULLSCREEN MODAL -->
@@ -283,7 +358,7 @@
       <p class="plugin-subtitle">Enable high-throughput vector memory, Playwright headless crawlers, and fintech connectors for peak performance.</p>
 
       <div class="plugin-grid" id="plugin-grid-list">
-        <!-- Dynamic Plugin Cards Rendered Here -->
+        <!-- Dynamic Plugin Cards -->
       </div>
     </div>
   </div>

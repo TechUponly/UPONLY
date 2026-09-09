@@ -20,6 +20,20 @@ document.addEventListener("DOMContentLoaded", () => {
   let expandedAgentId = null;
 
   // DOM Elements
+  const loginScreen = document.getElementById("login-screen");
+  const loginForm = document.getElementById("login-form");
+  const loginEmail = document.getElementById("login-email");
+  const userDisplayName = document.getElementById("user-display-name");
+
+  const btnHeaderExit = document.getElementById("btn-header-exit");
+  const btnSidebarExit = document.getElementById("btn-sidebar-exit");
+
+  const settingsModal = document.getElementById("settings-modal");
+  const btnOpenSettings = document.getElementById("btn-open-settings");
+  const btnCloseSettingsModal = document.getElementById("btn-close-settings-modal");
+  const settingsForm = document.getElementById("settings-form");
+  const currentEngineTag = document.getElementById("current-engine-tag");
+
   const agentNavList = document.getElementById("agent-nav-list");
   const directChatForm = document.getElementById("direct-chat-form");
   const chatInput = document.getElementById("chat-input");
@@ -62,6 +76,59 @@ document.addEventListener("DOMContentLoaded", () => {
     consoleOutput.scrollTop = consoleOutput.scrollHeight;
   }
 
+  // --- 1. LOGIN & AUTHENTICATION SESSION ---
+  function checkSession() {
+    const savedUser = localStorage.getItem("uponly_session_user");
+    if (savedUser) {
+      userDisplayName.textContent = savedUser.split("@")[0] || "TechUponly";
+      loginScreen.classList.remove("active");
+    } else {
+      loginScreen.classList.add("active");
+    }
+  }
+
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = loginEmail.value.trim() || "uponly.in@gmail.com";
+    localStorage.setItem("uponly_session_user", email);
+    userDisplayName.textContent = email.split("@")[0] || "TechUponly";
+    loginScreen.classList.remove("active");
+    log(`Executive Session Authenticated for '${email}'. Fleet Ready.`, "success");
+  });
+
+  // --- 2. EXIT & LOGOUT SESSION ---
+  function exitSession() {
+    if (confirm("Are you sure you want to exit the UPONLY session?")) {
+      localStorage.removeItem("uponly_session_user");
+      activeMonitors.clear();
+      renderGrid();
+      loginScreen.classList.add("active");
+      log("Executive Session Terminated.", "system");
+    }
+  }
+
+  btnHeaderExit.addEventListener("click", exitSession);
+  btnSidebarExit.addEventListener("click", exitSession);
+
+  // --- 3. SETTINGS MODAL ---
+  btnOpenSettings.addEventListener("click", () => {
+    settingsModal.classList.add("active");
+  });
+
+  btnCloseSettingsModal.addEventListener("click", () => {
+    settingsModal.classList.remove("active");
+  });
+
+  settingsForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const provider = document.getElementById("setting-llm-provider").value;
+    const providerName = provider === "anthropic" ? "Claude 3.5 Sonnet Engine" : provider === "gemini" ? "Gemini 1.5 Pro" : "GPT-4o Engine";
+    
+    currentEngineTag.textContent = `Powered by ${providerName}`;
+    settingsModal.classList.remove("active");
+    log(`Settings saved! Primary LLM set to '${providerName}'.`, "success");
+  });
+
   // Set Current Target Agent
   function setTargetAgent(agentKey) {
     currentTargetAgent = agentKey;
@@ -86,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Bind Sidebar Item Clicks
   function bindSidebarEvents() {
     document.querySelectorAll(".agent-nav-item").forEach(item => {
       item.onclick = () => setTargetAgent(item.dataset.agent);
@@ -165,7 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
       performingGrid.appendChild(tile);
     });
 
-    // Attach Grid Button Handlers
     document.querySelectorAll(".btn-tile.expand").forEach(btn => {
       btn.addEventListener("click", () => openModal(btn.dataset.agent));
     });
@@ -175,7 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Update Monitor Map
   function updateMonitor(agentId, actionText, progress, logLine) {
     if (!activeMonitors.has(agentId)) {
       activeMonitors.set(agentId, {
@@ -250,7 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnCloseModal.addEventListener("click", closeModal);
 
-  // --- DYNAMIC AGENT CREATOR ---
+  // Dynamic Agent Creator
   btnOpenCreateAgent.addEventListener("click", () => {
     createAgentModal.classList.add("active");
   });
@@ -268,10 +332,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const agentId = name.toLowerCase().replace(/[^a-z0-9]/g, "_");
 
-    // Add to Local Registry
     AGENT_REGISTRY[agentId] = { name: name, icon: icon, role: role };
 
-    // Dynamically append button to Left Navigation Sidebar
     const btn = document.createElement("button");
     btn.className = "agent-nav-item";
     btn.dataset.agent = agentId;
@@ -289,9 +351,8 @@ document.addEventListener("DOMContentLoaded", () => {
     agentNavList.prepend(btn);
     bindSidebarEvents();
 
-    log(`Created New Custom AI Agent: "${name}" (${icon})`, "success");
+    log(`Created Custom AI Agent: "${name}" (${icon})`, "success");
 
-    // Call REST API backend to register new agent
     try {
       await fetch("http://localhost:8000/agents/create", {
         method: "POST",
@@ -311,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
     createAgentForm.reset();
   });
 
-  // --- 3RD PARTY PLUGINS HUB ---
+  // 3rd Party Plugins Hub
   btnOpenPlugins.addEventListener("click", async () => {
     pluginModal.classList.add("active");
     await fetchPlugins();
@@ -421,12 +482,8 @@ document.addEventListener("DOMContentLoaded", () => {
     chatInput.value = "";
   });
 
-  // Initial State Setup
+  // Check Session on startup
+  checkSession();
   setTargetAgent("business_head");
   renderGrid();
-
-  setTimeout(() => {
-    chatInput.value = "Hire 2 Senior AI Engineers and audit Q4 financial P&L balance sheet";
-    directChatForm.dispatchEvent(new Event("submit"));
-  }, 800);
 });
