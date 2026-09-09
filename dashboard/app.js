@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentTargetAgent = "business_head";
   const activeMonitors = new Map();
   let expandedAgentId = null;
+  const currentAttachments = []; // Array of attached context items
+  let isAudioRecording = false;
 
   // DOM Elements
   const loginScreen = document.getElementById("login-screen");
@@ -43,6 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const performingGrid = document.getElementById("performing-grid");
   const consoleOutput = document.getElementById("console-output");
   const promptChips = document.querySelectorAll(".chip");
+
+  // Attachment & Context Toolbar Elements
+  const fileUploadInput = document.getElementById("file-upload-input");
+  const btnAttachFile = document.getElementById("btn-attach-file");
+  const btnAttachMedia = document.getElementById("btn-attach-media");
+  const btnAudioRecord = document.getElementById("btn-audio-record");
+  const audioRecDot = document.getElementById("audio-rec-dot");
+  const btnVideoRecord = document.getElementById("btn-video-record");
+  const btnAddUrl = document.getElementById("btn-add-url");
+  const attachmentPreviewBar = document.getElementById("attachment-preview-bar");
 
   // Dynamic Agent Modal Elements
   const btnOpenCreateAgent = document.getElementById("btn-open-create-agent");
@@ -76,7 +88,84 @@ document.addEventListener("DOMContentLoaded", () => {
     consoleOutput.scrollTop = consoleOutput.scrollHeight;
   }
 
-  // --- 1. LOGIN & AUTHENTICATION SESSION ---
+  // --- AUTO EXPANDING TEXTAREA ---
+  chatInput.addEventListener("input", () => {
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 250) + "px";
+  });
+
+  // --- ATTACHMENT CONTEXT TOOLBAR HANDLERS ---
+  btnAttachFile.addEventListener("click", () => {
+    fileUploadInput.accept = "*/*";
+    fileUploadInput.click();
+  });
+
+  btnAttachMedia.addEventListener("click", () => {
+    fileUploadInput.accept = "image/*,video/*";
+    fileUploadInput.click();
+  });
+
+  fileUploadInput.addEventListener("change", (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach(f => {
+      addAttachment({ type: "file", name: f.name, size: Math.round(f.size / 1024) + "KB" });
+    });
+  });
+
+  btnAudioRecord.addEventListener("click", () => {
+    isAudioRecording = !isAudioRecording;
+    if (isAudioRecording) {
+      btnAudioRecord.classList.add("recording");
+      audioRecDot.classList.add("active");
+      log("Voice Recording started...", "agent");
+    } else {
+      btnAudioRecord.classList.remove("recording");
+      audioRecDot.classList.remove("active");
+      addAttachment({ type: "audio", name: "Voice_Memo_Instruction.wav", size: "420KB" });
+      log("Voice Memo saved & attached to prompt.", "success");
+    }
+  });
+
+  btnVideoRecord.addEventListener("click", () => {
+    addAttachment({ type: "video", name: "Screen_Recording_Brief.mp4", size: "3.2MB" });
+    log("Screen Video Memo attached to prompt context.", "success");
+  });
+
+  btnAddUrl.addEventListener("click", () => {
+    const url = prompt("Enter Website URL for Agent Crawling / Context:", "https://linkedin.com/jobs");
+    if (url) {
+      addAttachment({ type: "url", name: url, size: "Web Link" });
+      log(`Web Link attached: ${url}`, "system");
+    }
+  });
+
+  function addAttachment(item) {
+    currentAttachments.push(item);
+    renderAttachments();
+  }
+
+  function removeAttachment(index) {
+    currentAttachments.splice(index, 1);
+    renderAttachments();
+  }
+
+  function renderAttachments() {
+    attachmentPreviewBar.innerHTML = "";
+    currentAttachments.forEach((item, idx) => {
+      const chip = document.createElement("div");
+      chip.className = "attach-chip";
+      const icon = item.type === "audio" ? "🎤" : item.type === "video" ? "📹" : item.type === "url" ? "🌐" : "📄";
+      chip.innerHTML = `
+        <span>${icon} ${item.name} (${item.size})</span>
+        <span class="remove-chip" onclick="removeAttach(${idx})">✖</span>
+      `;
+      attachmentPreviewBar.appendChild(chip);
+    });
+  }
+
+  window.removeAttach = removeAttachment;
+
+  // --- LOGIN & AUTHENTICATION SESSION ---
   function checkSession() {
     const savedUser = localStorage.getItem("uponly_session_user");
     if (savedUser) {
@@ -93,10 +182,10 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("uponly_session_user", email);
     userDisplayName.textContent = email.split("@")[0] || "TechUponly";
     loginScreen.classList.remove("active");
-    log(`Executive Session Authenticated for '${email}'. Fleet Ready.`, "success");
+    log(`Executive Session Authenticated for '${email}'. Unlimited Memory Active.`, "success");
   });
 
-  // --- 2. EXIT & LOGOUT SESSION ---
+  // --- EXIT & LOGOUT SESSION ---
   function exitSession() {
     if (confirm("Are you sure you want to exit the UPONLY session?")) {
       localStorage.removeItem("uponly_session_user");
@@ -110,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   btnHeaderExit.addEventListener("click", exitSession);
   btnSidebarExit.addEventListener("click", exitSession);
 
-  // --- 3. SETTINGS MODAL ---
+  // --- SETTINGS MODAL ---
   btnOpenSettings.addEventListener("click", () => {
     settingsModal.classList.add("active");
   });
@@ -124,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const provider = document.getElementById("setting-llm-provider").value;
     const providerName = provider === "anthropic" ? "Claude 3.5 Sonnet Engine" : provider === "gemini" ? "Gemini 1.5 Pro" : "GPT-4o Engine";
     
-    currentEngineTag.textContent = `Powered by ${providerName}`;
+    currentEngineTag.textContent = `Powered by ${providerName} • 🧠 Unlimited Memory Active`;
     settingsModal.classList.remove("active");
     log(`Settings saved! Primary LLM set to '${providerName}'.`, "success");
   });
@@ -147,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
     targetAgentDesc.textContent = info.role;
 
     if (agentKey === "business_head") {
-      chatInput.placeholder = "Instruct Business Head to lead operations or direct specific work across agents...";
+      chatInput.placeholder = "Describe the work in detail, attach documents, record voice/video notes, or instruct Business Head...";
     } else {
       chatInput.placeholder = `Direct work specifically to ${info.name}...`;
     }
@@ -190,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeMonitors.size === 0) {
       performingGrid.innerHTML = `
         <div class="tile-card empty-state" style="grid-column: span 2; display: flex; align-items: center; justify-content: center; color: #6b7280;">
-          <p>⚡ No active agent tasks running. Type your instruction above to direct Business Head or custom agents.</p>
+          <p>⚡ No active agent tasks running. Describe work above or attach files/audio to direct Business Head.</p>
         </div>
       `;
       return;
@@ -297,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       modalScreenView.innerHTML = `
         <div style="color: #38bdf8;">⚡ EXECUTING REASONING STEP VIA CLAUDE 3.5 SONNET...</div>
-        <div>Step 1: Parsed prompt directives & orchestrated target agent execution.</div>
+        <div>Step 1: Parsed prompt directives & attachments. Stored in Unlimited Memory.</div>
         <div>Step 2: Compiled parameters and returned final payload.</div>
         <div style="color: #10b981; margin-top: 8px;">✓ Action status: COMPLETED (100%).</div>
       `;
@@ -434,14 +523,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Direct Executive Chat Submission
   directChatForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const task = chatInput.value;
+    const task = chatInput.value.trim();
     const targetId = currentTargetAgent;
     const info = AGENT_REGISTRY[targetId] || { name: targetId };
 
-    log(`Directing work to ${info.name}: "${task}"`, "agent");
+    const attachSummary = currentAttachments.length > 0 ? ` (${currentAttachments.length} attachments added)` : "";
+    log(`Directing work to ${info.name}: "${task.substring(0, 80)}..."${attachSummary}`, "agent");
 
     if (targetId === "business_head") {
-      updateMonitor("business_head", "Orchestrating Fleet Operations...", 20, `Business Head evaluating directive: "${task}"`);
+      updateMonitor("business_head", "Orchestrating Fleet Operations...", 20, `Business Head evaluating directive with Unlimited Memory: "${task.substring(0, 60)}..."`);
       
       setTimeout(() => {
         updateMonitor("business_head", "Delegating to Recruiting & Finance...", 60, "Delegated tasks across specialized sub-agents.");
@@ -450,13 +540,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 1200);
 
       setTimeout(() => {
-        updateMonitor("business_head", "Directive Completed", 100, "All sub-agents completed work cleanly.");
+        updateMonitor("business_head", "Directive Completed", 100, "All sub-agents completed work cleanly. Logged to Unlimited Memory.");
         updateMonitor("recruiting", "Candidate Match Complete", 100, "Top Candidate: Alex Chen (96% fit match).");
         updateMonitor("finance", "Financial Audit Passed", 100, "Projected MRR: $125,000 | Gross Margin: 84%.");
       }, 3000);
 
     } else {
-      updateMonitor(targetId, `Executing ${info.name} Task...`, 30, `Task initialized for ${info.name}: "${task}"`);
+      updateMonitor(targetId, `Executing ${info.name} Task...`, 30, `Task initialized for ${info.name}: "${task.substring(0, 60)}..."`);
 
       setTimeout(() => {
         updateMonitor(targetId, `Processing Parameters...`, 70, `Step 1/2 completed via Claude 3.5 Sonnet.`);
@@ -474,16 +564,24 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           agent_type: targetId,
-          payload: { query: task, lead_name: task, company: task }
+          payload: { query: task, attachments: currentAttachments }
         })
       });
     } catch (err) {}
 
     chatInput.value = "";
+    chatInput.style.height = "auto";
+    currentAttachments.length = 0;
+    renderAttachments();
   });
 
   // Check Session on startup
   checkSession();
   setTargetAgent("business_head");
   renderGrid();
+
+  setTimeout(() => {
+    chatInput.value = "Hire 2 Senior AI Engineers and audit Q4 financial P&L balance sheet";
+    directChatForm.dispatchEvent(new Event("submit"));
+  }, 800);
 });

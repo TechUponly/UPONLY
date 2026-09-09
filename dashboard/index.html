@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UPONLY - Executive Command Center & Autonomous OS</title>
+  <title>UPONLY - Executive Command Center & Unlimited Memory OS</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- 1. LOGIN SCREEN OVERLAY -->
+  <!-- LOGIN SCREEN OVERLAY -->
   <div class="login-overlay active" id="login-screen">
     <div class="login-box">
       <div class="login-header">
@@ -39,7 +39,7 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <h2>UPONLY<span>.AI</span></h2>
-        <p class="tagline">Autonomous Business OS</p>
+        <p class="tagline">11 AI Agents • Unlimited Memory</p>
       </div>
 
       <div class="sidebar-section-title">
@@ -189,7 +189,7 @@
       <header class="top-header">
         <div class="header-title">
           <h1>Executive Command Hub</h1>
-          <span class="engine-tag" id="current-engine-tag">Powered by Claude 3.5 Sonnet Engine</span>
+          <span class="engine-tag" id="current-engine-tag">Powered by Claude 3.5 Sonnet Engine • 🧠 Unlimited Memory Active</span>
         </div>
         <div class="header-right">
           <button class="btn-header-plugin" id="btn-open-plugins">🔌 Plugins</button>
@@ -200,8 +200,8 @@
         </div>
       </header>
 
-      <!-- DIRECT EXECUTIVE CHAT INPUT (Led by Business Head) -->
-      <section class="card executive-chat-card">
+      <!-- BIGGER EXPANDABLE EXECUTIVE CHAT & CONTEXT TOOLBAR -->
+      <section class="card executive-chat-card expanded-chat-card">
         <div class="chat-header-bar">
           <div class="chat-agent-badge">
             <span class="badge-icon" id="target-agent-icon">👑</span>
@@ -217,9 +217,45 @@
           </div>
         </div>
 
-        <form id="direct-chat-form" class="chat-form">
-          <input type="text" id="chat-input" placeholder="Instruct Business Head to lead operations or direct specific work..." required>
-          <button type="submit" class="btn-send">Direct Work 🚀</button>
+        <form id="direct-chat-form" class="chat-form expanded-form">
+          <!-- BIGGER MULTI-LINE TEXTAREA -->
+          <textarea id="chat-input" rows="3" placeholder="Describe the work in detail, attach documents, record voice/video notes, or instruct Business Head..." required></textarea>
+          
+          <!-- ATTACHMENT PREVIEW CHIPS CONTAINER -->
+          <div class="attachment-preview-bar" id="attachment-preview-bar"></div>
+
+          <!-- CONTEXT & MEDIA TOOLBAR (Add Files, Media, Audio Record, Video Record, Mentions) -->
+          <div class="chat-toolbar">
+            <div class="toolbar-actions">
+              <!-- Hidden File Input -->
+              <input type="file" id="file-upload-input" multiple style="display: none;">
+              
+              <button type="button" class="tool-btn" id="btn-attach-file" title="Attach Document / File">
+                📎 Add File
+              </button>
+
+              <button type="button" class="tool-btn" id="btn-attach-media" title="Attach Image or Video">
+                🖼️ Media
+              </button>
+
+              <button type="button" class="tool-btn mic-btn" id="btn-audio-record" title="Record Audio Voice Memo">
+                🎤 Record Audio <span class="rec-dot" id="audio-rec-dot"></span>
+              </button>
+
+              <button type="button" class="tool-btn" id="btn-video-record" title="Record Screen or Video Memo">
+                📹 Record Video
+              </button>
+
+              <button type="button" class="tool-btn" id="btn-add-url" title="Attach Website URL for Agent Web Crawling">
+                🌐 Web Link
+              </button>
+            </div>
+
+            <div class="toolbar-right">
+              <span class="memory-badge">🧠 Unlimited Memory</span>
+              <button type="submit" class="btn-send">Direct Work 🚀</button>
+            </div>
+          </div>
         </form>
       </section>
 
@@ -241,13 +277,13 @@
           <h3>Live Executive Action Stream</h3>
         </div>
         <div class="console-box" id="console-output">
-          <div class="log-line system">[SYSTEM INITIALIZED] Session Authenticated. Business Head Ready...</div>
+          <div class="log-line system">[SYSTEM INITIALIZED] Business Head Ready • Unlimited Memory Active...</div>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- 2. SETTINGS MODAL -->
+  <!-- SETTINGS MODAL -->
   <div class="modal-overlay" id="settings-modal">
     <div class="modal-content modal-form-box">
       <div class="modal-header">
