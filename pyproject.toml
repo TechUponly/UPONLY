@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uponly"
+version = "1.0.0"
+description = "Autonomous Business Automation and AI Agent Platform"
+readme = "README.md"
+authors = [
+    { name = "TechUponly", email = "uponly.in@gmail.com" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "pyyaml>=6.0",
+    "requests>=2.31.0",
+    "websockets>=11.0",
+    "python-dotenv>=1.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/TechUponly/UPONLY"
+Repository = "https://github.com/TechUponly/UPONLY.git"

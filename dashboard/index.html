@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UPONLY - AI Agent & Business Automation Control Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-area">
+        <h1>UPONLY<span>.AI</span></h1>
+        <span class="badge">Business Automation OS</span>
+      </div>
+      <div class="status-indicator">
+        <span class="dot online"></span> API Server Active (Port 8000)
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Metrics Overview -->
+      <section class="metrics-grid">
+        <div class="card metric">
+          <h3>Active AI Agents</h3>
+          <p class="value" id="active-agents-count">4</p>
+          <span class="sub">Sales, Ops, Support, Analytics</span>
+        </div>
+        <div class="card metric">
+          <h3>Automated Workflows</h3>
+          <p class="value">99.8%</p>
+          <span class="sub">Success Rate</span>
+        </div>
+        <div class="card metric">
+          <h3>GitHub Status</h3>
+          <p class="value">Connected</p>
+          <span class="sub">TechUponly/UPONLY</span>
+        </div>
+      </section>
+
+      <!-- Agent Control Panel -->
+      <section class="card agent-panel">
+        <h2>Dispatch Autonomous Agent Task</h2>
+        <form id="task-form">
+          <div class="form-group">
+            <label for="agent-select">Select AI Agent:</label>
+            <select id="agent-select">
+              <option value="sales">Sales Agent (Outreach & Qualification)</option>
+              <option value="operations">Operations Agent (Process & Webhook Automation)</option>
+              <option value="support">Support Agent (24/7 Inquiry Resolution)</option>
+              <option value="analytics">Analytics Agent (Business KPI Reports)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-input">Task / Lead / Payload Information:</label>
+            <input type="text" id="task-input" placeholder="e.g. Qualify enterprise lead 'Acme Corp'" required>
+          </div>
+          <button type="submit" class="btn-primary">Execute Task</button>
+        </form>
+      </section>
+
+      <!-- Execution Console Log -->
+      <section class="card console-section">
+        <h2>Live Agent Execution Stream</h2>
+        <div class="console-box" id="console-output">
+          <div class="log-line system">[SYSTEM INITIALIZED] UPONLY AI Agent Engine ready...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
