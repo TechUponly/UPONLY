@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let expandedAgentId = null;
 
   // DOM Elements
-  const navItems = document.querySelectorAll(".agent-nav-item");
+  const agentNavList = document.getElementById("agent-nav-list");
   const directChatForm = document.getElementById("direct-chat-form");
   const chatInput = document.getElementById("chat-input");
   const targetAgentIcon = document.getElementById("target-agent-icon");
@@ -30,7 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const consoleOutput = document.getElementById("console-output");
   const promptChips = document.querySelectorAll(".chip");
 
-  // Modal Elements
+  // Dynamic Agent Modal Elements
+  const btnOpenCreateAgent = document.getElementById("btn-open-create-agent");
+  const createAgentModal = document.getElementById("create-agent-modal");
+  const btnCloseCreateModal = document.getElementById("btn-close-create-modal");
+  const createAgentForm = document.getElementById("create-agent-form");
+
+  // Plugin Modal Elements
+  const btnOpenPlugins = document.getElementById("btn-open-plugins");
+  const pluginModal = document.getElementById("plugin-modal");
+  const btnClosePluginModal = document.getElementById("btn-close-plugin-modal");
+  const pluginGridList = document.getElementById("plugin-grid-list");
+
+  // Expanded Fullscreen Modal Elements
   const expandModal = document.getElementById("expand-modal");
   const btnCloseModal = document.getElementById("btn-close-modal");
   const modalIcon = document.getElementById("modal-icon");
@@ -53,9 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Set Current Target Agent
   function setTargetAgent(agentKey) {
     currentTargetAgent = agentKey;
-    const info = AGENT_REGISTRY[agentKey] || AGENT_REGISTRY["business_head"];
+    const info = AGENT_REGISTRY[agentKey] || { name: agentKey, icon: "🤖", role: "Custom Dynamic AI Agent" };
 
-    navItems.forEach(item => {
+    document.querySelectorAll(".agent-nav-item").forEach(item => {
       if (item.dataset.agent === agentKey) {
         item.classList.add("active");
       } else {
@@ -74,12 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Sidebar Agent Item Selection
-  navItems.forEach(item => {
-    item.addEventListener("click", () => {
-      setTargetAgent(item.dataset.agent);
+  // Bind Sidebar Item Clicks
+  function bindSidebarEvents() {
+    document.querySelectorAll(".agent-nav-item").forEach(item => {
+      item.onclick = () => setTargetAgent(item.dataset.agent);
     });
-  });
+  }
+
+  bindSidebarEvents();
 
   // Quick Prompt Chips
   promptChips.forEach(chip => {
@@ -110,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeMonitors.size === 0) {
       performingGrid.innerHTML = `
         <div class="tile-card empty-state" style="grid-column: span 2; display: flex; align-items: center; justify-content: center; color: #6b7280;">
-          <p>⚡ No active agent tasks running. Type your instruction above to direct Business Head.</p>
+          <p>⚡ No active agent tasks running. Type your instruction above to direct Business Head or custom agents.</p>
         </div>
       `;
       return;
@@ -236,23 +250,140 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnCloseModal.addEventListener("click", closeModal);
 
+  // --- DYNAMIC AGENT CREATOR ---
+  btnOpenCreateAgent.addEventListener("click", () => {
+    createAgentModal.classList.add("active");
+  });
+
+  btnCloseCreateModal.addEventListener("click", () => {
+    createAgentModal.classList.remove("active");
+  });
+
+  createAgentForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("new-agent-name").value;
+    const icon = document.getElementById("new-agent-icon").value || "🤖";
+    const role = document.getElementById("new-agent-role").value;
+    const prompt = document.getElementById("new-agent-prompt").value;
+
+    const agentId = name.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+    // Add to Local Registry
+    AGENT_REGISTRY[agentId] = { name: name, icon: icon, role: role };
+
+    // Dynamically append button to Left Navigation Sidebar
+    const btn = document.createElement("button");
+    btn.className = "agent-nav-item";
+    btn.dataset.agent = agentId;
+    btn.innerHTML = `
+      <div class="nav-agent-info">
+        <span class="icon">${icon}</span>
+        <div class="nav-text">
+          <span class="name">${name}</span>
+          <span class="role">${role.substring(0, 20)}...</span>
+        </div>
+      </div>
+      <span class="status-badge idle" id="badge-${agentId}">IDLE</span>
+    `;
+
+    agentNavList.prepend(btn);
+    bindSidebarEvents();
+
+    log(`Created New Custom AI Agent: "${name}" (${icon})`, "success");
+
+    // Call REST API backend to register new agent
+    try {
+      await fetch("http://localhost:8000/agents/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agent_id: agentId,
+          name: name,
+          icon: icon,
+          role: role,
+          system_prompt: prompt
+        })
+      });
+    } catch (err) {}
+
+    createAgentModal.classList.remove("active");
+    setTargetAgent(agentId);
+    createAgentForm.reset();
+  });
+
+  // --- 3RD PARTY PLUGINS HUB ---
+  btnOpenPlugins.addEventListener("click", async () => {
+    pluginModal.classList.add("active");
+    await fetchPlugins();
+  });
+
+  btnClosePluginModal.addEventListener("click", () => {
+    pluginModal.classList.remove("active");
+  });
+
+  async function fetchPlugins() {
+    try {
+      const response = await fetch("http://localhost:8000/plugins/");
+      const data = await response.json();
+      renderPlugins(data.plugins);
+    } catch (err) {
+      renderPlugins([
+        { id: "vector_memory", name: "ChromaDB Vector Memory", category: "Memory & RAG", description: "Accelerates long-term agent memory retrieval.", status: "ACTIVE", icon: "🧠" },
+        { id: "web_crawler", name: "Playwright Headless Scraper", category: "Web Automation", description: "High-speed headless crawler for hiring & market data.", status: "ACTIVE", icon: "🌐" },
+        { id: "slack_bot", name: "Slack & WhatsApp Bot", category: "Messaging", description: "Sends live notifications & updates.", status: "ACTIVE", icon: "💬" }
+      ]);
+    }
+  }
+
+  function renderPlugins(plugins) {
+    pluginGridList.innerHTML = plugins.map(p => `
+      <div class="plugin-card">
+        <div>
+          <div class="plugin-card-header">
+            <span class="plugin-icon">${p.icon}</span>
+            <div>
+              <div class="plugin-name">${p.name}</div>
+              <div class="plugin-cat">${p.category}</div>
+            </div>
+          </div>
+          <p class="plugin-desc">${p.description}</p>
+        </div>
+        <div class="plugin-footer">
+          <span class="status-badge ${p.status === 'ACTIVE' ? 'working' : 'idle'}">${p.status}</span>
+          <button class="btn-toggle-plugin ${p.status === 'ACTIVE' ? 'active' : 'installed'}" onclick="togglePlugin('${p.id}')">
+            ${p.status === 'ACTIVE' ? 'Active ✓' : 'Activate'}
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.togglePlugin = async function(pluginId) {
+    try {
+      await fetch("http://localhost:8000/plugins/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plugin_id: pluginId })
+      });
+      await fetchPlugins();
+      log(`Toggled 3rd Party Plugin: ${pluginId}`, "system");
+    } catch (err) {}
+  };
+
   // Direct Executive Chat Submission
   directChatForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const task = chatInput.value;
     const targetId = currentTargetAgent;
-    const info = AGENT_REGISTRY[targetId];
+    const info = AGENT_REGISTRY[targetId] || { name: targetId };
 
     log(`Directing work to ${info.name}: "${task}"`, "agent");
 
-    // If directing Business Head, trigger Business Head + Sub-Agents simultaneously
     if (targetId === "business_head") {
       updateMonitor("business_head", "Orchestrating Fleet Operations...", 20, `Business Head evaluating directive: "${task}"`);
       
       setTimeout(() => {
-        updateMonitor("business_head", "Delegating to Recruiting & Finance...", 60, "Delegated tasks: Recruiting Agent -> Crawl Hiring Portals; Finance Agent -> Audit Budget");
-        
-        // Trigger Recruiting & Finance Monitors simultaneously
+        updateMonitor("business_head", "Delegating to Recruiting & Finance...", 60, "Delegated tasks across specialized sub-agents.");
         updateMonitor("recruiting", "Crawling hiring sites for AI talent...", 40, "Connecting to LinkedIn, Indeed & Greenhouse...");
         updateMonitor("finance", "Auditing revenue & budget allocation...", 50, "P&L verification in progress...");
       }, 1200);
@@ -264,7 +395,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 3000);
 
     } else {
-      // Direct Single Agent Execution
       updateMonitor(targetId, `Executing ${info.name} Task...`, 30, `Task initialized for ${info.name}: "${task}"`);
 
       setTimeout(() => {
@@ -277,7 +407,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 3000);
     }
 
-    // Call REST API backend
     try {
       await fetch("http://localhost:8000/agents/execute", {
         method: "POST",
@@ -287,9 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
           payload: { query: task, lead_name: task, company: task }
         })
       });
-    } catch (err) {
-      // Offline fallback
-    }
+    } catch (err) {}
 
     chatInput.value = "";
   });
@@ -298,7 +425,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setTargetAgent("business_head");
   renderGrid();
 
-  // Initial Demonstration Run
   setTimeout(() => {
     chatInput.value = "Hire 2 Senior AI Engineers and audit Q4 financial P&L balance sheet";
     directChatForm.dispatchEvent(new Event("submit"));

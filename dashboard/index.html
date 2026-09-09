@@ -13,10 +13,14 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <h2>UPONLY<span>.AI</span></h2>
-        <p class="tagline">11 AI Digital Employees</p>
+        <p class="tagline">Autonomous Business OS</p>
       </div>
 
-      <div class="sidebar-section-title">SPECIALIZED AGENT FLEET</div>
+      <div class="sidebar-section-title">
+        <span>SPECIALIZED AGENT FLEET</span>
+        <button class="btn-add-agent" id="btn-open-create-agent" title="Create Custom AI Agent">➕ Add Agent</button>
+      </div>
+
       <nav class="agent-nav" id="agent-nav-list">
         <button class="agent-nav-item active" data-agent="business_head">
           <div class="nav-agent-info">
@@ -147,9 +151,10 @@
       <header class="top-header">
         <div class="header-title">
           <h1>Executive Command Hub</h1>
-          <span class="engine-tag">Powered by Anthropic Claude 3.5 Sonnet Engine</span>
+          <span class="engine-tag">Powered by Claude 3.5 Sonnet Engine</span>
         </div>
         <div class="header-right">
+          <button class="btn-header-plugin" id="btn-open-plugins">🔌 3rd Party Plugins Hub</button>
           <span class="live-pulse"></span>
           <span class="api-status">API Port 8000 Active</span>
         </div>
@@ -196,7 +201,7 @@
           <h3>Live Executive Action Stream</h3>
         </div>
         <div class="console-box" id="console-output">
-          <div class="log-line system">[SYSTEM INITIALIZED] Business Head Ready to Direct 11-Agent Fleet...</div>
+          <div class="log-line system">[SYSTEM INITIALIZED] Business Head Ready to Direct Fleet & Custom Agents...</div>
         </div>
       </section>
     </main>
@@ -233,6 +238,52 @@
         <div class="modal-log-box" id="modal-log-box">
           <!-- Live log stream -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DYNAMIC AGENT CREATOR MODAL -->
+  <div class="modal-overlay" id="create-agent-modal">
+    <div class="modal-content modal-form-box">
+      <div class="modal-header">
+        <h2>➕ Create New Specialized AI Agent</h2>
+        <button class="btn-close-modal" id="btn-close-create-modal">✖ Close</button>
+      </div>
+      <form id="create-agent-form" class="create-agent-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="new-agent-name">Agent Name:</label>
+            <input type="text" id="new-agent-name" placeholder="e.g. Legal Advisory Specialist" required>
+          </div>
+          <div class="form-group">
+            <label for="new-agent-icon">Icon / Emoji:</label>
+            <input type="text" id="new-agent-icon" placeholder="e.g. ⚖️" value="🤖" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="new-agent-role">Agent Role / Title:</label>
+          <input type="text" id="new-agent-role" placeholder="e.g. Chief Corporate Legal Counsel & Compliance Advisor" required>
+        </div>
+        <div class="form-group">
+          <label for="new-agent-prompt">System Prompt / Instruction Directives:</label>
+          <textarea id="new-agent-prompt" rows="4" placeholder="Describe the personality, rules, and capabilities of this AI Agent..." required></textarea>
+        </div>
+        <button type="submit" class="btn-dispatch">Instantiate & Deploy Agent 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3RD PARTY PLUGINS HUB MODAL -->
+  <div class="modal-overlay" id="plugin-modal">
+    <div class="modal-content modal-plugin-box">
+      <div class="modal-header">
+        <h2>🔌 3rd-Party High Performance Plugins</h2>
+        <button class="btn-close-modal" id="btn-close-plugin-modal">✖ Close</button>
+      </div>
+      <p class="plugin-subtitle">Enable high-throughput vector memory, Playwright headless crawlers, and fintech connectors for peak performance.</p>
+
+      <div class="plugin-grid" id="plugin-grid-list">
+        <!-- Dynamic Plugin Cards Rendered Here -->
       </div>
     </div>
   </div>

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
+from agents.base_agent import BaseAgent
 from agents.sales_agent import SalesAgent
 from agents.operations_agent import OperationsAgent
 from agents.support_agent import SupportAgent
@@ -14,6 +15,22 @@ from agents.risk_agent import RiskAgent
 from agents.business_head_agent import BusinessHeadAgent
 
 router = APIRouter(prefix="/agents", tags=["Agents"])
+
+class CustomDynamicAgent(BaseAgent):
+    """Dynamic custom agent instantiated at runtime."""
+    def __init__(self, agent_id: str, name: str, role: str, system_prompt: str, tools: Optional[List[str]] = None):
+        super().__init__(name=name, role=role, system_prompt=system_prompt, tools=tools or ["webhook_connector"])
+        self.agent_id = agent_id
+
+    def execute_task(self, task_input: Dict[str, Any]) -> Dict[str, Any]:
+        query = task_input.get("query", f"Execute custom directive for {self.name}")
+        execution_result = self.runner.run(task_description=f"Task: {query}")
+        return {
+            "agent": self.name,
+            "status": "COMPLETED",
+            "task": query,
+            "execution_details": execution_result
+        }
 
 AGENTS_MAP = {
     "sales": SalesAgent(),
@@ -30,16 +47,51 @@ AGENTS_MAP = {
 }
 
 class AgentTaskRequest(BaseModel):
-    agent_type: str  # sales, operations, support, analytics, finance, content, video, recruiting, analyst, risk, business_head
+    agent_type: str
     payload: Dict[str, Any]
+
+class CreateAgentRequest(BaseModel):
+    agent_id: str
+    name: str
+    role: str
+    system_prompt: str
+    icon: Optional[str] = "🤖"
+    tools: Optional[List[str]] = []
 
 @router.get("/")
 def list_agents():
     return {
         "agents": [
-            {"id": key, "name": agent.name, "role": agent.role, "tools": agent.tools}
+            {"id": key, "name": agent.name, "role": agent.role, "tools": getattr(agent, "tools", [])}
             for key, agent in AGENTS_MAP.items()
         ]
+    }
+
+@router.post("/create")
+def create_new_agent(request: CreateAgentRequest):
+    agent_key = request.agent_id.lower().replace(" ", "_")
+    if agent_key in AGENTS_MAP:
+        raise HTTPException(status_code=400, detail=f"Agent ID '{agent_key}' already exists.")
+    
+    new_agent = CustomDynamicAgent(
+        agent_id=agent_key,
+        name=request.name,
+        role=request.role,
+        system_prompt=request.system_prompt,
+        tools=request.tools
+    )
+    
+    AGENTS_MAP[agent_key] = new_agent
+    return {
+        "status": "success",
+        "message": f"Agent '{request.name}' successfully created and added to fleet.",
+        "agent": {
+            "id": agent_key,
+            "name": request.name,
+            "role": request.role,
+            "icon": request.icon,
+            "tools": request.tools
+        }
     }
 
 @router.post("/execute")

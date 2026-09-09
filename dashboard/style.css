@@ -61,11 +61,31 @@ body {
 }
 
 .sidebar-section-title {
-  padding: 16px 20px 8px 20px;
+  padding: 16px 16px 8px 16px;
   font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-add-agent {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-agent:hover {
+  background: var(--accent-green);
+  color: black;
 }
 
 .agent-nav {
@@ -179,9 +199,26 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 13px;
   color: var(--text-muted);
+}
+
+.btn-header-plugin {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border: 1px solid var(--accent-blue);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-header-plugin:hover {
+  background: var(--accent-blue);
+  color: white;
 }
 
 .live-pulse {
@@ -561,4 +598,124 @@ body {
   font-size: 12px;
   flex: 1;
   overflow-y: auto;
+}
+
+/* CREATE AGENT FORM MODAL */
+.modal-form-box {
+  max-width: 600px;
+}
+
+.create-agent-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.form-group input, .form-group textarea {
+  padding: 10px;
+  background: #0b0f19;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+/* PLUGIN HUB MODAL */
+.modal-plugin-box {
+  max-width: 900px;
+}
+
+.plugin-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.plugin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.plugin-card {
+  background: #030712;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.plugin-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.plugin-icon {
+  font-size: 24px;
+}
+
+.plugin-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.plugin-cat {
+  font-size: 11px;
+  color: #818cf8;
+}
+
+.plugin-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.plugin-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid #1f2937;
+}
+
+.btn-toggle-plugin {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-toggle-plugin.active {
+  background: var(--accent-green);
+  color: black;
+}
+
+.btn-toggle-plugin.installed {
+  background: #374151;
+  color: white;
 }

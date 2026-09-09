@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config.settings import settings
 from api.routes_agents import router as agents_router
 from api.routes_workflows import router as workflows_router
+from api.routes_plugins import router as plugins_router
 from api.websocket_server import ws_manager
 
 app = FastAPI(
@@ -23,6 +24,7 @@ app.add_middleware(
 # Include API Routers
 app.include_router(agents_router)
 app.include_router(workflows_router)
+app.include_router(plugins_router)
 
 @app.get("/")
 def root():
@@ -35,7 +37,7 @@ def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "agents_active": 4, "uptime": "100%"}
+    return {"status": "healthy", "platform": "UPONLY AI OS", "uptime": "100%"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
