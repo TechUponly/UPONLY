@@ -1,24 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Agent Metadata Registry
+  // 11 Core Agents Registry with Avatars & Colors
   const AGENT_REGISTRY = {
-    business_head: { name: "Business Head", icon: "👑", role: "Chief Executive Orchestrator — Directing 11-Agent Fleet" },
-    finance: { name: "Finance Expert", icon: "💰", role: "Audit, P&L Balance Sheets & Cashflow Forecasts" },
-    content: { name: "Content Manager", icon: "📲", role: "Viral Social Copy & Multi-Platform Campaigns" },
-    video: { name: "Video & Animator", icon: "🎬", role: "Commercial Promo Scripts & Motion Storyboards" },
-    recruiting: { name: "Talent Acquisition", icon: "🤝", role: "Crawl Hiring Sites & Screen Candidate Resumes" },
-    analyst: { name: "Lead Analyst", icon: "📊", role: "Market Intelligence & Cohort LTV Modeling" },
-    risk: { name: "Risk & Compliance", icon: "🛡️", role: "Security Vulnerabilities & Legal Contract Audits" },
-    sales: { name: "Sales Agent", icon: "📈", role: "Lead Qualification & B2B Proposal Drafts" },
-    operations: { name: "Operations Agent", icon: "⚙️", role: "Process Automation & Webhook Integration" },
-    support: { name: "Support Agent", icon: "🎧", role: "24/7 Customer Inquiry & Ticket Resolution" },
-    analytics: { name: "Analytics Agent", icon: "📉", role: "Operational KPIs & Executive ROI Tracking" }
+    business_head: { name: "Business Head", avatar: "🔴", color: "red", role: "Chief Executive Orchestrator", snippet: "v2 in progress: text over real B-roll..." },
+    video: { name: "video creator", avatar: "🔵", color: "blue", role: "Multimedia & Motion Graphics Director", snippet: "v2 is building on the bank B-roll..." },
+    content: { name: "Content Writer", avatar: "🟤", color: "brown", role: "Viral Social & Copy Strategist", snippet: "Message from video creator..." },
+    recruiting: { name: "Talent Acquisition", avatar: "🟢", color: "green", role: "Crawl Hiring Portals & Screen Resumes", snippet: "Waiting for you: Verify @Up..." },
+    analyst: { name: "Analyst", avatar: "🔴", color: "red", role: "Market Intelligence & Cohort Modeling", snippet: "Message from Business Head..." },
+    support: { name: "email response", avatar: "🟣", color: "purple", role: "24/7 Customer Ticket Resolution", snippet: "No problem. I'll leave the w..." },
+    finance: { name: "Finance", avatar: "💖", color: "pink", role: "P&L Audit & Revenue Forecasting", snippet: "Message from Business Head..." },
+    operations: { name: "Operations", avatar: "🟢", color: "green", role: "Webhook Sync & SOP Automation", snippet: "Message from Business Head..." },
+    sales: { name: "sales", avatar: "🔵", color: "blue", role: "Lead Qualification & B2B Proposals", snippet: "What do you want me on first?" },
+    risk: { name: "Risk & Compliance", avatar: "🟠", color: "orange", role: "Security & Contract Compliance Audit", snippet: "Security audit complete..." },
+    analytics: { name: "Analytics Agent", avatar: "🟡", color: "yellow", role: "Operational KPIs & Executive Reports", snippet: "Weekly KPI summary ready..." }
   };
 
   // State Management
-  let currentTargetAgent = "business_head";
-  const activeMonitors = new Map();
-  let expandedAgentId = null;
-  const currentAttachments = []; // Array of attached context items
+  let activeAgentKey = "business_head";
+  const agentHistories = new Map();
+  const currentAttachments = [];
   let isAudioRecording = false;
 
   // DOM Elements
@@ -27,125 +26,214 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginEmail = document.getElementById("login-email");
   const userDisplayName = document.getElementById("user-display-name");
 
-  const btnHeaderExit = document.getElementById("btn-header-exit");
-  const btnSidebarExit = document.getElementById("btn-sidebar-exit");
+  const agentSearchInput = document.getElementById("agent-search-input");
+  const fleetList = document.getElementById("agent-fleet-list");
+  
+  const chatHeaderAvatar = document.getElementById("chat-header-avatar");
+  const chatHeaderTitle = document.getElementById("chat-header-title");
+  const chatHeaderRole = document.getElementById("chat-header-role");
+  const currentEngineTag = document.getElementById("current-engine-tag");
+  const chatThread = document.getElementById("chat-thread");
+  const attachmentPreviewBar = document.getElementById("attachment-preview-bar");
 
+  const chatInput = document.getElementById("chat-input");
+  const btnSendMessage = document.getElementById("btn-send-message");
+
+  // Context Menu Elements
+  const btnContextMenu = document.getElementById("btn-context-menu");
+  const contextMenuPopup = document.getElementById("context-menu-popup");
+  const fileUploadInput = document.getElementById("file-upload-input");
+
+  const menuItemMedia = document.getElementById("menu-item-media");
+  const menuItemAudio = document.getElementById("menu-item-audio");
+  const menuItemVideo = document.getElementById("menu-item-video");
+  const menuItemMentions = document.getElementById("menu-item-mentions");
+  const menuItemBrowser = document.getElementById("menu-item-browser");
+  const btnAudioRecord = document.getElementById("btn-audio-record");
+
+  // Right Pane Elements
+  const monitorTitle = document.getElementById("monitor-title");
+  const canvasHeaderText = document.getElementById("canvas-header-text");
+  const canvasBodyText = document.getElementById("canvas-body-text");
+  const gridProgressFill = document.getElementById("grid-progress-fill");
+  const btnExpandScreen = document.getElementById("btn-expand-screen");
+
+  // Modals
   const settingsModal = document.getElementById("settings-modal");
   const btnOpenSettings = document.getElementById("btn-open-settings");
   const btnCloseSettingsModal = document.getElementById("btn-close-settings-modal");
-  const settingsForm = document.getElementById("settings-form");
-  const currentEngineTag = document.getElementById("current-engine-tag");
 
-  const agentNavList = document.getElementById("agent-nav-list");
-  const directChatForm = document.getElementById("direct-chat-form");
-  const chatInput = document.getElementById("chat-input");
-  const targetAgentIcon = document.getElementById("target-agent-icon");
-  const targetAgentName = document.getElementById("target-agent-name");
-  const targetAgentDesc = document.getElementById("target-agent-desc");
-  const performingGrid = document.getElementById("performing-grid");
-  const consoleOutput = document.getElementById("console-output");
-  const promptChips = document.querySelectorAll(".chip");
-
-  // Attachment & Context Toolbar Elements
-  const fileUploadInput = document.getElementById("file-upload-input");
-  const btnAttachFile = document.getElementById("btn-attach-file");
-  const btnAttachMedia = document.getElementById("btn-attach-media");
-  const btnAudioRecord = document.getElementById("btn-audio-record");
-  const audioRecDot = document.getElementById("audio-rec-dot");
-  const btnVideoRecord = document.getElementById("btn-video-record");
-  const btnAddUrl = document.getElementById("btn-add-url");
-  const attachmentPreviewBar = document.getElementById("attachment-preview-bar");
-
-  // Dynamic Agent Modal Elements
   const btnOpenCreateAgent = document.getElementById("btn-open-create-agent");
   const createAgentModal = document.getElementById("create-agent-modal");
   const btnCloseCreateModal = document.getElementById("btn-close-create-modal");
-  const createAgentForm = document.getElementById("create-agent-form");
 
-  // Plugin Modal Elements
   const btnOpenPlugins = document.getElementById("btn-open-plugins");
   const pluginModal = document.getElementById("plugin-modal");
   const btnClosePluginModal = document.getElementById("btn-close-plugin-modal");
-  const pluginGridList = document.getElementById("plugin-grid-list");
 
-  // Expanded Fullscreen Modal Elements
   const expandModal = document.getElementById("expand-modal");
   const btnCloseModal = document.getElementById("btn-close-modal");
-  const modalIcon = document.getElementById("modal-icon");
-  const modalTitle = document.getElementById("modal-title");
-  const modalActionText = document.getElementById("modal-action-text");
-  const modalProgressFill = document.getElementById("modal-progress-fill");
-  const modalScreenView = document.getElementById("modal-screen-view");
-  const modalLogBox = document.getElementById("modal-log-box");
 
-  // Logging Helper
-  function log(message, type = "system") {
-    const div = document.createElement("div");
-    div.className = `log-line ${type}`;
-    const timestamp = new Date().toLocaleTimeString();
-    div.textContent = `[${timestamp}] ${message}`;
-    consoleOutput.appendChild(div);
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+  // --- INITIALIZE AGENT HISTORIES (Matching Reference Screenshot) ---
+  function initHistories() {
+    // Populate Business Head history as seen in reference screenshot
+    agentHistories.set("business_head", [
+      {
+        role: "agent",
+        content: "Cartesia is loaded via API (connector still session-based).\n\nBFSI cut with mentor VO: <span class='code-tag'>/workspace/youtube-week1/cuts/bfsi-upgrade/short-with-vo.mp4</span> (~23.5s)\nVoice: calm professional (Zander). Please rotate that API key when free — it was pasted in chat.\n\nSilent kinetic version still at <span class='code-tag'>short.mp4</span> if you prefer.",
+        hasVideo: true
+      },
+      { role: "system", content: "Messaged 🔵 video creator" },
+      {
+        role: "agent",
+        content: "Play that and tell me if the voice fits — we can swap voice or push a LinkedIn company post next."
+      },
+      { role: "system", content: "2 messages with 🔵 video creator" },
+      { role: "user", content: "its not good , visual is mostly empty" },
+      { role: "user", content: "no brand logo" },
+      {
+        role: "agent",
+        content: "Fair. Rebuilding denser — less empty black, and UPONLY + Bharat Co-op logos on screen."
+      },
+      { role: "system", content: "Messaged 🔵 video creator" },
+      {
+        role: "agent",
+        content: "v2 in progress: text over real B-roll (not empty black) + both brand logos on open and close. I'll send the new file when it's ready."
+      }
+    ]);
+
+    // Populate Video Creator history
+    agentHistories.set("video", [
+      { role: "agent", content: "v2 is building on the bank B-roll with audio track synced." },
+      { role: "user", content: "Ensure logo is crisp on startup." }
+    ]);
   }
 
-  // --- AUTO EXPANDING TEXTAREA ---
-  chatInput.addEventListener("input", () => {
-    chatInput.style.height = "auto";
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 250) + "px";
+  // Render Thread Messages for Active Agent
+  function renderThread(agentKey) {
+    chatThread.innerHTML = "";
+    const messages = agentHistories.get(agentKey) || [
+      { role: "agent", content: `Hello! I am ${AGENT_REGISTRY[agentKey]?.name || agentKey}. How can I assist your operations today?` }
+    ];
+
+    messages.forEach(msg => {
+      if (msg.role === "system") {
+        const pill = document.createElement("div");
+        pill.className = "system-pill";
+        pill.innerHTML = msg.content;
+        chatThread.appendChild(pill);
+      } else {
+        const row = document.createElement("div");
+        row.className = `chat-bubble-row ${msg.role}`;
+        
+        let htmlContent = `<div class="bubble">${msg.content}</div>`;
+        
+        // Add Rich Video Card if present (matching screenshot)
+        if (msg.hasVideo) {
+          htmlContent += `
+            <div class="media-card-widget">
+              <div class="video-preview-thumbnail">
+                <div class="play-btn">▶</div>
+                <div style="position: absolute; bottom: 8px; left: 12px; font-size: 11px;">Banking is evolving. (0:23)</div>
+              </div>
+            </div>
+          `;
+        }
+
+        row.innerHTML = htmlContent;
+        chatThread.appendChild(row);
+      }
+    });
+
+    chatThread.scrollTop = chatThread.scrollHeight;
+  }
+
+  // Switch Active Agent Selection
+  function selectAgent(agentKey) {
+    activeAgentKey = agentKey;
+    const info = AGENT_REGISTRY[agentKey] || { name: agentKey, avatar: "🤖", role: "AI Specialist" };
+
+    chatHeaderAvatar.textContent = info.avatar;
+    chatHeaderTitle.textContent = info.name;
+    chatHeaderRole.textContent = info.role;
+    chatInput.placeholder = `Message ${info.name}...`;
+
+    monitorTitle.textContent = `${info.name}'s screen`;
+    canvasHeaderText.textContent = `${info.avatar} ${info.name} Performing Monitor`;
+
+    document.querySelectorAll(".agent-card").forEach(card => {
+      if (card.dataset.agent === agentKey) {
+        card.classList.add("active");
+      } else {
+        card.classList.remove("active");
+      }
+    });
+
+    renderThread(agentKey);
+  }
+
+  // Bind Agent Fleet Card Clicks
+  function bindFleetClicks() {
+    document.querySelectorAll(".agent-card").forEach(card => {
+      card.onclick = () => selectAgent(card.dataset.agent);
+    });
+  }
+
+  // Agent Search Filtering
+  agentSearchInput.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll(".agent-card").forEach(card => {
+      const name = card.querySelector(".agent-title").textContent.toLowerCase();
+      if (name.includes(q)) {
+        card.style.display = "flex";
+      } else {
+        card.style.display = "none";
+      }
+    });
   });
 
-  // --- ATTACHMENT CONTEXT TOOLBAR HANDLERS ---
-  btnAttachFile.addEventListener("click", () => {
-    fileUploadInput.accept = "*/*";
-    fileUploadInput.click();
+  // Toggle Context Popup Menu (Add Context + button)
+  btnContextMenu.addEventListener("click", (e) => {
+    e.stopPropagation();
+    contextMenuPopup.classList.toggle("active");
   });
 
-  btnAttachMedia.addEventListener("click", () => {
-    fileUploadInput.accept = "image/*,video/*";
+  document.addEventListener("click", () => {
+    contextMenuPopup.classList.remove("active");
+  });
+
+  // Context Menu Item Handlers
+  menuItemMedia.addEventListener("click", () => {
+    fileUploadInput.accept = "image/*,video/*,*/*";
     fileUploadInput.click();
   });
 
   fileUploadInput.addEventListener("change", (e) => {
-    const files = Array.from(e.target.files);
-    files.forEach(f => {
-      addAttachment({ type: "file", name: f.name, size: Math.round(f.size / 1024) + "KB" });
+    Array.from(e.target.files).forEach(f => {
+      addAttachment({ type: "file", name: f.name });
     });
   });
 
-  btnAudioRecord.addEventListener("click", () => {
-    isAudioRecording = !isAudioRecording;
-    if (isAudioRecording) {
-      btnAudioRecord.classList.add("recording");
-      audioRecDot.classList.add("active");
-      log("Voice Recording started...", "agent");
-    } else {
-      btnAudioRecord.classList.remove("recording");
-      audioRecDot.classList.remove("active");
-      addAttachment({ type: "audio", name: "Voice_Memo_Instruction.wav", size: "420KB" });
-      log("Voice Memo saved & attached to prompt.", "success");
-    }
+  menuItemAudio.addEventListener("click", () => {
+    addAttachment({ type: "audio", name: "Voice_Memo_Audio.mp4" });
   });
 
-  btnVideoRecord.addEventListener("click", () => {
-    addAttachment({ type: "video", name: "Screen_Recording_Brief.mp4", size: "3.2MB" });
-    log("Screen Video Memo attached to prompt context.", "success");
+  menuItemVideo.addEventListener("click", () => {
+    addAttachment({ type: "video", name: "Screen_Recording.mp4" });
   });
 
-  btnAddUrl.addEventListener("click", () => {
-    const url = prompt("Enter Website URL for Agent Crawling / Context:", "https://linkedin.com/jobs");
-    if (url) {
-      addAttachment({ type: "url", name: url, size: "Web Link" });
-      log(`Web Link attached: ${url}`, "system");
-    }
+  menuItemMentions.addEventListener("click", () => {
+    chatInput.value += " @video ";
+    chatInput.focus();
+  });
+
+  menuItemBrowser.addEventListener("click", () => {
+    const url = prompt("Enter Web URL for agent to crawl:", "https://linkedin.com/jobs");
+    if (url) addAttachment({ type: "url", name: url });
   });
 
   function addAttachment(item) {
     currentAttachments.push(item);
-    renderAttachments();
-  }
-
-  function removeAttachment(index) {
-    currentAttachments.splice(index, 1);
     renderAttachments();
   }
 
@@ -154,434 +242,107 @@ document.addEventListener("DOMContentLoaded", () => {
     currentAttachments.forEach((item, idx) => {
       const chip = document.createElement("div");
       chip.className = "attach-chip";
-      const icon = item.type === "audio" ? "🎤" : item.type === "video" ? "📹" : item.type === "url" ? "🌐" : "📄";
-      chip.innerHTML = `
-        <span>${icon} ${item.name} (${item.size})</span>
-        <span class="remove-chip" onclick="removeAttach(${idx})">✖</span>
-      `;
+      chip.innerHTML = `<span>📎 ${item.name}</span><span class="remove-chip" onclick="removeAttach(${idx})">✖</span>`;
       attachmentPreviewBar.appendChild(chip);
     });
   }
 
-  window.removeAttach = removeAttachment;
-
-  // --- LOGIN & AUTHENTICATION SESSION ---
-  function checkSession() {
-    const savedUser = localStorage.getItem("uponly_session_user");
-    if (savedUser) {
-      userDisplayName.textContent = savedUser.split("@")[0] || "TechUponly";
-      loginScreen.classList.remove("active");
-    } else {
-      loginScreen.classList.add("active");
-    }
-  }
-
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = loginEmail.value.trim() || "uponly.in@gmail.com";
-    localStorage.setItem("uponly_session_user", email);
-    userDisplayName.textContent = email.split("@")[0] || "TechUponly";
-    loginScreen.classList.remove("active");
-    log(`Executive Session Authenticated for '${email}'. Unlimited Memory Active.`, "success");
-  });
-
-  // --- EXIT & LOGOUT SESSION ---
-  function exitSession() {
-    if (confirm("Are you sure you want to exit the UPONLY session?")) {
-      localStorage.removeItem("uponly_session_user");
-      activeMonitors.clear();
-      renderGrid();
-      loginScreen.classList.add("active");
-      log("Executive Session Terminated.", "system");
-    }
-  }
-
-  btnHeaderExit.addEventListener("click", exitSession);
-  btnSidebarExit.addEventListener("click", exitSession);
-
-  // --- SETTINGS MODAL ---
-  btnOpenSettings.addEventListener("click", () => {
-    settingsModal.classList.add("active");
-  });
-
-  btnCloseSettingsModal.addEventListener("click", () => {
-    settingsModal.classList.remove("active");
-  });
-
-  settingsForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const provider = document.getElementById("setting-llm-provider").value;
-    const providerName = provider === "anthropic" ? "Claude 3.5 Sonnet Engine" : provider === "gemini" ? "Gemini 1.5 Pro" : "GPT-4o Engine";
-    
-    currentEngineTag.textContent = `Powered by ${providerName} • 🧠 Unlimited Memory Active`;
-    settingsModal.classList.remove("active");
-    log(`Settings saved! Primary LLM set to '${providerName}'.`, "success");
-  });
-
-  // Set Current Target Agent
-  function setTargetAgent(agentKey) {
-    currentTargetAgent = agentKey;
-    const info = AGENT_REGISTRY[agentKey] || { name: agentKey, icon: "🤖", role: "Custom Dynamic AI Agent" };
-
-    document.querySelectorAll(".agent-nav-item").forEach(item => {
-      if (item.dataset.agent === agentKey) {
-        item.classList.add("active");
-      } else {
-        item.classList.remove("active");
-      }
-    });
-
-    targetAgentIcon.textContent = info.icon;
-    targetAgentName.textContent = info.name;
-    targetAgentDesc.textContent = info.role;
-
-    if (agentKey === "business_head") {
-      chatInput.placeholder = "Describe the work in detail, attach documents, record voice/video notes, or instruct Business Head...";
-    } else {
-      chatInput.placeholder = `Direct work specifically to ${info.name}...`;
-    }
-  }
-
-  function bindSidebarEvents() {
-    document.querySelectorAll(".agent-nav-item").forEach(item => {
-      item.onclick = () => setTargetAgent(item.dataset.agent);
-    });
-  }
-
-  bindSidebarEvents();
-
-  // Quick Prompt Chips
-  promptChips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      chatInput.value = chip.dataset.prompt;
-      directChatForm.dispatchEvent(new Event("submit"));
-    });
-  });
-
-  // Set Agent Badge Working/Idle State
-  function setAgentState(agentId, isWorking) {
-    const badge = document.getElementById(`badge-${agentId}`);
-    if (badge) {
-      if (isWorking) {
-        badge.className = "status-badge working";
-        badge.textContent = "● WORKING";
-      } else {
-        badge.className = "status-badge idle";
-        badge.textContent = "IDLE";
-      }
-    }
-  }
-
-  // Render 2x2 Grid Tiles
-  function renderGrid() {
-    performingGrid.innerHTML = "";
-
-    if (activeMonitors.size === 0) {
-      performingGrid.innerHTML = `
-        <div class="tile-card empty-state" style="grid-column: span 2; display: flex; align-items: center; justify-content: center; color: #6b7280;">
-          <p>⚡ No active agent tasks running. Describe work above or attach files/audio to direct Business Head.</p>
-        </div>
-      `;
-      return;
-    }
-
-    activeMonitors.forEach((data, agentId) => {
-      const info = AGENT_REGISTRY[agentId] || { name: agentId, icon: "🤖" };
-      const tile = document.createElement("div");
-      tile.className = "tile-card";
-
-      tile.innerHTML = `
-        <div class="tile-header">
-          <div class="tile-agent-title">
-            <span>${info.icon}</span>
-            <span>${info.name}</span>
-            <span class="status-badge ${data.isWorking ? 'working' : 'idle'}">${data.isWorking ? '● WORKING' : 'DONE'}</span>
-          </div>
-          <div class="tile-controls">
-            <button class="btn-tile expand" data-agent="${agentId}">⛶ Expand</button>
-            <button class="btn-tile exit" data-agent="${agentId}">✖ Exit</button>
-          </div>
-        </div>
-
-        <div class="screen-box">
-          <div class="action-bar">
-            <span>ACTION: ${data.actionText}</span>
-            <span>${data.progress}%</span>
-          </div>
-          <div class="progress-mini">
-            <div class="progress-mini-fill" style="width: ${data.progress}%"></div>
-          </div>
-          <div class="action-output-stream" id="stream-${agentId}">
-            ${data.streamLogs.map(l => `<div>> ${l}</div>`).join('')}
-          </div>
-        </div>
-      `;
-
-      performingGrid.appendChild(tile);
-    });
-
-    document.querySelectorAll(".btn-tile.expand").forEach(btn => {
-      btn.addEventListener("click", () => openModal(btn.dataset.agent));
-    });
-
-    document.querySelectorAll(".btn-tile.exit").forEach(btn => {
-      btn.addEventListener("click", () => removeMonitor(btn.dataset.agent));
-    });
-  }
-
-  function updateMonitor(agentId, actionText, progress, logLine) {
-    if (!activeMonitors.has(agentId)) {
-      activeMonitors.set(agentId, {
-        isWorking: true,
-        actionText: actionText,
-        progress: progress,
-        streamLogs: []
-      });
-    }
-
-    const item = activeMonitors.get(agentId);
-    item.isWorking = progress < 100;
-    item.actionText = actionText;
-    item.progress = progress;
-    if (logLine) item.streamLogs.push(logLine);
-
-    setAgentState(agentId, progress < 100);
-    renderGrid();
-
-    if (expandedAgentId === agentId) {
-      updateModalView(agentId);
-    }
-  }
-
-  function removeMonitor(agentId) {
-    activeMonitors.delete(agentId);
-    setAgentState(agentId, false);
-    renderGrid();
-    if (expandedAgentId === agentId) closeModal();
-  }
-
-  function openModal(agentId) {
-    expandedAgentId = agentId;
-    updateModalView(agentId);
-    expandModal.classList.add("active");
-  }
-
-  function updateModalView(agentId) {
-    const info = AGENT_REGISTRY[agentId] || { name: agentId, icon: "🤖" };
-    const data = activeMonitors.get(agentId) || { actionText: "Idle", progress: 0, streamLogs: [] };
-
-    modalIcon.textContent = info.icon;
-    modalTitle.textContent = `${info.name} Agent`;
-    modalActionText.textContent = data.actionText;
-    modalProgressFill.style.width = `${data.progress}%`;
-
-    if (agentId === "recruiting") {
-      modalScreenView.innerHTML = `
-        <div style="color: #38bdf8;">🌐 CRAWLING HIRING PORTALS & SOCIAL NETWORKS...</div>
-        <div>[CONNECTED] https://linkedin.com/jobs/search?q=AI+Engineer</div>
-        <div>[CONNECTED] https://indeed.com/viewjob?jk=90218</div>
-        <div>[CONNECTED] https://greenhouse.io/api/v1/jobs</div>
-        <div style="color: #10b981; margin-top: 8px;">✓ Parsed candidate profiles. Matched 2 Senior AI Engineers (>90% fit).</div>
-      `;
-    } else {
-      modalScreenView.innerHTML = `
-        <div style="color: #38bdf8;">⚡ EXECUTING REASONING STEP VIA CLAUDE 3.5 SONNET...</div>
-        <div>Step 1: Parsed prompt directives & attachments. Stored in Unlimited Memory.</div>
-        <div>Step 2: Compiled parameters and returned final payload.</div>
-        <div style="color: #10b981; margin-top: 8px;">✓ Action status: COMPLETED (100%).</div>
-      `;
-    }
-
-    modalLogBox.innerHTML = data.streamLogs.map(l => `<div style="color: #9ca3af; margin-bottom: 4px;">> ${l}</div>`).join('');
-    modalLogBox.scrollTop = modalLogBox.scrollHeight;
-  }
-
-  function closeModal() {
-    expandedAgentId = null;
-    expandModal.classList.remove("active");
-  }
-
-  btnCloseModal.addEventListener("click", closeModal);
-
-  // Dynamic Agent Creator
-  btnOpenCreateAgent.addEventListener("click", () => {
-    createAgentModal.classList.add("active");
-  });
-
-  btnCloseCreateModal.addEventListener("click", () => {
-    createAgentModal.classList.remove("active");
-  });
-
-  createAgentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("new-agent-name").value;
-    const icon = document.getElementById("new-agent-icon").value || "🤖";
-    const role = document.getElementById("new-agent-role").value;
-    const prompt = document.getElementById("new-agent-prompt").value;
-
-    const agentId = name.toLowerCase().replace(/[^a-z0-9]/g, "_");
-
-    AGENT_REGISTRY[agentId] = { name: name, icon: icon, role: role };
-
-    const btn = document.createElement("button");
-    btn.className = "agent-nav-item";
-    btn.dataset.agent = agentId;
-    btn.innerHTML = `
-      <div class="nav-agent-info">
-        <span class="icon">${icon}</span>
-        <div class="nav-text">
-          <span class="name">${name}</span>
-          <span class="role">${role.substring(0, 20)}...</span>
-        </div>
-      </div>
-      <span class="status-badge idle" id="badge-${agentId}">IDLE</span>
-    `;
-
-    agentNavList.prepend(btn);
-    bindSidebarEvents();
-
-    log(`Created Custom AI Agent: "${name}" (${icon})`, "success");
-
-    try {
-      await fetch("http://localhost:8000/agents/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agent_id: agentId,
-          name: name,
-          icon: icon,
-          role: role,
-          system_prompt: prompt
-        })
-      });
-    } catch (err) {}
-
-    createAgentModal.classList.remove("active");
-    setTargetAgent(agentId);
-    createAgentForm.reset();
-  });
-
-  // 3rd Party Plugins Hub
-  btnOpenPlugins.addEventListener("click", async () => {
-    pluginModal.classList.add("active");
-    await fetchPlugins();
-  });
-
-  btnClosePluginModal.addEventListener("click", () => {
-    pluginModal.classList.remove("active");
-  });
-
-  async function fetchPlugins() {
-    try {
-      const response = await fetch("http://localhost:8000/plugins/");
-      const data = await response.json();
-      renderPlugins(data.plugins);
-    } catch (err) {
-      renderPlugins([
-        { id: "vector_memory", name: "ChromaDB Vector Memory", category: "Memory & RAG", description: "Accelerates long-term agent memory retrieval.", status: "ACTIVE", icon: "🧠" },
-        { id: "web_crawler", name: "Playwright Headless Scraper", category: "Web Automation", description: "High-speed headless crawler for hiring & market data.", status: "ACTIVE", icon: "🌐" },
-        { id: "slack_bot", name: "Slack & WhatsApp Bot", category: "Messaging", description: "Sends live notifications & updates.", status: "ACTIVE", icon: "💬" }
-      ]);
-    }
-  }
-
-  function renderPlugins(plugins) {
-    pluginGridList.innerHTML = plugins.map(p => `
-      <div class="plugin-card">
-        <div>
-          <div class="plugin-card-header">
-            <span class="plugin-icon">${p.icon}</span>
-            <div>
-              <div class="plugin-name">${p.name}</div>
-              <div class="plugin-cat">${p.category}</div>
-            </div>
-          </div>
-          <p class="plugin-desc">${p.description}</p>
-        </div>
-        <div class="plugin-footer">
-          <span class="status-badge ${p.status === 'ACTIVE' ? 'working' : 'idle'}">${p.status}</span>
-          <button class="btn-toggle-plugin ${p.status === 'ACTIVE' ? 'active' : 'installed'}" onclick="togglePlugin('${p.id}')">
-            ${p.status === 'ACTIVE' ? 'Active ✓' : 'Activate'}
-          </button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  window.togglePlugin = async function(pluginId) {
-    try {
-      await fetch("http://localhost:8000/plugins/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plugin_id: pluginId })
-      });
-      await fetchPlugins();
-      log(`Toggled 3rd Party Plugin: ${pluginId}`, "system");
-    } catch (err) {}
+  window.removeAttach = function(idx) {
+    currentAttachments.splice(idx, 1);
+    renderAttachments();
   };
 
-  // Direct Executive Chat Submission
-  directChatForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const task = chatInput.value.trim();
-    const targetId = currentTargetAgent;
-    const info = AGENT_REGISTRY[targetId] || { name: targetId };
+  // Send Chat Message Handler
+  function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text && currentAttachments.length === 0) return;
 
-    const attachSummary = currentAttachments.length > 0 ? ` (${currentAttachments.length} attachments added)` : "";
-    log(`Directing work to ${info.name}: "${task.substring(0, 80)}..."${attachSummary}`, "agent");
+    const list = agentHistories.get(activeAgentKey) || [];
+    list.push({ role: "user", content: text });
 
-    if (targetId === "business_head") {
-      updateMonitor("business_head", "Orchestrating Fleet Operations...", 20, `Business Head evaluating directive with Unlimited Memory: "${task.substring(0, 60)}..."`);
-      
-      setTimeout(() => {
-        updateMonitor("business_head", "Delegating to Recruiting & Finance...", 60, "Delegated tasks across specialized sub-agents.");
-        updateMonitor("recruiting", "Crawling hiring sites for AI talent...", 40, "Connecting to LinkedIn, Indeed & Greenhouse...");
-        updateMonitor("finance", "Auditing revenue & budget allocation...", 50, "P&L verification in progress...");
-      }, 1200);
-
-      setTimeout(() => {
-        updateMonitor("business_head", "Directive Completed", 100, "All sub-agents completed work cleanly. Logged to Unlimited Memory.");
-        updateMonitor("recruiting", "Candidate Match Complete", 100, "Top Candidate: Alex Chen (96% fit match).");
-        updateMonitor("finance", "Financial Audit Passed", 100, "Projected MRR: $125,000 | Gross Margin: 84%.");
-      }, 3000);
-
-    } else {
-      updateMonitor(targetId, `Executing ${info.name} Task...`, 30, `Task initialized for ${info.name}: "${task.substring(0, 60)}..."`);
-
-      setTimeout(() => {
-        updateMonitor(targetId, `Processing Parameters...`, 70, `Step 1/2 completed via Claude 3.5 Sonnet.`);
-      }, 1500);
-
-      setTimeout(() => {
-        updateMonitor(targetId, `Task Completed Successfully`, 100, `Final Output generated cleanly.`);
-        log(`Execution Completed for ${info.name}!`, "success");
-      }, 3000);
-    }
-
-    try {
-      await fetch("http://localhost:8000/agents/execute", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agent_type: targetId,
-          payload: { query: task, attachments: currentAttachments }
-        })
-      });
-    } catch (err) {}
-
+    // Render immediately
+    renderThread(activeAgentKey);
     chatInput.value = "";
     chatInput.style.height = "auto";
     currentAttachments.length = 0;
     renderAttachments();
+
+    // Trigger Screen Monitor Animation
+    canvasBodyText.innerHTML = `> Executing Claude 3.5 Sonnet step for ${activeAgentKey}...<br>> Directing parameters & tool calls.`;
+    gridProgressFill.style.width = "40%";
+
+    // Backend Execution Call
+    fetch("http://localhost:8000/agents/execute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        agent_type: activeAgentKey,
+        payload: { query: text }
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      gridProgressFill.style.width = "100%";
+      canvasBodyText.innerHTML = `✓ Action Completed cleanly.<br>> Output: ${data.status || 'COMPLETED'}`;
+
+      list.push({
+        role: "agent",
+        content: `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: ${data.status || 'COMPLETED'}`
+      });
+
+      renderThread(activeAgentKey);
+    })
+    .catch(() => {
+      gridProgressFill.style.width = "100%";
+      list.push({
+        role: "agent",
+        content: `Executed instruction for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Action completed.`
+      });
+      renderThread(activeAgentKey);
+    });
+  }
+
+  btnSendMessage.addEventListener("click", sendMessage);
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   });
 
-  // Check Session on startup
-  checkSession();
-  setTargetAgent("business_head");
-  renderGrid();
+  // Session Login/Logout
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = loginEmail.value || "uponly.in@gmail.com";
+    localStorage.setItem("uponly_session_user", email);
+    userDisplayName.textContent = email.split("@")[0] || "sham rai";
+    loginScreen.classList.remove("active");
+  });
 
-  setTimeout(() => {
-    chatInput.value = "Hire 2 Senior AI Engineers and audit Q4 financial P&L balance sheet";
-    directChatForm.dispatchEvent(new Event("submit"));
-  }, 800);
+  document.getElementById("btn-sidebar-exit").onclick = () => {
+    localStorage.removeItem("uponly_session_user");
+    loginScreen.classList.add("active");
+  };
+
+  // Modals & Settings
+  btnOpenSettings.onclick = () => settingsModal.classList.add("active");
+  btnCloseSettingsModal.onclick = () => settingsModal.classList.remove("active");
+
+  btnOpenCreateAgent.onclick = () => createAgentModal.classList.add("active");
+  btnCloseCreateModal.onclick = () => createAgentModal.classList.remove("active");
+
+  btnOpenPlugins.onclick = () => pluginModal.classList.add("active");
+  btnClosePluginModal.onclick = () => pluginModal.classList.remove("active");
+
+  btnExpandScreen.onclick = () => expandModal.classList.add("active");
+  btnCloseModal.onclick = () => expandModal.classList.remove("active");
+
+  // Init
+  initHistories();
+  bindFleetClicks();
+  selectAgent("business_head");
+
+  if (localStorage.getItem("uponly_session_user")) {
+    loginScreen.classList.remove("active");
+  }
 });

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UPONLY - Executive Command Center & Unlimited Memory OS</title>
+  <title>UPONLY - Autonomous Business OS & Agent Hub</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- LOGIN SCREEN OVERLAY -->
+  <!-- LOGIN OVERLAY -->
   <div class="login-overlay active" id="login-screen">
     <div class="login-box">
       <div class="login-header">
@@ -22,10 +22,10 @@
           <input type="text" id="login-email" value="uponly.in@gmail.com" placeholder="e.g. uponly.in@gmail.com" required>
         </div>
         <div class="form-group">
-          <label for="login-password">Security Password / Passcode:</label>
-          <input type="password" id="login-password" value="••••••••••••" placeholder="Enter password" required>
+          <label for="login-password">Security Passcode:</label>
+          <input type="password" id="login-password" value="••••••••••••" placeholder="Enter passcode" required>
         </div>
-        <button type="submit" class="btn-login">Login to Command Center 🚀</button>
+        <button type="submit" class="btn-login">Login to Command Hub 🚀</button>
       </form>
       <div class="login-footer">
         <span>Protected by TechUponly Identity Protocol</span>
@@ -33,254 +33,305 @@
     </div>
   </div>
 
-  <!-- MAIN APP CONTAINER -->
-  <div class="layout-wrapper">
-    <!-- LEFT NAVIGATION SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <h2>UPONLY<span>.AI</span></h2>
-        <p class="tagline">11 AI Agents • Unlimited Memory</p>
-      </div>
-
-      <div class="sidebar-section-title">
-        <span>SPECIALIZED AGENT FLEET</span>
-        <button class="btn-add-agent" id="btn-open-create-agent" title="Create Custom AI Agent">➕ Add Agent</button>
-      </div>
-
-      <nav class="agent-nav" id="agent-nav-list">
-        <button class="agent-nav-item active" data-agent="business_head">
-          <div class="nav-agent-info">
-            <span class="icon">👑</span>
-            <div class="nav-text">
-              <span class="name">Business Head</span>
-              <span class="role">Executive Leader</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-business_head">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="finance">
-          <div class="nav-agent-info">
-            <span class="icon">💰</span>
-            <div class="nav-text">
-              <span class="name">Finance Expert</span>
-              <span class="role">Audit & Cashflow</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-finance">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="content">
-          <div class="nav-agent-info">
-            <span class="icon">📲</span>
-            <div class="nav-text">
-              <span class="name">Content Manager</span>
-              <span class="role">Viral Social Copy</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-content">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="video">
-          <div class="nav-agent-info">
-            <span class="icon">🎬</span>
-            <div class="nav-text">
-              <span class="name">Video & Animator</span>
-              <span class="role">Scripts & Motion</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-video">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="recruiting">
-          <div class="nav-agent-info">
-            <span class="icon">🤝</span>
-            <div class="nav-text">
-              <span class="name">Talent Acquisition</span>
-              <span class="role">Hiring & Sourcing</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-recruiting">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="analyst">
-          <div class="nav-agent-info">
-            <span class="icon">📊</span>
-            <div class="nav-text">
-              <span class="name">Lead Analyst</span>
-              <span class="role">Market & Cohorts</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-analyst">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="risk">
-          <div class="nav-agent-info">
-            <span class="icon">🛡️</span>
-            <div class="nav-text">
-              <span class="name">Risk & Compliance</span>
-              <span class="role">Security & Audit</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-risk">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="sales">
-          <div class="nav-agent-info">
-            <span class="icon">📈</span>
-            <div class="nav-text">
-              <span class="name">Sales Agent</span>
-              <span class="role">Leads & Proposals</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-sales">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="operations">
-          <div class="nav-agent-info">
-            <span class="icon">⚙️</span>
-            <div class="nav-text">
-              <span class="name">Operations Agent</span>
-              <span class="role">Webhooks & SOP</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-operations">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="support">
-          <div class="nav-agent-info">
-            <span class="icon">🎧</span>
-            <div class="nav-text">
-              <span class="name">Support Agent</span>
-              <span class="role">24/7 Resolution</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-support">IDLE</span>
-        </button>
-
-        <button class="agent-nav-item" data-agent="analytics">
-          <div class="nav-agent-info">
-            <span class="icon">📉</span>
-            <div class="nav-text">
-              <span class="name">Analytics Agent</span>
-              <span class="role">Executive KPIs</span>
-            </div>
-          </div>
-          <span class="status-badge idle" id="badge-analytics">IDLE</span>
-        </button>
-      </nav>
-
-      <!-- SIDEBAR FOOTER PROFILE & EXIT -->
-      <div class="sidebar-user-footer">
-        <div class="user-profile">
-          <span class="user-avatar">👤</span>
-          <div class="user-text">
-            <span class="user-name" id="user-display-name">TechUponly</span>
-            <span class="user-role">Administrator</span>
-          </div>
+  <!-- 3-PANE LAYOUT CONTAINER -->
+  <div class="three-pane-container">
+    
+    <!-- PANE 1: LEFT SIDEBAR (AGENT FLEET & NAVIGATION) -->
+    <aside class="left-pane">
+      <div class="pane-header">
+        <div class="brand">
+          <span class="logo-text">UPONLY<span>.AI</span></span>
         </div>
-        <button class="btn-exit-sidebar" id="btn-sidebar-exit" title="Exit Platform Session">🚪 Exit</button>
+        <button class="btn-icon-add" id="btn-open-create-agent" title="Create New Custom Agent">+</button>
+      </div>
+
+      <!-- Agent Search Input -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="agent-search-input" placeholder="Search agents...">
+      </div>
+
+      <!-- Agent List -->
+      <div class="agent-fleet-list" id="agent-fleet-list">
+        
+        <div class="agent-card active" data-agent="business_head">
+          <div class="agent-avatar red">🔴</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Business Head</span>
+              <span class="agent-time">1:22 PM</span>
+            </div>
+            <div class="agent-snippet">v2 in progress: text over real B-roll...</div>
+          </div>
+          <span class="dot-unread" id="badge-business_head"></span>
+        </div>
+
+        <div class="agent-card" data-agent="video">
+          <div class="agent-avatar blue">🔵</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">video creator</span>
+              <span class="agent-time">1:18 PM</span>
+            </div>
+            <div class="agent-snippet">v2 is building on the bank B-roll...</div>
+          </div>
+          <span class="dot-unread" id="badge-video"></span>
+        </div>
+
+        <div class="agent-card" data-agent="content">
+          <div class="agent-avatar brown">🟤</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Content Writer</span>
+              <span class="agent-time">12:45 PM</span>
+            </div>
+            <div class="agent-snippet">Message from video creator...</div>
+          </div>
+          <span class="dot-unread" id="badge-content"></span>
+        </div>
+
+        <div class="agent-card" data-agent="recruiting">
+          <div class="agent-avatar green">🟢</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Talent Acquisition</span>
+              <span class="agent-time">11:30 AM</span>
+            </div>
+            <div class="agent-snippet">Waiting for you: Verify @Up...</div>
+          </div>
+          <span class="dot-unread" id="badge-recruiting"></span>
+        </div>
+
+        <div class="agent-card" data-agent="analyst">
+          <div class="agent-avatar red">🔴</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Analyst</span>
+              <span class="agent-time">10:15 AM</span>
+            </div>
+            <div class="agent-snippet">Message from Business Head...</div>
+          </div>
+          <span class="dot-unread" id="badge-analyst"></span>
+        </div>
+
+        <div class="agent-card" data-agent="support">
+          <div class="agent-avatar purple">🟣</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">email response</span>
+              <span class="agent-time">9:40 AM</span>
+            </div>
+            <div class="agent-snippet">No problem. I'll leave the w...</div>
+          </div>
+          <span class="dot-unread" id="badge-support"></span>
+        </div>
+
+        <div class="agent-card" data-agent="finance">
+          <div class="agent-avatar pink">💖</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Finance</span>
+              <span class="agent-time">Yesterday</span>
+            </div>
+            <div class="agent-snippet">Message from Business Head...</div>
+          </div>
+          <span class="dot-unread" id="badge-finance"></span>
+        </div>
+
+        <div class="agent-card" data-agent="operations">
+          <div class="agent-avatar green">🟢</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Operations</span>
+              <span class="agent-time">9/2</span>
+            </div>
+            <div class="agent-snippet">Message from Business Head...</div>
+          </div>
+          <span class="dot-unread" id="badge-operations"></span>
+        </div>
+
+        <div class="agent-card" data-agent="sales">
+          <div class="agent-avatar blue">🔵</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">sales</span>
+              <span class="agent-time">9/2</span>
+            </div>
+            <div class="agent-snippet">What do you want me on first?</div>
+          </div>
+          <span class="dot-unread" id="badge-sales"></span>
+        </div>
+
+        <div class="agent-card" data-agent="risk">
+          <div class="agent-avatar orange">🟠</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Risk & Compliance</span>
+              <span class="agent-time">9/1</span>
+            </div>
+            <div class="agent-snippet">Security audit complete...</div>
+          </div>
+          <span class="dot-unread" id="badge-risk"></span>
+        </div>
+
+        <div class="agent-card" data-agent="analytics">
+          <div class="agent-avatar yellow">🟡</div>
+          <div class="agent-details">
+            <div class="agent-top">
+              <span class="agent-title">Analytics Agent</span>
+              <span class="agent-time">8/30</span>
+            </div>
+            <div class="agent-snippet">Weekly KPI summary ready...</div>
+          </div>
+          <span class="dot-unread" id="badge-analytics"></span>
+        </div>
+
+      </div>
+
+      <!-- Left Sidebar Footer -->
+      <div class="left-pane-footer">
+        <button class="footer-btn" id="btn-open-plugins">🔌 Plugins</button>
+        <div class="user-info-row">
+          <span class="avatar-circle">SR</span>
+          <span class="user-handle" id="user-display-name">sham rai</span>
+          <button class="btn-exit-icon" id="btn-sidebar-exit" title="Logout Session">🚪</button>
+        </div>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
-    <main class="main-body">
-      <!-- TOP HEADER -->
-      <header class="top-header">
-        <div class="header-title">
-          <h1>Executive Command Hub</h1>
-          <span class="engine-tag" id="current-engine-tag">Powered by Claude 3.5 Sonnet Engine • 🧠 Unlimited Memory Active</span>
-        </div>
-        <div class="header-right">
-          <button class="btn-header-plugin" id="btn-open-plugins">🔌 Plugins</button>
-          <button class="btn-header-settings" id="btn-open-settings">⚙️ Settings</button>
-          <button class="btn-header-exit" id="btn-header-exit">🚪 Exit</button>
-          <span class="live-pulse"></span>
-          <span class="api-status">API Port 8000 Active</span>
-        </div>
-      </header>
-
-      <!-- BIGGER EXPANDABLE EXECUTIVE CHAT & CONTEXT TOOLBAR -->
-      <section class="card executive-chat-card expanded-chat-card">
-        <div class="chat-header-bar">
-          <div class="chat-agent-badge">
-            <span class="badge-icon" id="target-agent-icon">👑</span>
-            <div>
-              <h3 id="target-agent-name">Business Head</h3>
-              <span class="target-desc" id="target-agent-desc">Chief Executive Orchestrator — Directing the 11-Agent Fleet</span>
-            </div>
-          </div>
-          <div class="quick-prompts">
-            <button class="chip" data-prompt="Crawl LinkedIn, Indeed & Greenhouse to hire Senior AI Engineers">🤝 Hire Engineers</button>
-            <button class="chip" data-prompt="Audit Q4 financial P&L balance sheet and forecast revenue">💰 Audit P&L</button>
-            <button class="chip" data-prompt="Formulate multi-channel product launch strategy across all agents">👑 Launch Strategy</button>
+    <!-- PANE 2: CENTER MAIN CHAT HUB -->
+    <main class="center-pane">
+      <!-- Active Agent Header -->
+      <div class="chat-header">
+        <div class="chat-agent-info">
+          <span class="agent-avatar red" id="chat-header-avatar">🔴</span>
+          <div>
+            <h2 id="chat-header-title">Business Head</h2>
+            <span class="chat-header-role" id="chat-header-role">Chief Executive Orchestrator</span>
           </div>
         </div>
+        <div class="server-status-pill">
+          <span class="status-dot"></span>
+          <span id="current-engine-tag">Claude 3.5 Sonnet Connected</span>
+          <button class="btn-settings-icon" id="btn-open-settings" title="Settings">⚙️</button>
+        </div>
+      </div>
 
-        <form id="direct-chat-form" class="chat-form expanded-form">
-          <!-- BIGGER MULTI-LINE TEXTAREA -->
-          <textarea id="chat-input" rows="3" placeholder="Describe the work in detail, attach documents, record voice/video notes, or instruct Business Head..." required></textarea>
+      <!-- Chat Thread Message Stream -->
+      <div class="chat-thread" id="chat-thread">
+        <!-- Messages rendered dynamically -->
+      </div>
+
+      <!-- Attachment Preview Chips Bar -->
+      <div class="attachment-preview-bar" id="attachment-preview-bar"></div>
+
+      <!-- Floating Bottom Chat Input Bar -->
+      <div class="floating-chat-bar">
+        <!-- Add Context Dropdown Button -->
+        <div class="add-context-container">
+          <button class="btn-add-context" id="btn-context-menu" title="Add Context">+</button>
           
-          <!-- ATTACHMENT PREVIEW CHIPS CONTAINER -->
-          <div class="attachment-preview-bar" id="attachment-preview-bar"></div>
+          <!-- Context Popup Menu -->
+          <div class="context-popup-menu" id="context-menu-popup">
+            <div class="menu-title">Add Context</div>
+            <button class="menu-item" id="menu-item-media">
+              <span class="item-icon">🖼️</span> Media / Upload File
+            </button>
+            <button class="menu-item" id="menu-item-audio">
+              <span class="item-icon">🎤</span> Audio Voice Memo
+            </button>
+            <button class="menu-item" id="menu-item-video">
+              <span class="item-icon">📹</span> Video Memo / Screen
+            </button>
+            <button class="menu-item" id="menu-item-mentions">
+              <span class="item-icon">@</span> Mentions / Tag Agent
+            </button>
+            <button class="menu-item" id="menu-item-browser">
+              <span class="item-icon">🌐</span> Browser / Web Link
+            </button>
+          </div>
+        </div>
 
-          <!-- CONTEXT & MEDIA TOOLBAR (Add Files, Media, Audio Record, Video Record, Mentions) -->
-          <div class="chat-toolbar">
-            <div class="toolbar-actions">
-              <!-- Hidden File Input -->
-              <input type="file" id="file-upload-input" multiple style="display: none;">
-              
-              <button type="button" class="tool-btn" id="btn-attach-file" title="Attach Document / File">
-                📎 Add File
-              </button>
+        <!-- Hidden File Input -->
+        <input type="file" id="file-upload-input" multiple style="display: none;">
 
-              <button type="button" class="tool-btn" id="btn-attach-media" title="Attach Image or Video">
-                🖼️ Media
-              </button>
+        <textarea id="chat-input" rows="1" placeholder="Message Business Head..." required></textarea>
 
-              <button type="button" class="tool-btn mic-btn" id="btn-audio-record" title="Record Audio Voice Memo">
-                🎤 Record Audio <span class="rec-dot" id="audio-rec-dot"></span>
-              </button>
+        <button type="button" class="btn-mic" id="btn-audio-record" title="Record Audio Voice Memo">🎤</button>
+        <button type="submit" class="btn-send-chat" id="btn-send-message" title="Send Message">🚀</button>
+      </div>
+    </main>
 
-              <button type="button" class="tool-btn" id="btn-video-record" title="Record Screen or Video Memo">
-                📹 Record Video
-              </button>
+    <!-- PANE 3: RIGHT SIDEBAR (LIVE PERFORMING SCREEN & ROUTINES) -->
+    <aside class="right-pane">
+      
+      <!-- Top Screen Player Monitor Box -->
+      <div class="screen-monitor-card">
+        <div class="monitor-top-bar">
+          <span class="monitor-title" id="monitor-title">Business Head's screen</span>
+          <div class="monitor-actions">
+            <button class="btn-mon-action" id="btn-expand-screen" title="Expand Fullscreen">⛶</button>
+          </div>
+        </div>
 
-              <button type="button" class="tool-btn" id="btn-add-url" title="Attach Website URL for Agent Web Crawling">
-                🌐 Web Link
-              </button>
+        <div class="screen-display-box" id="screen-display-box">
+          <div class="screen-canvas-preview">
+            <div class="canvas-header" id="canvas-header-text">🔴 Business Head Performing Action</div>
+            <div class="canvas-body" id="canvas-body-text">
+              > Executing Claude 3.5 Sonnet XML Reasoning Step 1...<br>
+              > Directing sub-agents: Video Creator, Content Writer, Finance.
             </div>
-
-            <div class="toolbar-right">
-              <span class="memory-badge">🧠 Unlimited Memory</span>
-              <button type="submit" class="btn-send">Direct Work 🚀</button>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="grid-progress-fill"></div>
             </div>
           </div>
-        </form>
-      </section>
+        </div>
+      </div>
 
-      <!-- 2x2 LIVE PERFORMING AGENT MONITOR GRID -->
-      <section class="performing-section">
-        <div class="section-title-bar">
-          <h3>2x2 LIVE PERFORMING MONITOR GRID</h3>
-          <span class="subtitle">Shows live action screens for active agents</span>
+      <!-- Routines & Automated Workflows Section -->
+      <div class="routines-section">
+        <div class="routines-header">
+          <h3>Routines</h3>
+          <button class="btn-add-routine" id="btn-add-routine" title="Add Automated Routine">+</button>
         </div>
 
-        <div class="monitor-grid-2x2" id="performing-grid">
-          <!-- Live tiles rendered dynamically -->
-        </div>
-      </section>
+        <div class="routines-list" id="routines-list">
+          <div class="routine-card">
+            <span class="routine-dot active">🟢</span>
+            <div class="routine-info">
+              <div class="routine-name">YouTube 30-day daily update</div>
+              <div class="routine-time">Every day at 9:10 AM</div>
+            </div>
+          </div>
 
-      <!-- GLOBAL LOG CONSOLE -->
-      <section class="card console-card">
-        <div class="console-header">
-          <h3>Live Executive Action Stream</h3>
+          <div class="routine-card">
+            <span class="routine-dot active">🟢</span>
+            <div class="routine-info">
+              <div class="routine-name">Money Matters 7-day recap</div>
+              <div class="routine-time">Every September 10 at 10:00 AM</div>
+            </div>
+          </div>
+
+          <div class="routine-card">
+            <span class="routine-dot active">🟢</span>
+            <div class="routine-info">
+              <div class="routine-name">P&L Revenue Audit & Forecast</div>
+              <div class="routine-time">Every Monday at 8:00 AM</div>
+            </div>
+          </div>
+
+          <div class="routine-card">
+            <span class="routine-dot active">🟢</span>
+            <div class="routine-info">
+              <div class="routine-name">Talent Acquisition Auto-Crawl</div>
+              <div class="routine-time">Every day at 6:00 PM</div>
+            </div>
+          </div>
         </div>
-        <div class="console-box" id="console-output">
-          <div class="log-line system">[SYSTEM INITIALIZED] Business Head Ready • Unlimited Memory Active...</div>
-        </div>
-      </section>
-    </main>
+      </div>
+
+    </aside>
+
   </div>
 
   <!-- SETTINGS MODAL -->
@@ -323,10 +374,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-agent-info">
-          <span class="modal-icon" id="modal-icon">👑</span>
+          <span class="modal-icon" id="modal-icon">🔴</span>
           <div>
-            <h2 id="modal-title">Business Head Agent</h2>
-            <span class="status-badge working">● WORKING AT PEAK REASONING</span>
+            <h2 id="modal-title">Business Head</h2>
+            <span class="status-badge working">● PERFORMING ACTION AT PEAK REASONING</span>
           </div>
         </div>
         <button class="btn-close-modal" id="btn-close-modal">✖ Exit Fullscreen</button>
