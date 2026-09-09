@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UPONLY - Autonomous AI Agent Command Center</title>
+  <title>UPONLY - Executive Chat & Autonomous Business OS</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -21,7 +21,10 @@
         <button class="agent-nav-item active" data-agent="business_head">
           <div class="nav-agent-info">
             <span class="icon">👑</span>
-            <span class="name">Business Head</span>
+            <div class="nav-text">
+              <span class="name">Business Head</span>
+              <span class="role">Executive Leader</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-business_head">IDLE</span>
         </button>
@@ -29,7 +32,10 @@
         <button class="agent-nav-item" data-agent="finance">
           <div class="nav-agent-info">
             <span class="icon">💰</span>
-            <span class="name">Finance Expert</span>
+            <div class="nav-text">
+              <span class="name">Finance Expert</span>
+              <span class="role">Audit & Cashflow</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-finance">IDLE</span>
         </button>
@@ -37,7 +43,10 @@
         <button class="agent-nav-item" data-agent="content">
           <div class="nav-agent-info">
             <span class="icon">📲</span>
-            <span class="name">Content Manager</span>
+            <div class="nav-text">
+              <span class="name">Content Manager</span>
+              <span class="role">Viral Social Copy</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-content">IDLE</span>
         </button>
@@ -45,7 +54,10 @@
         <button class="agent-nav-item" data-agent="video">
           <div class="nav-agent-info">
             <span class="icon">🎬</span>
-            <span class="name">Video & Animator</span>
+            <div class="nav-text">
+              <span class="name">Video & Animator</span>
+              <span class="role">Scripts & Motion</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-video">IDLE</span>
         </button>
@@ -53,7 +65,10 @@
         <button class="agent-nav-item" data-agent="recruiting">
           <div class="nav-agent-info">
             <span class="icon">🤝</span>
-            <span class="name">Talent Acquisition</span>
+            <div class="nav-text">
+              <span class="name">Talent Acquisition</span>
+              <span class="role">Hiring & Sourcing</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-recruiting">IDLE</span>
         </button>
@@ -61,7 +76,10 @@
         <button class="agent-nav-item" data-agent="analyst">
           <div class="nav-agent-info">
             <span class="icon">📊</span>
-            <span class="name">Lead Analyst</span>
+            <div class="nav-text">
+              <span class="name">Lead Analyst</span>
+              <span class="role">Market & Cohorts</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-analyst">IDLE</span>
         </button>
@@ -69,7 +87,10 @@
         <button class="agent-nav-item" data-agent="risk">
           <div class="nav-agent-info">
             <span class="icon">🛡️</span>
-            <span class="name">Risk & Compliance</span>
+            <div class="nav-text">
+              <span class="name">Risk & Compliance</span>
+              <span class="role">Security & Audit</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-risk">IDLE</span>
         </button>
@@ -77,7 +98,10 @@
         <button class="agent-nav-item" data-agent="sales">
           <div class="nav-agent-info">
             <span class="icon">📈</span>
-            <span class="name">Sales Agent</span>
+            <div class="nav-text">
+              <span class="name">Sales Agent</span>
+              <span class="role">Leads & Proposals</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-sales">IDLE</span>
         </button>
@@ -85,7 +109,10 @@
         <button class="agent-nav-item" data-agent="operations">
           <div class="nav-agent-info">
             <span class="icon">⚙️</span>
-            <span class="name">Operations Agent</span>
+            <div class="nav-text">
+              <span class="name">Operations Agent</span>
+              <span class="role">Webhooks & SOP</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-operations">IDLE</span>
         </button>
@@ -93,7 +120,10 @@
         <button class="agent-nav-item" data-agent="support">
           <div class="nav-agent-info">
             <span class="icon">🎧</span>
-            <span class="name">Support Agent</span>
+            <div class="nav-text">
+              <span class="name">Support Agent</span>
+              <span class="role">24/7 Resolution</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-support">IDLE</span>
         </button>
@@ -101,7 +131,10 @@
         <button class="agent-nav-item" data-agent="analytics">
           <div class="nav-agent-info">
             <span class="icon">📉</span>
-            <span class="name">Analytics Agent</span>
+            <div class="nav-text">
+              <span class="name">Analytics Agent</span>
+              <span class="role">Executive KPIs</span>
+            </div>
           </div>
           <span class="status-badge idle" id="badge-analytics">IDLE</span>
         </button>
@@ -113,8 +146,8 @@
       <!-- TOP HEADER -->
       <header class="top-header">
         <div class="header-title">
-          <h1>Command Center & Performing Monitor</h1>
-          <span class="engine-tag">Powered by Claude 3.5 Sonnet Engine</span>
+          <h1>Executive Command Hub</h1>
+          <span class="engine-tag">Powered by Anthropic Claude 3.5 Sonnet Engine</span>
         </div>
         <div class="header-right">
           <span class="live-pulse"></span>
@@ -122,50 +155,48 @@
         </div>
       </header>
 
-      <!-- DISPATCH CONTROL PANEL -->
-      <section class="card dispatch-card">
-        <div class="dispatch-header">
-          <h3>Dispatch Task & Trigger Agent Work</h3>
-          <span class="hint">Select agent or click any agent on left navbar</span>
+      <!-- DIRECT EXECUTIVE CHAT INPUT (Led by Business Head) -->
+      <section class="card executive-chat-card">
+        <div class="chat-header-bar">
+          <div class="chat-agent-badge">
+            <span class="badge-icon" id="target-agent-icon">👑</span>
+            <div>
+              <h3 id="target-agent-name">Business Head</h3>
+              <span class="target-desc" id="target-agent-desc">Chief Executive Orchestrator — Directing the 11-Agent Fleet</span>
+            </div>
+          </div>
+          <div class="quick-prompts">
+            <button class="chip" data-prompt="Crawl LinkedIn, Indeed & Greenhouse to hire Senior AI Engineers">🤝 Hire Engineers</button>
+            <button class="chip" data-prompt="Audit Q4 financial P&L balance sheet and forecast revenue">💰 Audit P&L</button>
+            <button class="chip" data-prompt="Formulate multi-channel product launch strategy across all agents">👑 Launch Strategy</button>
+          </div>
         </div>
-        <form id="task-form" class="dispatch-form">
-          <select id="agent-select">
-            <option value="recruiting">🤝 Talent Acquisition (Crawl Hiring Sites & Screen Candidates)</option>
-            <option value="business_head">👑 Business Head (Formulate Executive Growth Directive)</option>
-            <option value="finance">💰 Finance Expert (P&L Audit & Revenue Forecast)</option>
-            <option value="content">📲 Content Manager (Viral Campaign Copywriting)</option>
-            <option value="video">🎬 Video & Animator (Promo Script & Motion Graphics)</option>
-            <option value="analyst">📊 Lead Analyst (Cohort LTV & Market Intelligence)</option>
-            <option value="risk">🛡️ Risk & Compliance (Security & Contract Audit)</option>
-            <option value="sales">📈 Sales Agent (Lead Qualification & Proposal Draft)</option>
-            <option value="operations">⚙️ Operations Agent (Webhook & Process Automation)</option>
-            <option value="support">🎧 Support Agent (24/7 Ticket Resolution)</option>
-            <option value="analytics">📉 Analytics Agent (Executive KPI Summaries)</option>
-          </select>
-          <input type="text" id="task-input" placeholder="e.g. Crawl LinkedIn, Indeed, Greenhouse to hire Senior AI Engineers" required>
-          <button type="submit" class="btn-dispatch">🚀 Dispatch Agent</button>
+
+        <form id="direct-chat-form" class="chat-form">
+          <input type="text" id="chat-input" placeholder="Instruct Business Head to lead operations or direct specific work..." required>
+          <button type="submit" class="btn-send">Direct Work 🚀</button>
         </form>
       </section>
 
-      <!-- 2x2 PERFORMING SCREENS MONITOR GRID -->
+      <!-- 2x2 LIVE PERFORMING AGENT MONITOR GRID -->
       <section class="performing-section">
         <div class="section-title-bar">
-          <h3>2x2 LIVE PERFORMING AGENT MONITOR</h3>
-          <span class="subtitle">Shows live performing screens for active agents</span>
+          <h3>2x2 LIVE PERFORMING MONITOR GRID</h3>
+          <span class="subtitle">Shows live action screens for active agents</span>
         </div>
 
         <div class="monitor-grid-2x2" id="performing-grid">
-          <!-- Live tiles will be dynamically rendered here -->
+          <!-- Live tiles rendered dynamically -->
         </div>
       </section>
 
       <!-- GLOBAL LOG CONSOLE -->
       <section class="card console-card">
         <div class="console-header">
-          <h3>Global Event Execution Stream</h3>
+          <h3>Live Executive Action Stream</h3>
         </div>
         <div class="console-box" id="console-output">
-          <div class="log-line system">[SYSTEM INITIALIZED] UPONLY 11-Agent Command Center Online & Ready...</div>
+          <div class="log-line system">[SYSTEM INITIALIZED] Business Head Ready to Direct 11-Agent Fleet...</div>
         </div>
       </section>
     </main>
@@ -176,10 +207,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-agent-info">
-          <span class="modal-icon" id="modal-icon">🤝</span>
+          <span class="modal-icon" id="modal-icon">👑</span>
           <div>
-            <h2 id="modal-title">Talent Acquisition Agent</h2>
-            <span class="status-badge working">● WORKING AT PEAK PERFORMANCE</span>
+            <h2 id="modal-title">Business Head Agent</h2>
+            <span class="status-badge working">● WORKING AT PEAK REASONING</span>
           </div>
         </div>
         <button class="btn-close-modal" id="btn-close-modal">✖ Exit Fullscreen</button>
@@ -187,8 +218,8 @@
 
       <div class="modal-body">
         <div class="modal-action-bar">
-          <span class="action-label">Current Active Action:</span>
-          <span class="action-value" id="modal-action-text">Crawling sites for hiring...</span>
+          <span class="action-label">Active Action:</span>
+          <span class="action-value" id="modal-action-text">Directing Executive Operations...</span>
         </div>
 
         <div class="progress-bar-container">
@@ -196,11 +227,11 @@
         </div>
 
         <div class="performing-screen-view" id="modal-screen-view">
-          <!-- Rendered live visual screen details -->
+          <!-- Live performing stream -->
         </div>
 
         <div class="modal-log-box" id="modal-log-box">
-          <!-- Expanded detailed logs -->
+          <!-- Live log stream -->
         </div>
       </div>
     </div>
