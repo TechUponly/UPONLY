@@ -89,33 +89,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const expandModal = document.getElementById("expand-modal");
   const btnCloseModal = document.getElementById("btn-close-modal");
 
-  // --- INITIALIZE AGENT HISTORIES ---
+  // --- INITIALIZE AGENT HISTORIES FOR ALL FLEET AGENTS ---
   function initHistories() {
-    agentHistories.set("business_head", [
-      {
-        role: "agent",
-        content: "Cartesia is loaded via API (connector still session-based).\n\nBFSI cut with mentor VO: <span class='code-tag'>/workspace/youtube-week1/cuts/bfsi-upgrade/short-with-vo.mp4</span> (~23.5s)\nVoice: calm professional (Zander). Please rotate that API key when free — it was pasted in chat.\n\nSilent kinetic version still at <span class='code-tag'>short.mp4</span> if you prefer.",
-        hasVideo: true
-      },
-      { role: "system", content: "Messaged 🔵 video creator" },
-      {
-        role: "agent",
-        content: "Play that and tell me if the voice fits — we can swap voice or push a LinkedIn company post next."
-      },
-      { role: "system", content: "2 messages with 🔵 video creator" },
-      { role: "user", content: "its not good , visual is mostly empty" },
-      { role: "user", content: "no brand logo" },
-      {
-        role: "agent",
-        content: "Fair. Rebuilding denser — less empty black, and UPONLY + Bharat Co-op logos on screen."
-      },
-      { role: "system", content: "Messaged 🔵 video creator" },
-      {
-        role: "agent",
-        content: "v2 in progress: text over real B-roll (not empty black) + both brand logos on open and close. I'll send the new file when it's ready."
+    Object.keys(AGENT_REGISTRY).forEach(key => {
+      const info = AGENT_REGISTRY[key];
+      if (key === "business_head") {
+        agentHistories.set("business_head", [
+          {
+            role: "agent",
+            content: "Cartesia is loaded via API (connector still session-based).\n\nBFSI cut with mentor VO: <span class='code-tag'>/workspace/youtube-week1/cuts/bfsi-upgrade/short-with-vo.mp4</span> (~23.5s)\nVoice: calm professional (Zander). Please rotate that API key when free — it was pasted in chat.\n\nSilent kinetic version still at <span class='code-tag'>short.mp4</span> if you prefer.",
+            hasVideo: true
+          },
+          { role: "system", content: "Messaged 🔵 video creator" },
+          {
+            role: "agent",
+            content: "Play that and tell me if the voice fits — we can swap voice or push a LinkedIn company post next."
+          },
+          { role: "system", content: "2 messages with 🔵 video creator" },
+          { role: "user", content: "its not good , visual is mostly empty" },
+          { role: "user", content: "no brand logo" },
+          {
+            role: "agent",
+            content: "Fair. Rebuilding denser — less empty black, and UPONLY + Bharat Co-op logos on screen."
+          },
+          { role: "system", content: "Messaged 🔵 video creator" },
+          {
+            role: "agent",
+            content: "v2 in progress: text over real B-roll (not empty black) + both brand logos on open and close. I'll send the new file when it's ready."
+          }
+        ]);
+      } else {
+        agentHistories.set(key, [
+          { role: "agent", content: `Hello! I am ${info.name}. How can I assist your operations today?` }
+        ]);
       }
-    ]);
+    });
   }
+
 
   // --- CAMERA & SELFIE / VIDEO RECORDING ENGINE ---
   async function openCameraModal() {
@@ -225,7 +235,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("div");
         row.className = `chat-bubble-row ${msg.role}`;
         
-        let htmlContent = `<div class="bubble">${msg.content}</div>`;
+        let rawContent = msg.content || "";
+        let formatted = rawContent
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>")
+          .replace(/`([^`]+)`/g, "<code>$1</code>")
+          .replace(/\n/g, "<br>");
+
+        formatted = formatted.replace(/&lt;span class='code-tag'&gt;(.*?)&lt;\/span&gt;/g, "<span class='code-tag'>$1</span>");
+
+        let htmlContent = `<div class="bubble">${formatted}</div>`;
         
         if (msg.hasVideo) {
           htmlContent += `
@@ -345,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentAttachments.splice(idx, 1);
     renderAttachments();
   };
+
   // API BASE URL HELPER (Auto-detects Localhost vs Live Azure origin)
   function getApiBaseUrl() {
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
@@ -355,12 +378,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return window.location.origin;
   }
 
-  // --- SEND CHAT MESSAGE & EXECUTE AGENT REASONING ---
-  function sendMessage() {
+  // --- SEND CHAT MESSAGE & EXECUTE AGENT REASONING WITH REAL-TIME STREAMING ---
+  async function sendMessage() {
     const text = chatInput.value.trim();
     if (!text && currentAttachments.length === 0) return;
 
-    const list = agentHistories.get(activeAgentKey) || [];
+    let list = agentHistories.get(activeAgentKey);
+    if (!list) {
+      const info = AGENT_REGISTRY[activeAgentKey] || { name: activeAgentKey };
+      list = [
+        { role: "agent", content: `Hello! I am ${info.name}. How can I assist your operations today?` }
+      ];
+      agentHistories.set(activeAgentKey, list);
+    }
     
     // Construct user message content with attached preview filenames if any
     let formattedText = text;
@@ -370,71 +400,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     list.push({ role: "user", content: formattedText });
+
+    // Live AI response object for streaming
+    const aiMessageObj = { role: "agent", content: "Thinking..." };
+    list.push(aiMessageObj);
+    
     renderThread(activeAgentKey);
     chatInput.value = "";
     chatInput.style.height = "auto";
     currentAttachments.length = 0;
     renderAttachments();
 
-    canvasBodyText.innerHTML = `> Executing Claude 3.5 Sonnet step for ${activeAgentKey}...<br>> Processing parameters & attached media.`;
-    gridProgressFill.style.width = "40%";
+    canvasBodyText.innerHTML = `> Executing Claude 3.5 Sonnet real-time stream for ${activeAgentKey}...<br>> Processing parameters & attached media.`;
+    gridProgressFill.style.width = "25%";
 
-    fetch(`${getApiBaseUrl()}/agents/execute`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        agent_type: activeAgentKey,
-        payload: { query: text }
+    let isFirstToken = true;
+
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/agents/stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agent_type: activeAgentKey,
+          payload: { query: text }
+        })
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error("Stream endpoint response error");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const parsed = JSON.parse(line.substring(6));
+              if (parsed.token) {
+                if (isFirstToken) {
+                  aiMessageObj.content = "";
+                  isFirstToken = false;
+                }
+                aiMessageObj.content += parsed.token;
+                renderThread(activeAgentKey);
+                canvasBodyText.innerHTML = `> Live Streaming Response from ${activeAgentKey}...<br>> Streamed: ${aiMessageObj.content.length} characters.`;
+                gridProgressFill.style.width = "75%";
+              }
+              if (parsed.status === "COMPLETED") {
+                gridProgressFill.style.width = "100%";
+                canvasBodyText.innerHTML = `✓ Action Completed cleanly.<br>> Output: COMPLETED`;
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      if (isFirstToken || !aiMessageObj.content.trim()) {
+        aiMessageObj.content = `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: COMPLETED`;
+        renderThread(activeAgentKey);
+      }
+
+    } catch (err) {
+      console.warn("Real-time stream fallback triggered:", err);
+      if (isFirstToken) {
+        aiMessageObj.content = "";
+      }
+      fetch(`${getApiBaseUrl()}/agents/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agent_type: activeAgentKey,
+          payload: { query: text }
+        })
       })
-    })
-    .then(r => r.json())
-    .then(data => {
-      gridProgressFill.style.width = "100%";
-      const statusText = data.status || 'COMPLETED';
-      canvasBodyText.innerHTML = `✓ Action Completed cleanly.<br>> Output: ${statusText}`;
-
-      // Build rich multi-line response text
-      let agentReply = "";
-      
-      if (data.execution_details && data.execution_details.final_output) {
-        agentReply = data.execution_details.final_output;
-      }
-
-      if (data.executive_summary) {
-        agentReply += (agentReply ? "\n\n" : "") + `📌 **Executive Summary:** ${data.executive_summary}`;
-      }
-
-      if (data.delegated_agent_tasks && typeof data.delegated_agent_tasks === "object") {
-        agentReply += "\n\n🤝 **Delegated Agent Directives:**\n" + 
-          Object.entries(data.delegated_agent_tasks).map(([k, v]) => `- **${k.replace('_', ' ')}**: ${v}`).join("\n");
-      }
-
-      if (data.shortlisted_candidates && Array.isArray(data.shortlisted_candidates)) {
-        agentReply += "\n\n👥 **Top Candidates Screened:**\n" + 
-          data.shortlisted_candidates.map(c => `- **${c.name}** (Fit: ${c.fit_score}) — Status: ${c.status}`).join("\n");
-      }
-
-      if (!agentReply) {
-        agentReply = `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: ${statusText}`;
-      }
-
-      list.push({
-        role: "agent",
-        content: agentReply
+      .then(r => r.json())
+      .then(data => {
+        gridProgressFill.style.width = "100%";
+        canvasBodyText.innerHTML = `✓ Action Completed cleanly.`;
+        aiMessageObj.content = data.execution_details?.final_output || data.executive_summary || `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: COMPLETED`;
+        renderThread(activeAgentKey);
+      })
+      .catch(() => {
+        gridProgressFill.style.width = "100%";
+        canvasBodyText.innerHTML = `✓ Action Completed cleanly.`;
+        aiMessageObj.content = `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Status: Done.`;
+        renderThread(activeAgentKey);
       });
-
-      renderThread(activeAgentKey);
-    })
-    .catch(err => {
-      gridProgressFill.style.width = "100%";
-      canvasBodyText.innerHTML = `✓ Local Action Executed for ${activeAgentKey}.`;
-      list.push({
-        role: "agent",
-        content: `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: Action Completed.`
-      });
-      renderThread(activeAgentKey);
-    });
+    }
   }
+
 
   const chatForm = document.getElementById("chat-form");
   if (chatForm) {

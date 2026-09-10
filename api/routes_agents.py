@@ -94,6 +94,10 @@ def create_new_agent(request: CreateAgentRequest):
         }
     }
 
+from fastapi.responses import StreamingResponse
+import json
+from core.llm_provider import LLMProvider
+
 @router.post("/execute")
 def execute_agent_task(request: AgentTaskRequest):
     agent = AGENTS_MAP.get(request.agent_type.lower())
@@ -102,3 +106,22 @@ def execute_agent_task(request: AgentTaskRequest):
     
     result = agent.execute_task(request.payload)
     return result
+
+@router.post("/stream")
+def stream_agent_task(request: AgentTaskRequest):
+    agent = AGENTS_MAP.get(request.agent_type.lower())
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{request.agent_type}' not found.")
+    
+    query = request.payload.get("query", f"Execute directive for {agent.name}")
+    prompt = f"Task Directive: {query}"
+    system_prompt = f"Role: {agent.role}\nDirective: {getattr(agent, 'system_prompt', 'Execute directive with peak reasoning.')}"
+
+    def event_generator():
+        llm = LLMProvider()
+        for chunk in llm.stream_generate(prompt, system_prompt):
+            yield f"data: {json.dumps({'token': chunk})}\n\n"
+        yield f"data: {json.dumps({'status': 'COMPLETED'})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+

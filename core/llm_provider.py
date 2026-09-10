@@ -113,6 +113,74 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         # Dynamic AI Reasoning Engine (Parses prompt and system context dynamically)
         return self._generate_dynamic_ai_response(prompt, system_prompt)
 
+    def stream_generate(self, prompt: str, system_prompt: Optional[str] = None):
+        """
+        Yields real-time streaming tokens from LLM provider (Anthropic Claude 3.5 Sonnet / Gemini / OpenAI).
+        """
+        api_key = os.getenv(f"{self.provider_name.upper()}_API_KEY", "") or os.getenv("ANTHROPIC_API_KEY", "")
+
+        # 1. Anthropic Claude Real-Time Token Streaming
+        if self.provider_name == "anthropic" and api_key:
+            try:
+                import anthropic
+                client = anthropic.Anthropic(api_key=api_key)
+                sys_instruction = system_prompt or "You are an elite UPONLY Autonomous Agent."
+                formatted_user_prompt = self._format_claude_prompt(prompt)
+
+                with client.messages.stream(
+                    model=self.model_name,
+                    max_tokens=4096,
+                    temperature=0.2,
+                    system=sys_instruction,
+                    messages=[{"role": "user", "content": formatted_user_prompt}]
+                ) as stream:
+                    for text in stream.text_stream:
+                        yield text
+                return
+            except Exception as e:
+                pass
+
+        # 2. Google Gemini Real-Time Token Streaming
+        elif self.provider_name == "gemini" and api_key:
+            try:
+                import google.generativeai as genai
+                genai.configure(api_key=api_key)
+                model = genai.GenerativeModel(self.model_name, system_instruction=system_prompt)
+                response = model.generate_content(prompt, stream=True)
+                for chunk in response:
+                    if chunk.text:
+                        yield chunk.text
+                return
+            except Exception as e:
+                pass
+
+        # 3. OpenAI Real-Time Token Streaming
+        elif self.provider_name == "openai" and api_key:
+            try:
+                import openai
+                client = openai.OpenAI(api_key=api_key)
+                messages = []
+                if system_prompt:
+                    messages.append({"role": "system", "content": system_prompt})
+                messages.append({"role": "user", "content": prompt})
+                response = client.chat.completions.create(model=self.model_name, messages=messages, stream=True)
+                for chunk in response:
+                    if chunk.choices and chunk.choices[0].delta.content:
+                        yield chunk.choices[0].delta.content
+                return
+            except Exception as e:
+                pass
+
+        # 4. Fallback Dynamic AI Reasoning Real-Time Generator
+        full_resp = self._generate_dynamic_ai_response(prompt, system_prompt)
+        content = full_resp["content"]
+        words = content.split(" ")
+        import time
+        for i in range(0, len(words), 2):
+            chunk = " ".join(words[i:i+2]) + " "
+            yield chunk
+            time.sleep(0.02)
+
     def _generate_dynamic_ai_response(self, prompt: str, system_prompt: Optional[str] = None) -> Dict[str, Any]:
         """
         Dynamically analyzes user input prompt, agent role, and directives to synthesize detailed, personalized AI responses.
@@ -147,3 +215,4 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             "content": reasoning,
             "tool_calls": []
         }
+

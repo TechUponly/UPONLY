@@ -66,6 +66,17 @@ try:
     res_data = r.json()
     log_test("Execute Agent Task (/agents/execute)", r.status_code == 200, f"Agent: {res_data.get('agent')}, Status: {res_data.get('status')}")
 
+    # Execute Real-Time Stream Test for Talent Acquisition (Recruiting Agent)
+    r_stream = requests.post(f"{BASE_URL}/agents/stream", json={
+        "agent_type": "recruiting",
+        "payload": {"query": "Screen resumes for Senior AI Engineer position."}
+    }, stream=True)
+    stream_tokens = 0
+    for chunk in r_stream.iter_lines():
+        if chunk:
+            stream_tokens += 1
+    log_test("Real-Time Token Stream (/agents/stream)", r_stream.status_code == 200, f"Received {stream_tokens} stream chunks successfully")
+
     # Dynamic Agent Creation
     r = requests.post(f"{BASE_URL}/agents/create", json={
         "agent_id": "audit_spec",
@@ -78,6 +89,7 @@ try:
 
 except Exception as e:
     log_test("Agent Fleet Integration Audit", False, str(e))
+
 
 # 4. Workflows & DAG Orchestration
 try:
