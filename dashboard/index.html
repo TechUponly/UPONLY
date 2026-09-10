@@ -268,30 +268,30 @@
       <div class="attachment-preview-bar" id="attachment-preview-bar"></div>
 
       <!-- Floating Bottom Chat Input Bar -->
-      <div class="floating-chat-bar">
+      <form id="chat-form" class="floating-chat-bar">
         <!-- Add Context Dropdown Button -->
         <div class="add-context-container">
-          <button class="btn-add-context" id="btn-context-menu" title="Add Context">+</button>
+          <button type="button" class="btn-add-context" id="btn-context-menu" title="Add Context">+</button>
           
           <!-- Context Popup Menu (Includes Live Camera / Selfie Option) -->
           <div class="context-popup-menu" id="context-menu-popup">
             <div class="menu-title">Add Context</div>
-            <button class="menu-item" id="menu-item-camera">
+            <button type="button" class="menu-item" id="menu-item-camera">
               <span class="item-icon">📷</span> Live Camera & Selfie
             </button>
-            <button class="menu-item" id="menu-item-media">
+            <button type="button" class="menu-item" id="menu-item-media">
               <span class="item-icon">🖼️</span> Media / Upload File
             </button>
-            <button class="menu-item" id="menu-item-audio">
+            <button type="button" class="menu-item" id="menu-item-audio">
               <span class="item-icon">🎤</span> Audio Voice Memo
             </button>
-            <button class="menu-item" id="menu-item-video">
+            <button type="button" class="menu-item" id="menu-item-video">
               <span class="item-icon">📹</span> Video Memo / Screen
             </button>
-            <button class="menu-item" id="menu-item-mentions">
+            <button type="button" class="menu-item" id="menu-item-mentions">
               <span class="item-icon">@</span> Mentions / Tag Agent
             </button>
-            <button class="menu-item" id="menu-item-browser">
+            <button type="button" class="menu-item" id="menu-item-browser">
               <span class="item-icon">🌐</span> Browser / Web Link
             </button>
           </div>
@@ -300,11 +300,11 @@
         <!-- Hidden File Input -->
         <input type="file" id="file-upload-input" multiple style="display: none;">
 
-        <textarea id="chat-input" rows="1" placeholder="Message Business Head..." required></textarea>
+        <textarea id="chat-input" rows="1" placeholder="Message Business Head..."></textarea>
 
         <button type="button" class="btn-mic" id="btn-camera-shortcut" title="Take Live Selfie or Record Video">📷</button>
         <button type="submit" class="btn-send-chat" id="btn-send-message" title="Send Message">🚀</button>
-      </div>
+      </form>
     </main>
 
     <!-- PANE 3: RIGHT SIDEBAR (LIVE PERFORMING SCREEN & ROUTINES) -->

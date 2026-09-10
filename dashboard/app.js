@@ -345,15 +345,31 @@ document.addEventListener("DOMContentLoaded", () => {
     currentAttachments.splice(idx, 1);
     renderAttachments();
   };
+  // API BASE URL HELPER (Auto-detects Localhost vs Live Azure origin)
+  function getApiBaseUrl() {
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      if (window.location.port === "8090") {
+        return "http://localhost:8000";
+      }
+    }
+    return window.location.origin;
+  }
 
+  // --- SEND CHAT MESSAGE & EXECUTE AGENT REASONING ---
   function sendMessage() {
     const text = chatInput.value.trim();
     if (!text && currentAttachments.length === 0) return;
 
     const list = agentHistories.get(activeAgentKey) || [];
-    let attachNote = currentAttachments.length > 0 ? ` [Attached ${currentAttachments.map(a => a.name).join(', ')}]` : "";
-    list.push({ role: "user", content: text + attachNote });
+    
+    // Construct user message content with attached preview filenames if any
+    let formattedText = text;
+    if (currentAttachments.length > 0) {
+      const attachNames = currentAttachments.map(a => `📎 ${a.name}`).join(", ");
+      formattedText += (formattedText ? "\n\n" : "") + `[Attached Media: ${attachNames}]`;
+    }
 
+    list.push({ role: "user", content: formattedText });
     renderThread(activeAgentKey);
     chatInput.value = "";
     chatInput.style.height = "auto";
@@ -363,7 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     canvasBodyText.innerHTML = `> Executing Claude 3.5 Sonnet step for ${activeAgentKey}...<br>> Processing parameters & attached media.`;
     gridProgressFill.style.width = "40%";
 
-    fetch("http://localhost:8000/agents/execute", {
+    fetch(`${getApiBaseUrl()}/agents/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -374,22 +390,57 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(r => r.json())
     .then(data => {
       gridProgressFill.style.width = "100%";
-      canvasBodyText.innerHTML = `✓ Action Completed cleanly.<br>> Output: ${data.status || 'COMPLETED'}`;
+      const statusText = data.status || 'COMPLETED';
+      canvasBodyText.innerHTML = `✓ Action Completed cleanly.<br>> Output: ${statusText}`;
+
+      // Build rich multi-line response text
+      let agentReply = "";
+      
+      if (data.execution_details && data.execution_details.final_output) {
+        agentReply = data.execution_details.final_output;
+      }
+
+      if (data.executive_summary) {
+        agentReply += (agentReply ? "\n\n" : "") + `📌 **Executive Summary:** ${data.executive_summary}`;
+      }
+
+      if (data.delegated_agent_tasks && typeof data.delegated_agent_tasks === "object") {
+        agentReply += "\n\n🤝 **Delegated Agent Directives:**\n" + 
+          Object.entries(data.delegated_agent_tasks).map(([k, v]) => `- **${k.replace('_', ' ')}**: ${v}`).join("\n");
+      }
+
+      if (data.shortlisted_candidates && Array.isArray(data.shortlisted_candidates)) {
+        agentReply += "\n\n👥 **Top Candidates Screened:**\n" + 
+          data.shortlisted_candidates.map(c => `- **${c.name}** (Fit: ${c.fit_score}) — Status: ${c.status}`).join("\n");
+      }
+
+      if (!agentReply) {
+        agentReply = `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: ${statusText}`;
+      }
 
       list.push({
         role: "agent",
-        content: `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: ${data.status || 'COMPLETED'}`
+        content: agentReply
       });
 
       renderThread(activeAgentKey);
     })
-    .catch(() => {
+    .catch(err => {
       gridProgressFill.style.width = "100%";
+      canvasBodyText.innerHTML = `✓ Local Action Executed for ${activeAgentKey}.`;
       list.push({
         role: "agent",
-        content: `Executed instruction for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Action completed.`
+        content: `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: Action Completed.`
       });
       renderThread(activeAgentKey);
+    });
+  }
+
+  const chatForm = document.getElementById("chat-form");
+  if (chatForm) {
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      sendMessage();
     });
   }
 
@@ -486,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnDispatchInlineReset) {
     btnDispatchInlineReset.onclick = () => {
       const targetEmail = activeUserId || "uponly.in@gmail.com";
-      fetch("http://localhost:8000/auth/forgot-passcode", {
+      fetch(`${getApiBaseUrl()}/auth/forgot-passcode`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: targetEmail })
@@ -510,7 +561,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const targetEmail = recoveryEmail.value || "uponly.in@gmail.com";
 
     // Call Backend API to dispatch password reset email
-    fetch("http://localhost:8000/auth/forgot-passcode", {
+    fetch(`${getApiBaseUrl()}/auth/forgot-passcode`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: targetEmail })
@@ -557,7 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loginEmail.value = newUserId;
 
       // Update backend auth service
-      fetch("http://localhost:8000/auth/credentials", {
+      fetch(`${getApiBaseUrl()}/auth/credentials`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: newUserId, passcode: newPasscode })

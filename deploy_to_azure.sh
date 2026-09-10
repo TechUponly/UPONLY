@@ -61,7 +61,7 @@ $AZ_BIN webapp config container set \
 $AZ_BIN webapp config appsettings set \
   --resource-group $RESOURCE_GROUP \
   --name $WEB_APP_NAME \
-  --settings WEBSITES_PORT=8090 ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}"
+  --settings WEBSITES_PORT=8000 ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}"
 
 echo "=============================================================================="
 echo "🎉 SUCCESS: UPONLY AI OS is Live on Microsoft Azure!"
