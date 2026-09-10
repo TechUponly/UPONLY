@@ -537,9 +537,25 @@
         <!-- Dynamic Plugin Cards -->
       </div>
     </div>
+  <!-- CANDIDATE CV & RESUME VIEWER MODAL -->
+  <div class="modal-overlay" id="cv-viewer-modal">
+    <div class="modal-content modal-form-box" style="max-width: 720px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2 id="cv-modal-name">📄 Candidate Curriculum Vitae (CV)</h2>
+        <button class="btn-close-modal" id="btn-close-cv-modal">✖ Close</button>
+      </div>
+      <div id="cv-modal-body" class="cv-document-preview" style="background: #0b0c10; padding: 20px; border-radius: 8px; font-family: sans-serif; line-height: 1.6; color: #e2e8f0; border: 1px solid var(--border-color);">
+        <!-- CV Content rendered dynamically -->
+      </div>
+      <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
+        <button type="button" class="btn-cam-action" id="btn-modal-download-cv">📥 Download CV Document</button>
+        <button type="button" class="btn-dispatch" id="btn-modal-schedule-interview" style="width: auto;">📧 Schedule Interview</button>
+      </div>
+    </div>
   </div>
 
-  <script src="app.js?v=2.0"></script>
+  <script src="app.js?v=2.1"></script>
+
 
 </body>
 </html>

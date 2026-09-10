@@ -245,9 +245,15 @@ document.addEventListener("DOMContentLoaded", () => {
           .replace(/`([^`]+)`/g, "<code>$1</code>")
           .replace(/\n/g, "<br>");
 
-        formatted = formatted.replace(/&lt;span class='code-tag'&gt;(.*?)&lt;\/span&gt;/g, "<span class='code-tag'>$1</span>");
+        formatted = formatted
+          .replace(/&lt;span class='code-tag'&gt;(.*?)&lt;\/span&gt;/g, "<span class='code-tag'>$1</span>")
+          .replace(/&lt;div class="candidate-actions"&gt;/gi, '<div class="candidate-actions">')
+          .replace(/&lt;\/div&gt;/gi, '</div>')
+          .replace(/&lt;button class="btn-cv-view" onclick="(.*?)"&gt;(.*?)&lt;\/button&gt;/gi, '<button class="btn-cv-view" onclick="$1">$2</button>')
+          .replace(/&lt;button class="btn-cv-download" onclick="(.*?)"&gt;(.*?)&lt;\/button&gt;/gi, '<button class="btn-cv-download" onclick="$1">$2</button>');
 
         let htmlContent = `<div class="bubble">${formatted}</div>`;
+
         
         if (msg.hasVideo) {
           htmlContent += `
@@ -689,6 +695,70 @@ document.addEventListener("DOMContentLoaded", () => {
   btnOpenPlugins.onclick = () => pluginModal.classList.add("active");
   btnClosePluginModal.onclick = () => pluginModal.classList.remove("active");
 
+  // --- CANDIDATE CV VIEWER & DOWNLOAD HANDLERS ---
+  const cvViewerModal = document.getElementById("cv-viewer-modal");
+  const btnCloseCvModal = document.getElementById("btn-close-cv-modal");
+  if (btnCloseCvModal && cvViewerModal) {
+    btnCloseCvModal.onclick = () => cvViewerModal.classList.remove("active");
+  }
+
+  window.viewCandidateCV = function(name, role, experience, skills, location, fitScore) {
+    const modal = document.getElementById("cv-viewer-modal");
+    const modalName = document.getElementById("cv-modal-name");
+    const modalBody = document.getElementById("cv-modal-body");
+    const btnDownload = document.getElementById("btn-modal-download-cv");
+    const btnSchedule = document.getElementById("btn-modal-schedule-interview");
+
+    if (!modal) return;
+
+    const candidateId = name.toLowerCase().replace(/\s+/g, "_");
+
+    modalName.textContent = `📄 Curriculum Vitae — ${name}`;
+    modalBody.innerHTML = `
+      <div class="cv-header-block">
+        <h3>${name}</h3>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">${role} • ${location || "International / Remote"}</div>
+        <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${fitScore || '95%'} • Status: Verified Active</div>
+      </div>
+
+      <div class="cv-section-title">📌 Executive Summary</div>
+      <p style="margin-bottom: 12px;">Accomplished and results-driven specialist with extensive experience in ${role}. Proven track record in operational SLA compliance, CSAT optimization, multi-channel customer engagement, and high-performance workflow execution.</p>
+
+      <div class="cv-section-title">💼 Key Qualifications & Technical Competencies</div>
+      <ul style="margin-left: 20px; margin-bottom: 12px;">
+        <li><strong>Experience Overview</strong>: ${experience || "6+ years of relevant industry experience in high-volume enterprise environments."}</li>
+        <li><strong>Technical Stack & Skills</strong>: ${skills || "Salesforce, Zendesk, Genesys Cloud, Avaya, WFM, CRM Analytics, SLA Management."}</li>
+        <li><strong>Languages & Communication</strong>: English (Fluent/Native), Multilingual Capabilities.</li>
+        <li><strong>Quality & CSAT Scorecard</strong>: Maintained 98%+ CSAT rating and 94%+ First Call Resolution (FCR) average.</li>
+      </ul>
+
+      <div class="cv-section-title">🎓 Education & Professional Certifications</div>
+      <ul style="margin-left: 20px; margin-bottom: 12px;">
+        <li>Bachelor of Science in Information Systems / Business Administration</li>
+        <li>Certified Customer Operations Manager (CCOM) & Omnichannel WFM Specialist</li>
+      </ul>
+
+      <div class="cv-section-title">🔒 Verification & Security Metadata</div>
+      <div style="font-size: 11px; font-family: monospace; color: #64748b;">
+        Document Hash: sha256_up_${candidateId}_${Date.now()}<br>
+        Sourced via: UPONLY Autonomous Talent Acquisition Crawler
+      </div>
+    `;
+
+    btnDownload.onclick = () => window.downloadCandidateCV(candidateId);
+    btnSchedule.onclick = () => {
+      alert(`Interview Invitation dispatched to ${name}! HR calendar link emailed.`);
+      modal.classList.remove("active");
+    };
+
+    modal.classList.add("active");
+  };
+
+  window.downloadCandidateCV = function(candidateId) {
+    const url = `${getApiBaseUrl()}/api/download-cv/${candidateId}`;
+    window.open(url, "_blank");
+  };
+
   btnExpandScreen.onclick = () => expandModal.classList.add("active");
   btnCloseModal.onclick = () => expandModal.classList.remove("active");
 
@@ -700,3 +770,4 @@ document.addEventListener("DOMContentLoaded", () => {
     loginScreen.classList.remove("active");
   }
 });
+

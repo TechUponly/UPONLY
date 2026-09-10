@@ -1092,3 +1092,75 @@ body {
   font-weight: 500;
   text-align: center;
 }
+
+/* CANDIDATE CV ACTION BUTTONS & MODAL */
+.candidate-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-cv-view, .btn-cv-download {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.15s ease;
+}
+
+.btn-cv-view {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.btn-cv-view:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.btn-cv-download {
+  background: #10b981;
+  color: white;
+}
+
+.btn-cv-download:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.cv-document-preview {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.cv-header-block {
+  border-bottom: 2px solid var(--accent-blue);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.cv-header-block h3 {
+  font-size: 20px;
+  color: #60a5fa;
+  margin-bottom: 4px;
+}
+
+.cv-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #334155;
+  padding-bottom: 2px;
+}
+

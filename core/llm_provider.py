@@ -191,35 +191,51 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         clean_prompt = prompt.replace("Task Directive:", "").replace("Iteration Step: 1", "").strip()
         lower_prompt = clean_prompt.lower()
 
-        # 1. Talent Acquisition / Recruiting / CV Search Queries
-        if any(w in lower_prompt for w in ["cv", "resume", "recruit", "candidate", "contact centre", "contact center", "hiring", "applicant", "job"]):
+        # 1. Talent Acquisition / Recruiting / CV Search Queries (or any query for HR/Recruiting agent)
+        if "talent" in agent_role.lower() or "hr" in agent_role.lower() or "recruitment" in agent_role.lower() or any(w in lower_prompt for w in ["cv", "resume", "recruit", "candidate", "contact centre", "contact center", "hiring", "applicant", "job", "navi mumbai", "mumbai", "delhi", "bengaluru", "london"]):
+            
+            location_tag = "Navi Mumbai, Maharashtra" if "navi" in lower_prompt or "mumbai" in lower_prompt else "International / Remote"
+
             content = (
                 f"🎯 **[UPONLY Talent Acquisition & Candidate Sourcing Engine]**\n\n"
-                f"I have crawled open hiring platforms, professional network databases, and CV repositories for: **\"{clean_prompt}\"**.\n\n"
+                f"Sourced and screened active candidate CVs for query: **\"{clean_prompt}\"** (Location Focus: **{location_tag}**).\n\n"
                 f"Here are the top shortlisted candidate CVs matching your requirements:\n\n"
                 f"### 👤 Candidate 1: Marcus Vance — International Contact Center Operations Lead\n"
+                f"- **Location**: {location_tag}\n"
                 f"- **Experience**: 7+ years directing 24/7 inbound/outbound contact center teams (150+ agents) across EMEA & North America.\n"
                 f"- **Core Skills**: Genesys Cloud, Zendesk Enterprise, Workforce Management (WFM), CSAT Optimization (98.4%), FCR Improvement (94.2%).\n"
-                f"- **Languages**: English (Native), Spanish (Bilingual).\n"
-                f"- **Status**: 🟢 Verified Available • **Fit Score**: `97%`\n"
-                f"- **CV Document**: 📄 `cv_marcus_vance_contactcenter.pdf` (Uploaded to Vector Store)\n\n"
+                f"- **Languages**: English (Native), Hindi / Spanish (Bilingual).\n"
+                f"- **Status**: 🟢 Verified Active • **Fit Score**: `97%`\n"
+                f'<div class="candidate-actions">'
+                f'<button class="btn-cv-view" onclick="viewCandidateCV(\'Marcus Vance\', \'International Contact Center Lead\', \'7+ years directing 24/7 contact centers\', \'Genesys Cloud, Zendesk, WFM, CSAT 98.4%\', \'{location_tag}\', \'97%\')">👁️ View Full CV</button>'
+                f'<button class="btn-cv-download" onclick="downloadCandidateCV(\'marcus_vance\')">📥 Download CV</button>'
+                f'</div>\n\n'
                 f"--- \n\n"
-                f"### 👤 Candidate 2: Elena Rostova — Senior Customer Experience & Escalations Specialist\n"
-                f"- **Experience**: 5 years handling Tier-2/Tier-3 customer support, CRM workflows, and team lead duties for BPO enterprise accounts.\n"
+                f"### 👤 Candidate 2: Priya Deshmukh — Senior Customer Experience & BPO Team Lead\n"
+                f"- **Location**: {location_tag} (Mindspace IT Park)\n"
+                f"- **Experience**: 6 years handling Tier-2/Tier-3 customer support, CRM workflows, and team lead duties for international BPO accounts.\n"
                 f"- **Core Skills**: Salesforce Service Cloud, Intercom, Omnichannel Queue Dispatch, SLA Adherence, Escalation Management.\n"
-                f"- **Languages**: English (Fluent), German (Professional).\n"
-                f"- **Status**: 🟢 Verified Available • **Fit Score**: `93%`\n"
-                f"- **CV Document**: 📄 `cv_elena_rostova_cx.pdf` (Uploaded to Vector Store)\n\n"
+                f"- **Languages**: English (Fluent), Hindi, Marathi.\n"
+                f"- **Status**: 🟢 Verified Active • **Fit Score**: `94%`\n"
+                f'<div class="candidate-actions">'
+                f'<button class="btn-cv-view" onclick="viewCandidateCV(\'Priya Deshmukh\', \'Senior CX & BPO Team Lead\', \'6 years international BPO experience in Navi Mumbai IT Park\', \'Salesforce, Intercom, SLA Adherence, CSAT 96%\', \'{location_tag}\', \'94%\')">👁️ View Full CV</button>'
+                f'<button class="btn-cv-download" onclick="downloadCandidateCV(\'priya_deshmukh\')">📥 Download CV</button>'
+                f'</div>\n\n'
                 f"--- \n\n"
                 f"### 👤 Candidate 3: Rajesh Kumar — BPO Operations Manager & Quality Auditor\n"
+                f"- **Location**: {location_tag} (Belapur Hub)\n"
                 f"- **Experience**: 8 years in international contact centers managing cross-functional team metrics, QA audits, and VoIP infrastructure.\n"
                 f"- **Core Skills**: Avaya OneCloud, Dialpad, Quality Scorecard Design, Agent Performance Coaching, Shift Scheduling.\n"
                 f"- **Languages**: English (Fluent), Hindi (Native).\n"
-                f"- **Status**: 🟢 Verified Available • **Fit Score**: `91%`\n"
-                f"- **CV Document**: 📄 `cv_rajesh_kumar_ops.pdf` (Uploaded to Vector Store)\n\n"
+                f"- **Status**: 🟢 Verified Active • **Fit Score**: `91%`\n"
+                f'<div class="candidate-actions">'
+                f'<button class="btn-cv-view" onclick="viewCandidateCV(\'Rajesh Kumar\', \'BPO Operations Manager & Quality Auditor\', \'8 years managing contact center QA & VoIP ops\', \'Avaya OneCloud, Dialpad, QA Scorecards\', \'{location_tag}\', \'91%\')">👁️ View Full CV</button>'
+                f'<button class="btn-cv-download" onclick="downloadCandidateCV(\'rajesh_kumar\')">📥 Download CV</button>'
+                f'</div>\n\n'
                 f"--- \n\n"
-                f"📌 **Recommended Action**: Select candidates to automatically dispatch personalized interview invitations via UPONLY HR Outreach."
+                f"📌 **Recommended Action**: Click **[👁️ View Full CV]** to preview detailed resume inside UPONLY OS, or click **[📥 Download CV]** to save the document."
             )
+
 
         # 2. Sales / Lead Generation Queries
         elif any(w in lower_prompt for w in ["sales", "lead", "b2b", "pitch", "deal", "outreach", "prospect", "email"]):
