@@ -38,7 +38,7 @@ dashboard_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dashbo
 def root():
     index_path = os.path.join(dashboard_dir, "index.html")
     if os.path.exists(index_path):
-        return FileResponse(index_path)
+        return FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
     return {
         "status": "online",
         "platform": settings.app_name,
@@ -48,11 +48,12 @@ def root():
 
 @app.get("/app.js")
 def get_app_js():
-    return FileResponse(os.path.join(dashboard_dir, "app.js"))
+    return FileResponse(os.path.join(dashboard_dir, "app.js"), headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/style.css")
 def get_style_css():
-    return FileResponse(os.path.join(dashboard_dir, "style.css"))
+    return FileResponse(os.path.join(dashboard_dir, "style.css"), headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+
 
 @app.get("/health")
 def health_check():

@@ -11,9 +11,9 @@ LOCATION="westus2"
 ACR_NAME="acruponlyai"
 APP_SERVICE_PLAN="asp-uponly-plan"
 WEB_APP_NAME="uponly-ai-os"
-IMAGE_TAG="latest"
+IMAGE_TAG="v$(date +%s)"
 
-echo "🚀 Initiating UPONLY AI OS Deployment to Microsoft Azure..."
+echo "🚀 Initiating UPONLY AI OS Deployment to Microsoft Azure (Tag: $IMAGE_TAG)..."
 
 AZ_BIN="/Users/shamrai/Desktop/UPONLY/.venv/bin/az"
 if [ ! -f "$AZ_BIN" ]; then
@@ -32,7 +32,7 @@ echo "🏗️ Step 2/5: Creating Azure Container Registry ($ACR_NAME)..."
 $AZ_BIN acr create --resource-group $RESOURCE_GROUP --name $ACR_NAME --sku Basic --admin-enabled true || true
 
 # Step 4: Build and Push Docker Image to ACR
-echo "🐳 Step 3/5: Building & Pushing Container Image to Azure Container Registry..."
+echo "🐳 Step 3/5: Building & Pushing Container Image ($IMAGE_TAG) to Azure Container Registry..."
 $AZ_BIN acr build --registry $ACR_NAME --image uponly-ai-os:$IMAGE_TAG .
 
 # Step 5: Create App Service Plan
@@ -48,7 +48,7 @@ $AZ_BIN webapp create \
   --resource-group $RESOURCE_GROUP \
   --plan $APP_SERVICE_PLAN \
   --name $WEB_APP_NAME \
-  --deployment-container-image-name ${ACR_SERVER}/uponly-ai-os:${IMAGE_TAG}
+  --deployment-container-image-name ${ACR_SERVER}/uponly-ai-os:${IMAGE_TAG} || true
 
 $AZ_BIN webapp config container set \
   --name $WEB_APP_NAME \
@@ -62,6 +62,10 @@ $AZ_BIN webapp config appsettings set \
   --resource-group $RESOURCE_GROUP \
   --name $WEB_APP_NAME \
   --settings WEBSITES_PORT=8000 ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}"
+
+echo "🔄 Restarting Azure Web App to force immediate pull of container $IMAGE_TAG..."
+$AZ_BIN webapp restart --name $WEB_APP_NAME --resource-group $RESOURCE_GROUP
+
 
 echo "=============================================================================="
 echo "🎉 SUCCESS: UPONLY AI OS is Live on Microsoft Azure!"
