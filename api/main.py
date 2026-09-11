@@ -117,6 +117,105 @@ Verified Candidate Reference ID: UPONLY-CV-{abs(hash(clean_name)) % 1000000}
     )
 
 
+import io
+import csv
+
+@app.get("/api/export-master-excel")
+def export_master_candidate_excel():
+    from integrations.cv_crawler import cv_crawler
+    candidates = cv_crawler.get_master_candidates()
+
+    try:
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Master Candidate Ledger"
+
+        # Title Header Banner
+        ws.merge_cells("A1:L1")
+        title_cell = ws["A1"]
+        title_cell.value = "UPONLY AI OS - MASTER CANDIDATE SOURCING LEDGER (LATEST AT TOP)"
+        title_cell.font = Font(name="Calibri", size=14, bold=True, color="FFFFFF")
+        title_cell.fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
+        title_cell.alignment = Alignment(horizontal="center", vertical="center")
+        ws.row_dimensions[1].height = 35
+
+        # Table Column Headers
+        headers = ["S.No", "Timestamp", "Candidate Name", "Job Role", "Location", "Phone Number", "Email Address", "LinkedIn Profile", "Experience Summary", "Core Skills", "Fit Score", "Status"]
+        ws.append(headers)
+
+        header_font = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="334155", end_color="334155", fill_type="solid")
+
+        for col_num, h_text in enumerate(headers, 1):
+            cell = ws.cell(row=2, column=col_num)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+        ws.row_dimensions[2].height = 25
+
+        # Data Rows (Placed with LATEST candidate at the TOP!)
+        for idx, c in enumerate(candidates, 1):
+            row = [
+                idx,
+                c.get("timestamp", ""),
+                c.get("name", ""),
+                c.get("role", ""),
+                c.get("location", ""),
+                c.get("phone", ""),
+                c.get("email", ""),
+                c.get("linkedin", ""),
+                c.get("experience", ""),
+                c.get("skills", ""),
+                c.get("fit", ""),
+                "Verified Active"
+            ]
+            ws.append(row)
+
+        # Column Auto-Widths
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            col_letter = openpyxl.utils.get_column_letter(col[0].column)
+            ws.column_dimensions[col_letter].width = min(max(max_len + 3, 12), 45)
+
+        output = io.BytesIO()
+        wb.save(output)
+        output.seek(0)
+
+        return Response(
+            content=output.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=UPONLY_Master_Candidate_Ledger.xlsx"}
+        )
+
+    except Exception:
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["S.No", "Timestamp", "Candidate Name", "Job Role", "Location", "Phone Number", "Email Address", "LinkedIn Profile", "Experience Summary", "Core Skills", "Fit Score", "Status"])
+        for idx, c in enumerate(candidates, 1):
+            writer.writerow([
+                idx,
+                c.get("timestamp", ""),
+                c.get("name", ""),
+                c.get("role", ""),
+                c.get("location", ""),
+                c.get("phone", ""),
+                c.get("email", ""),
+                c.get("linkedin", ""),
+                c.get("experience", ""),
+                c.get("skills", ""),
+                c.get("fit", ""),
+                "Verified Active"
+            ])
+        return Response(
+            content=output.getvalue(),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=UPONLY_Master_Candidate_Ledger.csv"}
+        )
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)

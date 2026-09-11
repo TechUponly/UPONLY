@@ -1135,6 +1135,28 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-excel-export {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #10b981;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-excel-export:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
 .cv-document-preview {
   font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.6;

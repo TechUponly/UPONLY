@@ -810,7 +810,12 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open(url, "_blank");
   };
 
-  // Event Delegation for Candidate Actions (View CV & Download CV)
+  window.downloadMasterExcel = function() {
+    const url = `${getApiBaseUrl()}/api/export-master-excel`;
+    window.open(url, "_blank");
+  };
+
+  // Event Delegation for Candidate Actions (View CV, Download CV, Export Master Excel)
   if (chatThread) {
     chatThread.addEventListener("click", (e) => {
       const btnView = e.target.closest(".btn-cv-view");
@@ -830,6 +835,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (btnDownload) {
         const id = btnDownload.getAttribute("data-cv-id") || "candidate";
         window.downloadCandidateCV(id);
+      }
+
+      const btnExcel = e.target.closest(".btn-excel-export");
+      if (btnExcel) {
+        window.downloadMasterExcel();
       }
     });
   }
