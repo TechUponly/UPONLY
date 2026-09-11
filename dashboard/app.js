@@ -702,7 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnCloseCvModal.onclick = () => cvViewerModal.classList.remove("active");
   }
 
-  window.viewCandidateCV = function(name, role, experience, skills, location, fitScore) {
+  window.viewCandidateCV = function(name, role, experience, skills, location, fitScore, phone, email) {
     const modal = document.getElementById("cv-viewer-modal");
     const modalName = document.getElementById("cv-modal-name");
     const modalBody = document.getElementById("cv-modal-body");
@@ -717,8 +717,9 @@ document.addEventListener("DOMContentLoaded", () => {
     modalBody.innerHTML = `
       <div class="cv-header-block">
         <h3>${name}</h3>
-        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">${role} • ${location || "International / Remote"}</div>
-        <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${fitScore || '95%'} • Status: Verified Active</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">${role} • ${location || "Navi Mumbai, Maharashtra"}</div>
+        <div style="font-size: 13px; color: #38bdf8; margin-top: 6px; font-weight: 600;">📞 Phone: <span style="color: #f3f4f6;">${phone || '+91 98201 44321'}</span> &nbsp;|&nbsp; 📧 Email: <span style="color: #f3f4f6;">${email || 'candidate@gmail.com'}</span></div>
+        <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${fitScore || '95%'} • Status: Verified Active Candidate</div>
       </div>
 
       <div class="cv-section-title">📌 Executive Summary</div>
@@ -747,7 +748,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnDownload.onclick = () => window.downloadCandidateCV(candidateId);
     btnSchedule.onclick = () => {
-      alert(`Interview Invitation dispatched to ${name}! HR calendar link emailed.`);
+      alert(`Interview Invitation dispatched to ${name} (${email || 'email'})! HR calendar link emailed.`);
       modal.classList.remove("active");
     };
 
@@ -770,7 +771,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const skills = btnView.getAttribute("data-cv-skills") || "CRM, SLA Management, CSAT";
         const location = btnView.getAttribute("data-cv-location") || "Navi Mumbai";
         const fit = btnView.getAttribute("data-cv-fit") || "95%";
-        window.viewCandidateCV(name, role, exp, skills, location, fit);
+        const phone = btnView.getAttribute("data-cv-phone") || "+91 98201 44321";
+        const email = btnView.getAttribute("data-cv-email") || "candidate@gmail.com";
+        window.viewCandidateCV(name, role, exp, skills, location, fit, phone, email);
       }
 
       const btnDownload = e.target.closest(".btn-cv-download");
@@ -780,6 +783,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
 
 
   btnExpandScreen.onclick = () => expandModal.classList.add("active");
