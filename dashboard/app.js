@@ -89,8 +89,53 @@ document.addEventListener("DOMContentLoaded", () => {
   const expandModal = document.getElementById("expand-modal");
   const btnCloseModal = document.getElementById("btn-close-modal");
 
+  // --- PERSISTENT CHAT HISTORY ENGINE (LOCALSTORAGE + BACKEND SYNC) ---
+  function saveHistoriesToStorage() {
+    const obj = {};
+    agentHistories.forEach((val, key) => {
+      obj[key] = val;
+    });
+    try {
+      localStorage.setItem("uponly_agent_histories_v2", JSON.stringify(obj));
+    } catch (e) {}
+  }
+
+  async function syncServerMemory(agentKey) {
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/agents/${agentKey}/memory`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.history && data.history.length > 0) {
+          const current = agentHistories.get(agentKey) || [];
+          if (current.length <= 1) {
+            const restored = data.history.map(item => ({
+              role: item.role === "user" ? "user" : "agent",
+              content: item.content
+            }));
+            agentHistories.set(agentKey, restored);
+            saveHistoriesToStorage();
+            if (activeAgentKey === agentKey) {
+              renderThread(agentKey);
+            }
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
   // --- INITIALIZE AGENT HISTORIES FOR ALL FLEET AGENTS ---
   function initHistories() {
+    const saved = localStorage.getItem("uponly_agent_histories_v2");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        Object.keys(parsed).forEach(k => {
+          agentHistories.set(k, parsed[k]);
+        });
+        return;
+      } catch (e) {}
+    }
+
     Object.keys(AGENT_REGISTRY).forEach(key => {
       const info = AGENT_REGISTRY[key];
       if (key === "business_head") {
@@ -124,6 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ]);
       }
     });
+    saveHistoriesToStorage();
   }
 
 
@@ -295,6 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     renderThread(agentKey);
+    syncServerMemory(agentKey);
   }
 
   function bindFleetClicks() {
@@ -475,6 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
         aiMessageObj.content = `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: COMPLETED`;
         renderThread(activeAgentKey);
       }
+      saveHistoriesToStorage();
 
     } catch (err) {
       console.warn("Real-time stream fallback triggered:", err);
@@ -495,12 +543,14 @@ document.addEventListener("DOMContentLoaded", () => {
         canvasBodyText.innerHTML = `✓ Action Completed cleanly.`;
         aiMessageObj.content = data.execution_details?.final_output || data.executive_summary || `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Result: COMPLETED`;
         renderThread(activeAgentKey);
+        saveHistoriesToStorage();
       })
       .catch(() => {
         gridProgressFill.style.width = "100%";
         canvasBodyText.innerHTML = `✓ Action Completed cleanly.`;
         aiMessageObj.content = `Executed directive for ${AGENT_REGISTRY[activeAgentKey]?.name || activeAgentKey}. Status: Done.`;
         renderThread(activeAgentKey);
+        saveHistoriesToStorage();
       });
     }
   }
