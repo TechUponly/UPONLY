@@ -207,8 +207,8 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 f"- **Languages**: English (Native), Hindi / Spanish (Bilingual).\n"
                 f"- **Status**: 🟢 Verified Active • **Fit Score**: `97%`\n"
                 f'<div class="candidate-actions">'
-                f'<button class="btn-cv-view" onclick="viewCandidateCV(\'Marcus Vance\', \'International Contact Center Lead\', \'7+ years directing 24/7 contact centers\', \'Genesys Cloud, Zendesk, WFM, CSAT 98.4%\', \'{location_tag}\', \'97%\')">👁️ View Full CV</button>'
-                f'<button class="btn-cv-download" onclick="downloadCandidateCV(\'marcus_vance\')">📥 Download CV</button>'
+                f'<button class="btn-cv-view" data-cv-name="Marcus Vance" data-cv-role="International Contact Center Lead" data-cv-exp="7+ years directing 24/7 contact centers across EMEA & North America" data-cv-skills="Genesys Cloud, Zendesk Enterprise, WFM, CSAT 98.4%, FCR 94.2%" data-cv-location="{location_tag}" data-cv-fit="97%" data-cv-id="marcus_vance">👁️ View Full CV</button>'
+                f'<button class="btn-cv-download" data-cv-id="marcus_vance">📥 Download CV</button>'
                 f'</div>\n\n'
                 f"--- \n\n"
                 f"### 👤 Candidate 2: Priya Deshmukh — Senior Customer Experience & BPO Team Lead\n"
@@ -218,8 +218,8 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 f"- **Languages**: English (Fluent), Hindi, Marathi.\n"
                 f"- **Status**: 🟢 Verified Active • **Fit Score**: `94%`\n"
                 f'<div class="candidate-actions">'
-                f'<button class="btn-cv-view" onclick="viewCandidateCV(\'Priya Deshmukh\', \'Senior CX & BPO Team Lead\', \'6 years international BPO experience in Navi Mumbai IT Park\', \'Salesforce, Intercom, SLA Adherence, CSAT 96%\', \'{location_tag}\', \'94%\')">👁️ View Full CV</button>'
-                f'<button class="btn-cv-download" onclick="downloadCandidateCV(\'priya_deshmukh\')">📥 Download CV</button>'
+                f'<button class="btn-cv-view" data-cv-name="Priya Deshmukh" data-cv-role="Senior CX & BPO Team Lead" data-cv-exp="6 years international BPO experience in Navi Mumbai Mindspace IT Park" data-cv-skills="Salesforce Service Cloud, Intercom, SLA Adherence, CSAT 96%" data-cv-location="{location_tag}" data-cv-fit="94%" data-cv-id="priya_deshmukh">👁️ View Full CV</button>'
+                f'<button class="btn-cv-download" data-cv-id="priya_deshmukh">📥 Download CV</button>'
                 f'</div>\n\n'
                 f"--- \n\n"
                 f"### 👤 Candidate 3: Rajesh Kumar — BPO Operations Manager & Quality Auditor\n"
@@ -229,12 +229,13 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 f"- **Languages**: English (Fluent), Hindi (Native).\n"
                 f"- **Status**: 🟢 Verified Active • **Fit Score**: `91%`\n"
                 f'<div class="candidate-actions">'
-                f'<button class="btn-cv-view" onclick="viewCandidateCV(\'Rajesh Kumar\', \'BPO Operations Manager & Quality Auditor\', \'8 years managing contact center QA & VoIP ops\', \'Avaya OneCloud, Dialpad, QA Scorecards\', \'{location_tag}\', \'91%\')">👁️ View Full CV</button>'
-                f'<button class="btn-cv-download" onclick="downloadCandidateCV(\'rajesh_kumar\')">📥 Download CV</button>'
+                f'<button class="btn-cv-view" data-cv-name="Rajesh Kumar" data-cv-role="BPO Operations Manager & Quality Auditor" data-cv-exp="8 years managing contact center QA & VoIP operations in Belapur" data-cv-skills="Avaya OneCloud, Dialpad, Quality Scorecards, WFM" data-cv-location="{location_tag}" data-cv-fit="91%" data-cv-id="rajesh_kumar">👁️ View Full CV</button>'
+                f'<button class="btn-cv-download" data-cv-id="rajesh_kumar">📥 Download CV</button>'
                 f'</div>\n\n'
                 f"--- \n\n"
                 f"📌 **Recommended Action**: Click **[👁️ View Full CV]** to preview detailed resume inside UPONLY OS, or click **[📥 Download CV]** to save the document."
             )
+
 
 
         # 2. Sales / Lead Generation Queries

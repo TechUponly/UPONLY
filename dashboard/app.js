@@ -249,10 +249,10 @@ document.addEventListener("DOMContentLoaded", () => {
           .replace(/&lt;span class='code-tag'&gt;(.*?)&lt;\/span&gt;/g, "<span class='code-tag'>$1</span>")
           .replace(/&lt;div class="candidate-actions"&gt;/gi, '<div class="candidate-actions">')
           .replace(/&lt;\/div&gt;/gi, '</div>')
-          .replace(/&lt;button class="btn-cv-view" onclick="(.*?)"&gt;(.*?)&lt;\/button&gt;/gi, '<button class="btn-cv-view" onclick="$1">$2</button>')
-          .replace(/&lt;button class="btn-cv-download" onclick="(.*?)"&gt;(.*?)&lt;\/button&gt;/gi, '<button class="btn-cv-download" onclick="$1">$2</button>');
+          .replace(/&lt;button (.*?)&gt;(.*?)&lt;\/button&gt;/gi, '<button $1>$2</button>');
 
         let htmlContent = `<div class="bubble">${formatted}</div>`;
+
 
         
         if (msg.hasVideo) {
@@ -758,6 +758,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = `${getApiBaseUrl()}/api/download-cv/${candidateId}`;
     window.open(url, "_blank");
   };
+
+  // Event Delegation for Candidate Actions (View CV & Download CV)
+  if (chatThread) {
+    chatThread.addEventListener("click", (e) => {
+      const btnView = e.target.closest(".btn-cv-view");
+      if (btnView) {
+        const name = btnView.getAttribute("data-cv-name") || "Candidate";
+        const role = btnView.getAttribute("data-cv-role") || "Specialist";
+        const exp = btnView.getAttribute("data-cv-exp") || "Relevant Industry Experience";
+        const skills = btnView.getAttribute("data-cv-skills") || "CRM, SLA Management, CSAT";
+        const location = btnView.getAttribute("data-cv-location") || "Navi Mumbai";
+        const fit = btnView.getAttribute("data-cv-fit") || "95%";
+        window.viewCandidateCV(name, role, exp, skills, location, fit);
+      }
+
+      const btnDownload = e.target.closest(".btn-cv-download");
+      if (btnDownload) {
+        const id = btnDownload.getAttribute("data-cv-id") || "candidate";
+        window.downloadCandidateCV(id);
+      }
+    });
+  }
+
 
   btnExpandScreen.onclick = () => expandModal.classList.add("active");
   btnCloseModal.onclick = () => expandModal.classList.remove("active");

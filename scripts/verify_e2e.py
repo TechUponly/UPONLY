@@ -78,14 +78,17 @@ try:
     log_test("Real-Time Token Stream (/agents/stream)", r_stream.status_code == 200, f"Received {stream_tokens} stream chunks successfully")
 
     # Dynamic Agent Creation
+    import time
+    dynamic_id = f"audit_spec_{int(time.time())}"
     r = requests.post(f"{BASE_URL}/agents/create", json={
-        "agent_id": "audit_spec",
+        "agent_id": dynamic_id,
         "name": "Custom Audit Specialist",
         "icon": "🛡️",
         "role": "Chief Enterprise Security & Compliance Auditor",
         "system_prompt": "Audit all enterprise workflows and ensure strict regulatory adherence."
     })
     log_test("Create Dynamic Custom Agent (/agents/create)", r.status_code == 200, f"Message: {r.json().get('message')}")
+
 
 except Exception as e:
     log_test("Agent Fleet Integration Audit", False, str(e))
