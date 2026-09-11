@@ -46,3 +46,6 @@ wheels/
 node_modules/
 .npm
 .turbo
+
+# Runtime Memory Data
+data/

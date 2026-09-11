@@ -66,7 +66,11 @@ def download_candidate_cv(candidate_name: str):
     clean_id = candidate_name.lower()
     clean_name = candidate_name.replace("_", " ").title()
 
-    if "dev" in clean_id or "sharma" in clean_id or "verma" in clean_id or "singh" in clean_id or "python" in clean_id:
+    if "caller" in clean_id or "telecaller" in clean_id or "voice" in clean_id:
+        role_title = "Senior Inbound/Outbound Telecaller & Contact Center Executive"
+        competencies = "• Call Operations: Outbound Cold Calling, Inbound Customer Care, Tele-Sales, Voice Quality & Accent\n• Systems & CRMs: Dialpad, Zendesk, Salesforce Service Cloud, Call Script Execution\n• Metrics: 120+ Daily Call Volume, 96% Customer Satisfaction Rating, FCR Compliance"
+        experience = "1. Senior Telecaller & Contact Center Executive (2021 - Present)\n   - Managed high-volume inbound/outbound call queues for international BPO accounts in Navi Mumbai.\n   - Maintained 98% call quality score and achieved top caller conversion awards.\n\n2. Customer Support & Voice Specialist (2019 - 2021)\n   - Handled customer inquiries, ticket logging, and escalation resolutions."
+    elif "dev" in clean_id or "sharma_dev" in clean_id or "verma" in clean_id or "singh" in clean_id or "python" in clean_id:
         role_title = "Senior Software & Systems Engineer"
         competencies = "• Languages & Frameworks: Python 3.12, FastAPI, React.js, Node.js, TypeScript\n• Architecture: Microservices, Docker, Kubernetes, Redis, PostgreSQL, Vector Databases\n• Cloud & AI: AWS, Azure, LLM APIs, LangChain, CI/CD Pipelines"
         experience = "1. Senior Software Engineer (2021 - Present)\n   - Architected distributed microservices and RESTful APIs serving 500k+ daily requests.\n   - Streamlined deployment pipelines reducing release cycles by 45%.\n\n2. Full-Stack Developer (2018 - 2021)\n   - Built responsive SaaS web applications and database integrations."

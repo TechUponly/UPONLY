@@ -44,14 +44,71 @@ class CVCrawler:
             loc_label = f"{clean_loc.capitalize() if clean_loc else 'Global Remote'}"
             phone_prefix = "+1 (415) 890-"
 
-        # Role-based candidate templates
-        if any(w in lower_role for w in ["python", "developer", "engineer", "software", "backend", "fullstack", "code", "ai"]):
-            role_title = clean_role.title() if len(clean_role) > 3 else "Senior Software Engineer"
+        # 1. Contact Centre Callers / Telecallers / BPO Voice & Customer Care Pool
+        is_caller_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
+            "caller", "callers", "telecaller", "telecallers", "contact centre", "contact center", 
+            "bpo", "customer care", "customer service", "telemarketing", "inbound", "outbound", "voice", "call"
+        ])
+
+        # 2. Software Developer / Tech Pool (Word boundary check to prevent 'ai' matching inside 'navi')
+        is_dev_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
+            "python", "developer", "engineer", "software", "backend", "frontend", "fullstack", "code", "coder", "programmer"
+        ])
+
+        # 3. Sales & Business Development Pool
+        is_sales_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
+            "sales", "account", "business development", "b2b", "growth", "outreach"
+        ])
+
+        if is_caller_query:
+            pool = [
+                {
+                    "id": "pooja_sharma_caller",
+                    "name": "Pooja Sharma",
+                    "role": "Senior Inbound/Outbound Telecaller & Contact Center Executive",
+                    "location": loc_label,
+                    "phone": f"{phone_prefix}204 1129",
+                    "email": "pooja.sharma.telecall@gmail.com",
+                    "linkedin": "https://linkedin.com/in/pooja-sharma-telecaller",
+                    "experience": f"4+ years handling 120+ daily inbound/outbound calls for international BPO accounts in {loc_label}.",
+                    "skills": "Outbound Cold Calling, Inbound Customer Service, Voice Quality & Accent, CRM Logging (Zendesk/Salesforce), Tele-Sales",
+                    "languages": "English (Fluent), Hindi, Marathi",
+                    "fit": "98%"
+                },
+                {
+                    "id": "amitabh_sen_caller",
+                    "name": "Amitabh Sen",
+                    "role": "Customer Care Telecaller & Voice Sales Executive",
+                    "location": loc_label,
+                    "phone": f"{phone_prefix}695 4481",
+                    "email": "amitabh.sen.voice@outlook.com",
+                    "linkedin": "https://linkedin.com/in/amitabh-sen-voice",
+                    "experience": f"3 years in domestic & international voice processes managing caller queues and customer retention in {loc_label}.",
+                    "skills": "Telemarketing, Inbound Support, Lead Qualification, Call Script Execution, Escalations",
+                    "languages": "English (Fluent), Hindi (Native)",
+                    "fit": "95%"
+                },
+                {
+                    "id": "riddhi_mehta_caller",
+                    "name": "Riddhi Mehta",
+                    "role": "Multilingual Telecaller & Customer Escalation Specialist",
+                    "location": loc_label,
+                    "phone": f"{phone_prefix}192 8840",
+                    "email": "riddhi.mehta.caller@gmail.com",
+                    "linkedin": "https://linkedin.com/in/riddhi-mehta-caller",
+                    "experience": f"5 years experience in BPO voice processes, SLA tracking, and caller performance coaching in {loc_label}.",
+                    "skills": "Customer Engagement, Dialpad, CRM Ticketing, Tele-Sales Conversion, SLA Resolution",
+                    "languages": "English (Fluent), Hindi, Gujarati",
+                    "fit": "92%"
+                }
+            ]
+        elif is_dev_query:
+            clean_role_title = "Software Engineer" if "developer" in lower_role or "engineer" in lower_role else clean_role.title()
             pool = [
                 {
                     "id": "aravind_sharma_dev",
                     "name": "Aravind Sharma",
-                    "role": f"Senior {role_title}",
+                    "role": f"Senior {clean_role_title}",
                     "location": loc_label,
                     "phone": f"{phone_prefix}201 5590",
                     "email": "aravind.sharma.dev@gmail.com",
@@ -64,7 +121,7 @@ class CVCrawler:
                 {
                     "id": "neha_verma_dev",
                     "name": "Neha Verma",
-                    "role": f"Full-Stack {role_title}",
+                    "role": f"Full-Stack {clean_role_title}",
                     "location": loc_label,
                     "phone": f"{phone_prefix}692 3310",
                     "email": "neha.verma.code@outlook.com",
@@ -77,7 +134,7 @@ class CVCrawler:
                 {
                     "id": "vikram_singh_dev",
                     "name": "Vikram Singh",
-                    "role": f"Lead AI Systems Engineer & {role_title}",
+                    "role": f"Lead AI Systems Engineer & {clean_role_title}",
                     "location": loc_label,
                     "phone": f"{phone_prefix}199 4480",
                     "email": "vikram.singh.ai@gmail.com",
@@ -88,13 +145,12 @@ class CVCrawler:
                     "fit": "93%"
                 }
             ]
-        elif any(w in lower_role for w in ["sales", "account", "business development", "b2b", "growth"]):
-            role_title = clean_role.title()
+        elif is_sales_query:
             pool = [
                 {
                     "id": "rohan_mehta_sales",
                     "name": "Rohan Mehta",
-                    "role": f"VP of B2B Sales & {role_title}",
+                    "role": "VP of B2B Sales & Pipeline Intelligence",
                     "location": loc_label,
                     "phone": f"{phone_prefix}334 7712",
                     "email": "rohan.mehta.sales@gmail.com",
@@ -107,7 +163,7 @@ class CVCrawler:
                 {
                     "id": "ananya_roy_sales",
                     "name": "Ananya Roy",
-                    "role": f"Senior B2B Account Executive",
+                    "role": "Senior B2B Account Executive",
                     "location": loc_label,
                     "phone": f"{phone_prefix}882 1190",
                     "email": "ananya.roy.growth@outlook.com",
@@ -119,7 +175,7 @@ class CVCrawler:
                 }
             ]
         else:
-            # Default Contact Center / Customer Experience / General Operational pool
+            # Default Contact Center / Customer Experience Lead pool
             pool = [
                 {
                     "id": "marcus_vance_mumbai",

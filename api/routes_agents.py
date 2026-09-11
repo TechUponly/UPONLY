@@ -97,19 +97,74 @@ def create_new_agent(request: CreateAgentRequest):
 from fastapi.responses import StreamingResponse
 import json
 from core.llm_provider import LLMProvider
+from core.memory import get_agent_memory
+
+class AgentMemoryRequest(BaseModel):
+    key: str
+    value: Any
+
+@router.get("/{agent_type}/memory")
+def get_agent_memory_endpoint(agent_type: str):
+    clean_type = agent_type.lower()
+    if clean_type not in AGENTS_MAP:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_type}' not found.")
+    mem = get_agent_memory(clean_type)
+    return {
+        "agent_id": clean_type,
+        "context": mem.get_context(),
+        "total_events": len(mem.get_history()),
+        "history": mem.get_history(limit=50)
+    }
+
+@router.post("/{agent_type}/memory")
+def update_agent_memory_endpoint(agent_type: str, request: AgentMemoryRequest):
+    clean_type = agent_type.lower()
+    if clean_type not in AGENTS_MAP:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_type}' not found.")
+    mem = get_agent_memory(clean_type)
+    mem.set_context(request.key, request.value)
+    return {
+        "status": "success",
+        "agent_id": clean_type,
+        "message": f"Memory context key '{request.key}' updated for agent '{clean_type}'.",
+        "context": mem.get_context()
+    }
+
+@router.delete("/{agent_type}/memory")
+def clear_agent_memory_endpoint(agent_type: str):
+    clean_type = agent_type.lower()
+    if clean_type not in AGENTS_MAP:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_type}' not found.")
+    mem = get_agent_memory(clean_type)
+    mem.clear()
+    return {
+        "status": "success",
+        "agent_id": clean_type,
+        "message": f"Persistent memory cleared for agent '{clean_type}'."
+    }
 
 @router.post("/execute")
 def execute_agent_task(request: AgentTaskRequest):
-    agent = AGENTS_MAP.get(request.agent_type.lower())
+    clean_type = request.agent_type.lower()
+    agent = AGENTS_MAP.get(clean_type)
     if not agent:
         raise HTTPException(status_code=404, detail=f"Agent '{request.agent_type}' not found.")
     
+    query = request.payload.get("query", f"Execute directive for {agent.name}")
+    mem = get_agent_memory(clean_type)
+    mem.add_event(role="user", content=query)
+
     result = agent.execute_task(request.payload)
+    
+    final_output = result.get("execution_details", {}).get("content", str(result))
+    mem.add_event(role="agent", content=final_output)
+
     return result
 
 @router.post("/stream")
 def stream_agent_task(request: AgentTaskRequest):
-    agent = AGENTS_MAP.get(request.agent_type.lower())
+    clean_type = request.agent_type.lower()
+    agent = AGENTS_MAP.get(clean_type)
     if not agent:
         raise HTTPException(status_code=404, detail=f"Agent '{request.agent_type}' not found.")
     
@@ -117,10 +172,17 @@ def stream_agent_task(request: AgentTaskRequest):
     prompt = f"Task Directive: {query}"
     system_prompt = f"Role: {agent.role}\nDirective: {getattr(agent, 'system_prompt', 'Execute directive with peak reasoning.')}"
 
+    mem = get_agent_memory(clean_type)
+    mem.add_event(role="user", content=query)
+
     def event_generator():
         llm = LLMProvider()
+        full_content = ""
         for chunk in llm.stream_generate(prompt, system_prompt):
+            full_content += chunk
             yield f"data: {json.dumps({'token': chunk})}\n\n"
+        
+        mem.add_event(role="agent", content=full_content)
         yield f"data: {json.dumps({'status': 'COMPLETED'})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
