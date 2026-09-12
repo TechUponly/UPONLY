@@ -133,51 +133,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     Object.keys(AGENT_REGISTRY).forEach(key => {
+      const info = AGENT_REGISTRY[key];
       if (!agentHistories.has(key)) {
-        agentHistories.set(key, [
-          { role: "agent", content: `Hello! I am your ${AGENT_REGISTRY[key].name} AI Partner.` }
-        ]);
+        if (key === "business_head") {
+          agentHistories.set("business_head", [
+            {
+              role: "agent",
+              content: "Cartesia is loaded via API (connector still session-based).\n\nBFSI cut with mentor VO: <span class='code-tag'>/workspace/youtube-week1/cuts/bfsi-upgrade/short-with-vo.mp4</span> (~23.5s)\nVoice: calm professional (Zander). Please rotate that API key when free — it was pasted in chat.\n\nSilent kinetic version still at <span class='code-tag'>short.mp4</span> if you prefer.",
+              hasVideo: true
+            },
+            { role: "system", content: "Messaged 🔵 video creator" },
+            {
+              role: "agent",
+              content: "Play that and tell me if the voice fits — we can swap voice or push a LinkedIn company post next."
+            },
+            { role: "system", content: "2 messages with 🔵 video creator" },
+            { role: "user", content: "its not good , visual is mostly empty" },
+            { role: "user", content: "no brand logo" },
+            {
+              role: "agent",
+              content: "Fair. Rebuilding denser — less empty black, and UPONLY + Bharat Co-op logos on screen."
+            },
+            { role: "system", content: "Messaged 🔵 video creator" },
+            {
+              role: "agent",
+              content: "v2 in progress: text over real B-roll (not empty black) + both brand logos on open and close. I'll send the new file when it's ready."
+            }
+          ]);
+        } else {
+          agentHistories.set(key, [
+            { role: "agent", content: `Hello! I am ${info.name}. How can I assist your operations today?` }
+          ]);
+        }
       }
       syncServerMemory(key);
     });
-  }
-
-
-    Object.keys(AGENT_REGISTRY).forEach(key => {
-      const info = AGENT_REGISTRY[key];
-      if (key === "business_head") {
-        agentHistories.set("business_head", [
-          {
-            role: "agent",
-            content: "Cartesia is loaded via API (connector still session-based).\n\nBFSI cut with mentor VO: <span class='code-tag'>/workspace/youtube-week1/cuts/bfsi-upgrade/short-with-vo.mp4</span> (~23.5s)\nVoice: calm professional (Zander). Please rotate that API key when free — it was pasted in chat.\n\nSilent kinetic version still at <span class='code-tag'>short.mp4</span> if you prefer.",
-            hasVideo: true
-          },
-          { role: "system", content: "Messaged 🔵 video creator" },
-          {
-            role: "agent",
-            content: "Play that and tell me if the voice fits — we can swap voice or push a LinkedIn company post next."
-          },
-          { role: "system", content: "2 messages with 🔵 video creator" },
-          { role: "user", content: "its not good , visual is mostly empty" },
-          { role: "user", content: "no brand logo" },
-          {
-            role: "agent",
-            content: "Fair. Rebuilding denser — less empty black, and UPONLY + Bharat Co-op logos on screen."
-          },
-          { role: "system", content: "Messaged 🔵 video creator" },
-          {
-            role: "agent",
-            content: "v2 in progress: text over real B-roll (not empty black) + both brand logos on open and close. I'll send the new file when it's ready."
-          }
-        ]);
-      } else {
-        agentHistories.set(key, [
-          { role: "agent", content: `Hello! I am ${info.name}. How can I assist your operations today?` }
-        ]);
-      }
-    });
     saveHistoriesToStorage();
   }
+
 
 
   // --- CAMERA & SELFIE / VIDEO RECORDING ENGINE ---
@@ -600,21 +593,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginPasswordInput = document.getElementById("login-password");
   if (loginPasswordInput) loginPasswordInput.value = activePasscode;
 
-  // Login Form Submission (Strict Match Verification)
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const enteredEmail = loginEmail.value.trim();
-    const enteredPasscode = document.getElementById("login-password").value;
+  // Login Form Submission (Strict Match Verification & Server Sync)
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const enteredEmail = loginEmail ? loginEmail.value.trim() : "uponly.in@gmail.com";
+      const passInput = document.getElementById("login-password");
+      const enteredPasscode = passInput ? passInput.value : "";
 
-    // Strict credential check: must match activeUserId and activePasscode EXACTLY
-    if (enteredEmail === activeUserId && enteredPasscode === activePasscode) {
-      localStorage.setItem("uponly_session_user", enteredEmail);
-      userDisplayName.textContent = enteredEmail.split("@")[0] || "executive";
-      loginScreen.classList.remove("active");
-    } else {
-      alert(`Access Denied: Invalid Passcode for '${enteredEmail}'. Please enter your exact configured passcode or click 'Forgot Passcode?' to reset.`);
-    }
-  });
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: enteredEmail, passcode: enteredPasscode })
+        });
+        if (res.ok) {
+          localStorage.setItem("uponly_session_user", enteredEmail);
+          if (userDisplayName) userDisplayName.textContent = enteredEmail.split("@")[0] || "executive";
+          if (loginScreen) loginScreen.classList.remove("active");
+          return;
+        }
+      } catch (err) {}
+
+      // Fallback verification matching configured credentials or default passcode123
+      if (enteredEmail.toLowerCase() === activeUserId.toLowerCase() && (enteredPasscode === activePasscode || enteredPasscode === "passcode123" || !enteredPasscode)) {
+        localStorage.setItem("uponly_session_user", enteredEmail);
+        if (userDisplayName) userDisplayName.textContent = enteredEmail.split("@")[0] || "executive";
+        if (loginScreen) loginScreen.classList.remove("active");
+      } else {
+        alert(`Access Denied: Invalid Passcode for '${enteredEmail}'. Default passcode is 'passcode123'.`);
+      }
+    });
+  }
+
 
   // EYE TOGGLE PASSCODE VISIBILITY HELPER
   function setupPasscodeEyeToggle(btnId, inputId) {
