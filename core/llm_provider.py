@@ -193,6 +193,27 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         lower_prompt = clean_prompt.lower()
         stripped_prompt = re.sub(r"[^\w\s]", "", lower_prompt).strip()
 
+        has_role_target = any(w in lower_prompt for w in [
+            "candidate", "candidates", "cv", "cvs", "resume", "resumes", 
+            "telecaller", "telecallers", "caller", "callers", "bpo",
+            "developer", "developers", "engineer", "engineers", "programmer"
+        ])
+        has_action_verb = any(w in lower_prompt for w in [
+            "find", "search", "list", "source", "fetch", "get", "show", "need", "look for", "check", "run", "want", "hire"
+        ])
+        explicit_phrase = any(w in lower_prompt for w in [
+            "telecaller", "telecallers", "caller list", "cv list", "resume list", "candidate list", "need callers", "need telecallers", "check now", "sourcing"
+        ])
+        is_informational = any(w in lower_prompt for w in [
+            "tell me about", "how do you", "what is your", "explain", "understand", "remember", "guide", "process", "policy", "workflow"
+        ])
+
+        if is_informational and not explicit_phrase:
+            is_candidate_search_query = False
+        else:
+            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase
+
+
         is_recruiting = any(w in agent_role.lower() for w in ["talent", "recruiting", "hr", "hiring"]) or "recruiting" in (system_prompt or "").lower()
         is_sales = "sales" in agent_role.lower()
         is_content = "content" in agent_role.lower()
@@ -205,36 +226,32 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             if is_recruiting:
                 content = (
                     "👋 **Hello! I am UPONLY's Autonomous Talent Acquisition & Sourcing Agent.**\n\n"
-                    "I crawl open candidate databases, extract CVs with verified contact details (Phone, Email, LinkedIn), screen profiles, and generate interactive resume previews and downloads.\n\n"
+                    "I crawl open candidate databases, extract CVs with verified contact details (10-digit Phone, Email, LinkedIn), screen profiles, and manage candidate sourcing ledgers.\n\n"
                     "💡 **How can I help you today?** You can ask me to:\n"
-                    "• *\"Find Python developers in Navi Mumbai\"*\n"
-                    "• *\"Search contact center operations managers in Mumbai\"*\n"
-                    "• *\"Find B2B sales executives in Bengaluru\"*\n"
-                    "• *\"Source international customer support leads\"*"
+                    "• *\"Find telecallers in Navi Mumbai\"*\n"
+                    "• *\"Search 100 Python developer CVs\"*\n"
+                    "• Or click the **Candidate Ledger** tab to view all sourced talent in tabular format."
                 )
             elif is_sales:
                 content = (
-                    "💼 **Hello! I am UPONLY's B2B Sales & Pipeline Agent.**\n\n"
-                    "I qualify high-intent B2B prospects, draft outreach campaigns, analyze sales conversion funnels, and build custom B2B proposals.\n\n"
-                    "💡 Tell me your target market or product directive (e.g. *\"Qualify leads for enterprise SaaS in fintech\"* or *\"Draft cold outreach email for logistics executives\"*)."
-                )
-            elif is_video:
-                content = (
-                    "🎬 **Hello! I am UPONLY's Multimedia & Video Production Director.**\n\n"
-                    "I design kinetic storyboards, B-roll overlay sequences, voiceover scripts, and automated video cuts for brand campaigns.\n\n"
-                    "💡 Describe your video request (e.g. *\"Create a 30-second promo script for UPONLY OS launching in BFSI\"*)."
+                    "💼 **Greetings! I am your B2B Sales & Pipeline Intelligence Partner.**\n\n"
+                    "I qualify target lead cohorts, draft outreach emails, and optimize sales pipelines.\n\n"
+                    "💡 How can I assist your sales team today?"
                 )
             elif is_content:
                 content = (
-                    "✍️ **Hello! I am UPONLY's Viral Content & Copy Strategist.**\n\n"
-                    "I draft high-converting LinkedIn articles, social posts, technical blogs, and ad copy tailored for your audience.\n\n"
-                    "💡 What topic or format would you like me to write about today?"
+                    "✍️ **Hello! I am your Content Strategy & Executive Copywriting AI.**\n\n"
+                    "I create corporate articles, social media posts, and marketing campaign drafts."
+                )
+            elif is_video:
+                content = (
+                    "🎬 **Hello! I am your Multimedia & Video Production Specialist.**\n\n"
+                    "I create video storyboards, voiceover script breakdowns, and promo cuts."
                 )
             elif is_finance:
                 content = (
-                    "📈 **Hello! I am UPONLY's P&L Audit & Revenue Forecasting Agent.**\n\n"
-                    "I perform real-time financial modeling, margin audits, COGS tracking, and executive budget forecasts.\n\n"
-                    "💡 How can I assist with your financial analytics today?"
+                    "📈 **Greetings! I am your Financial Audit & Forecasting Partner.**\n\n"
+                    "I analyze revenue models, run cost audits, and build P&L projections."
                 )
             elif is_business_head:
                 content = (
@@ -249,8 +266,8 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                     f"💡 Type your prompt or instruction to begin."
                 )
 
-        # 2. CANDIDATE SOURCING / RESUME / CV SEARCH
-        elif is_recruiting or any(w in lower_prompt for w in ["cv", "resume", "recruit", "candidate", "hire", "hiring", "applicant", "sourcing", "developer", "engineer", "lead"]):
+        # 2. CANDIDATE SOURCING / RESUME / CV SEARCH (TRIGGERED ONLY ON EXPLICIT SEARCH INTENT)
+        elif is_candidate_search_query:
             loc_match = "Navi Mumbai"
             if "navi" in lower_prompt or "mumbai" in lower_prompt:
                 loc_match = "Navi Mumbai"

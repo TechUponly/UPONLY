@@ -10,6 +10,24 @@ from pathlib import Path
 MASTER_FILE = Path(__file__).resolve().parent.parent / "data" / "memory" / "candidate_master.json"
 MASTER_FILE.parent.mkdir(parents=True, exist_ok=True)
 
+def deduplicate_candidates(candidates_list):
+    if not candidates_list:
+        return []
+    seen = set()
+    unique = []
+    for c in candidates_list:
+        name_clean = (c.get("name") or "").strip().lower()
+        email_clean = (c.get("email") or "").strip().lower()
+        phone_clean = (c.get("phone") or "").replace(" ", "").strip()
+        c_id = (c.get("id") or "").strip()
+        
+        fingerprint = (name_clean, phone_clean) if name_clean and phone_clean else (email_clean or c_id)
+        if fingerprint and fingerprint not in seen:
+            seen.add(fingerprint)
+            unique.append(c)
+    return unique
+
+
 class CVCrawler:
     """
     Live Open-Source CV & Contact Information Crawler with Master Ledger & Deduplication Engine.
@@ -27,20 +45,24 @@ class CVCrawler:
         if MASTER_FILE.exists():
             try:
                 with open(MASTER_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    return deduplicate_candidates(data)
             except Exception:
                 pass
         return []
 
     def _save_master(self):
         try:
+            self.master_candidates = deduplicate_candidates(self.master_candidates)
             with open(MASTER_FILE, "w", encoding="utf-8") as f:
                 json.dump(self.master_candidates, f, indent=2)
         except Exception:
             pass
 
     def get_master_candidates(self):
+        self.master_candidates = deduplicate_candidates(self.master_candidates)
         return self.master_candidates
+
 
     def search_candidates(self, location: str = "Navi Mumbai", role: str = "contact center", limit: int = 100):
         """

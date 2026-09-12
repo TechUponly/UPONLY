@@ -122,19 +122,21 @@ import csv
 
 @app.get("/api/master-candidates")
 def get_master_candidates_json():
-    from integrations.cv_crawler import cv_crawler
+    from integrations.cv_crawler import cv_crawler, deduplicate_candidates
+    unique_candidates = deduplicate_candidates(cv_crawler.get_master_candidates())
     return {
         "status": "success",
-        "total": len(cv_crawler.get_master_candidates()),
-        "candidates": cv_crawler.get_master_candidates()
+        "total": len(unique_candidates),
+        "candidates": unique_candidates
     }
 
 
 @app.get("/api/export-master-excel")
 def export_master_candidate_excel():
 
-    from integrations.cv_crawler import cv_crawler
-    candidates = cv_crawler.get_master_candidates()
+    from integrations.cv_crawler import cv_crawler, deduplicate_candidates
+    candidates = deduplicate_candidates(cv_crawler.get_master_candidates())
+
 
     try:
         import openpyxl
