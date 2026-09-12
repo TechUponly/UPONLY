@@ -106,17 +106,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (res.ok) {
         const data = await res.json();
         if (data.history && data.history.length > 0) {
-          const current = agentHistories.get(agentKey) || [];
-          if (current.length <= 1) {
-            const restored = data.history.map(item => ({
-              role: item.role === "user" ? "user" : "agent",
-              content: item.content
-            }));
-            agentHistories.set(agentKey, restored);
-            saveHistoriesToStorage();
-            if (activeAgentKey === agentKey) {
-              renderThread(agentKey);
-            }
+          const restored = data.history.map(item => ({
+            role: item.role === "user" ? "user" : "agent",
+            content: item.content
+          }));
+          agentHistories.set(agentKey, restored);
+          saveHistoriesToStorage();
+          if (activeAgentKey === agentKey) {
+            renderThread(agentKey);
           }
         }
       }
@@ -132,9 +129,19 @@ document.addEventListener("DOMContentLoaded", () => {
         Object.keys(parsed).forEach(k => {
           agentHistories.set(k, parsed[k]);
         });
-        return;
       } catch (e) {}
     }
+
+    Object.keys(AGENT_REGISTRY).forEach(key => {
+      if (!agentHistories.has(key)) {
+        agentHistories.set(key, [
+          { role: "agent", content: `Hello! I am your ${AGENT_REGISTRY[key].name} AI Partner.` }
+        ]);
+      }
+      syncServerMemory(key);
+    });
+  }
+
 
     Object.keys(AGENT_REGISTRY).forEach(key => {
       const info = AGENT_REGISTRY[key];
@@ -849,6 +856,138 @@ document.addEventListener("DOMContentLoaded", () => {
   btnExpandScreen.onclick = () => expandModal.classList.add("active");
   btnCloseModal.onclick = () => expandModal.classList.remove("active");
 
+  // --- TOP NAVIGATION TABS & CANDIDATE SEARCH LEDGER (TABULAR VIEW) ---
+  const tabChatStream = document.getElementById("tab-chat-stream");
+  const tabCandidateLedger = document.getElementById("tab-candidate-ledger");
+  const chatHeader = document.getElementById("chat-header");
+  const candidateTabularView = document.getElementById("candidate-tabular-view");
+  const ledgerCountBadge = document.getElementById("ledger-count-badge");
+  const ledgerSearchInput = document.getElementById("ledger-search-input");
+  const candidateTableBody = document.getElementById("candidate-table-body");
+  const btnExportExcelTab = document.getElementById("btn-export-excel-tab");
+
+  let masterCandidatesCache = [];
+
+  async function fetchMasterCandidateLedger() {
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/master-candidates`);
+      if (res.ok) {
+        const data = await res.json();
+        masterCandidatesCache = data.candidates || [];
+        if (ledgerCountBadge) {
+          ledgerCountBadge.textContent = masterCandidatesCache.length;
+        }
+        renderCandidateTable(masterCandidatesCache);
+      }
+    } catch (e) {}
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderCandidateTable(candidates) {
+    if (!candidateTableBody) return;
+    const filter = (ledgerSearchInput?.value || "").toLowerCase().trim();
+    
+    const filtered = candidates.filter(c => {
+      if (!filter) return true;
+      const str = `${c.name} ${c.role} ${c.location} ${c.skills} ${c.email} ${c.phone}`.toLowerCase();
+      return str.includes(filter);
+    });
+
+    if (filtered.length === 0) {
+      candidateTableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">No candidates found matching search filter.</td></tr>`;
+      return;
+    }
+
+    let html = "";
+    filtered.forEach((c, idx) => {
+      html += `
+        <tr>
+          <td><strong>${idx + 1}</strong></td>
+          <td><strong>${escapeHtml(c.name || 'Candidate')}</strong></td>
+          <td><span style="color: #60a5fa; font-weight: 600;">${escapeHtml(c.role || '')}</span></td>
+          <td>${escapeHtml(c.location || '')}</td>
+          <td><code style="background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #10b981;">${escapeHtml(c.phone || '')}</code></td>
+          <td><code style="background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #94a3b8;">${escapeHtml(c.email || '')}</code></td>
+          <td style="max-width: 260px;"><div style="font-size: 11px; color: #cbd5e1;">${escapeHtml(c.skills || c.experience || '')}</div></td>
+          <td><span style="background: #065f46; color: #6ee7b7; padding: 2px 8px; border-radius: 12px; font-weight: 700;">${escapeHtml(c.fit || '90%')}</span></td>
+          <td>
+            <div class="table-action-group">
+              <button class="table-btn-cv table-btn-view btn-cv-view" data-cv-name="${escapeHtml(c.name)}" data-cv-role="${escapeHtml(c.role)}" data-cv-phone="${escapeHtml(c.phone)}" data-cv-email="${escapeHtml(c.email)}" data-cv-linkedin="${escapeHtml(c.linkedin)}" data-cv-exp="${escapeHtml(c.experience)}" data-cv-skills="${escapeHtml(c.skills)}" data-cv-location="${escapeHtml(c.location)}" data-cv-fit="${escapeHtml(c.fit)}" data-cv-id="${escapeHtml(c.id)}">👁️ CV</button>
+              <button class="table-btn-cv table-btn-dl btn-cv-download" data-cv-id="${escapeHtml(c.id)}">📥 DL</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    candidateTableBody.innerHTML = html;
+  }
+
+  if (tabChatStream && tabCandidateLedger) {
+    tabChatStream.addEventListener("click", () => {
+      tabChatStream.classList.add("active");
+      tabCandidateLedger.classList.remove("active");
+      if (chatHeader) chatHeader.style.display = "flex";
+      if (chatThread) chatThread.style.display = "flex";
+      if (chatForm) chatForm.style.display = "flex";
+      if (candidateTabularView) candidateTabularView.style.display = "none";
+    });
+
+    tabCandidateLedger.addEventListener("click", () => {
+      tabCandidateLedger.classList.add("active");
+      tabChatStream.classList.remove("active");
+      if (chatHeader) chatHeader.style.display = "none";
+      if (chatThread) chatThread.style.display = "none";
+      if (chatForm) chatForm.style.display = "none";
+      if (candidateTabularView) candidateTabularView.style.display = "flex";
+      fetchMasterCandidateLedger();
+    });
+  }
+
+  if (ledgerSearchInput) {
+    ledgerSearchInput.addEventListener("input", () => {
+      renderCandidateTable(masterCandidatesCache);
+    });
+  }
+
+  if (btnExportExcelTab) {
+    btnExportExcelTab.addEventListener("click", () => {
+      window.downloadMasterExcel();
+    });
+  }
+
+  if (candidateTabularView) {
+    candidateTabularView.addEventListener("click", (e) => {
+      const btnView = e.target.closest(".btn-cv-view");
+      if (btnView) {
+        const name = btnView.getAttribute("data-cv-name") || "Candidate";
+        const role = btnView.getAttribute("data-cv-role") || "Specialist";
+        const exp = btnView.getAttribute("data-cv-exp") || "Relevant Industry Experience";
+        const skills = btnView.getAttribute("data-cv-skills") || "CRM, SLA Management, CSAT";
+        const location = btnView.getAttribute("data-cv-location") || "Navi Mumbai";
+        const fit = btnView.getAttribute("data-cv-fit") || "95%";
+        const phone = btnView.getAttribute("data-cv-phone") || "+91 98201 44321";
+        const email = btnView.getAttribute("data-cv-email") || "candidate@gmail.com";
+        window.viewCandidateCV(name, role, exp, skills, location, fit, phone, email);
+      }
+
+      const btnDownload = e.target.closest(".btn-cv-download");
+      if (btnDownload) {
+        const id = btnDownload.getAttribute("data-cv-id") || "candidate";
+        window.downloadCandidateCV(id);
+      }
+    });
+  }
+
+  fetchMasterCandidateLedger();
+
   initHistories();
   bindFleetClicks();
   selectAgent("business_head");
@@ -857,4 +996,5 @@ document.addEventListener("DOMContentLoaded", () => {
     loginScreen.classList.remove("active");
   }
 });
+
 

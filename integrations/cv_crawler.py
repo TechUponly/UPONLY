@@ -160,7 +160,23 @@ class CVCrawler:
         if newly_sourced:
             self.master_candidates = newly_sourced + self.master_candidates
             self._save_master()
+            return newly_sourced
 
-        return newly_sourced
+        # Fallback: if no new candidates were added (already in master ledger), filter and return master ledger candidates
+        filtered_master = []
+        for c in self.master_candidates:
+            c_role = c.get("role", "").lower()
+            if is_caller_query and any(w in c_role for w in ["caller", "telecaller", "contact center", "bpo", "voice"]):
+                filtered_master.append(c)
+            elif is_dev_query and any(w in c_role for w in ["engineer", "python", "software", "developer", "cloud"]):
+                filtered_master.append(c)
+            elif is_sales_query and any(w in c_role for w in ["sales", "b2b", "account"]):
+                filtered_master.append(c)
+
+        if not filtered_master:
+            filtered_master = self.master_candidates
+
+        return filtered_master[:min(limit, len(filtered_master))]
 
 cv_crawler = CVCrawler()
+

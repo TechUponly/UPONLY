@@ -120,8 +120,19 @@ Verified Candidate Reference ID: UPONLY-CV-{abs(hash(clean_name)) % 1000000}
 import io
 import csv
 
+@app.get("/api/master-candidates")
+def get_master_candidates_json():
+    from integrations.cv_crawler import cv_crawler
+    return {
+        "status": "success",
+        "total": len(cv_crawler.get_master_candidates()),
+        "candidates": cv_crawler.get_master_candidates()
+    }
+
+
 @app.get("/api/export-master-excel")
 def export_master_candidate_excel():
+
     from integrations.cv_crawler import cv_crawler
     candidates = cv_crawler.get_master_candidates()
 

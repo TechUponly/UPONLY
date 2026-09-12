@@ -243,8 +243,14 @@
 
     <!-- PANE 2: CENTER MAIN CHAT HUB -->
     <main class="center-pane">
+      <!-- Workspace Top Navigation Tabs Bar -->
+      <div class="workspace-top-tabs">
+        <button type="button" class="top-tab-btn active" id="tab-chat-stream">💬 Chat Stream</button>
+        <button type="button" class="top-tab-btn" id="tab-candidate-ledger">📊 Candidate Search Ledger <span class="tab-badge" id="ledger-count-badge">0</span></button>
+      </div>
+
       <!-- Active Agent Header -->
-      <div class="chat-header">
+      <div class="chat-header" id="chat-header">
         <div class="chat-agent-info">
           <span class="agent-avatar red" id="chat-header-avatar">🔴</span>
           <div>
@@ -263,6 +269,42 @@
       <div class="chat-thread" id="chat-thread">
         <!-- Messages rendered dynamically -->
       </div>
+
+      <!-- Candidate Search Ledger (Tabular View Container) -->
+      <div class="candidate-tabular-view" id="candidate-tabular-view" style="display: none;">
+        <div class="ledger-top-control-bar">
+          <div class="ledger-title-group">
+            <h3>📋 Sourced Candidate Master Ledger</h3>
+            <span class="ledger-subtitle">Real-time indexed candidate profiles with 10-digit contact details (Latest at top)</span>
+          </div>
+          <div class="ledger-actions-group">
+            <input type="text" id="ledger-search-input" placeholder="🔍 Search name, role, skills, location..." class="ledger-filter-input">
+            <button type="button" class="btn-excel-export-header" id="btn-export-excel-tab">📥 Download Master Excel (.xlsx)</button>
+          </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+          <table class="candidate-master-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Candidate Name</th>
+                <th>Job Role</th>
+                <th>Location</th>
+                <th>Phone Number</th>
+                <th>Email Address</th>
+                <th>Skills & Experience</th>
+                <th>Fit Score</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="candidate-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
 
       <!-- Attachment Preview Chips Bar -->
       <div class="attachment-preview-bar" id="attachment-preview-bar"></div>
@@ -554,7 +596,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js?v=3.0"></script>
 
 
 
