@@ -986,11 +986,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const btnHeaderExportExcel = document.getElementById("btn-header-export-excel");
+  if (btnHeaderExportExcel) {
+    btnHeaderExportExcel.addEventListener("click", () => {
+      window.downloadMasterExcel();
+    });
+  }
+
   fetchMasterCandidateLedger();
 
   initHistories();
   bindFleetClicks();
   selectAgent("business_head");
+
 
   if (localStorage.getItem("uponly_session_user")) {
     loginScreen.classList.remove("active");

@@ -74,7 +74,7 @@ class CVCrawler:
         # 1. Contact Centre Callers / Telecallers / BPO Voice Pool
         is_caller_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
             "caller", "callers", "telecaller", "telecallers", "contact centre", "contact center", 
-            "bpo", "customer care", "customer service", "telemarketing", "inbound", "outbound", "voice", "call"
+            "bpo", "customer care", "customer service", "telemarketing", "inbound", "outbound", "voice", "call", "tele"
         ])
 
         # 2. Software Developer / Tech Pool
@@ -86,6 +86,10 @@ class CVCrawler:
         is_sales_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
             "sales", "account", "business development", "b2b", "growth", "outreach"
         ])
+
+        # If generic query (e.g. "check now", "search"), default to caller query unless dev/sales is specified
+        if not is_dev_query and not is_sales_query:
+            is_caller_query = True
 
         # Name Bank for dynamic candidate synthesis
         first_names = ["Pooja", "Amitabh", "Riddhi", "Siddharth", "Deepika", "Karan", "Tanvi", "Rahul", "Neha", "Aravind", "Vikram", "Sameer", "Divya", "Rohan", "Ananya", "Manish", "Priya", "Rajesh", "Marcus", "Sneha", "Aditya", "Bhavna", "Chetan", "Devika", "Esha", "Farhan", "Gaurav", "Harini", "Ishaan", "Jaya", "Kavya", "Lokesh", "Meera", "Nikhil", "Omkar", "Pranav", "Qasim", "Ritu", "Sanjay", "Trisha", "Uma", "Varun", "Yash", "Zoya", "Alok", "Bhavesh", "Chirag", "Dinesh", "Gautam"]
@@ -127,10 +131,10 @@ class CVCrawler:
                 c_slug = "ops"
 
             c_id = f"{fn.lower()}_{ln.lower()}_{c_slug}_{i}"
-            email = f"{fn.lower()}.{ln.lower()}{i+10}@gmail.com"
+            email = f"{fn.lower()}.{ln.lower()}{i+10}.{c_slug}@gmail.com"
             
-            # Format EXACT 10-digit Indian phone number after +91
-            p_mid = 98200 + (i * 17) % 9000
+            # Format EXACT 10-digit Indian phone number after +91 (5 digits space 5 digits)
+            p_mid = 98200 + (i * 17) % 1700
             p_end = 10000 + (i * 131) % 89999
             phone = f"+91 {p_mid} {p_end}"
 
@@ -156,13 +160,13 @@ class CVCrawler:
                 existing_ids.add(c_id)
                 existing_emails.add(email)
 
-        # Place NEW candidates at the TOP (latest first) of the master ledger!
+        # Save NEW candidates at the TOP of the master ledger!
         if newly_sourced:
             self.master_candidates = newly_sourced + self.master_candidates
             self._save_master()
             return newly_sourced
 
-        # Fallback: if no new candidates were added (already in master ledger), filter and return master ledger candidates
+        # Filter master ledger for matching role
         filtered_master = []
         for c in self.master_candidates:
             c_role = c.get("role", "").lower()
@@ -173,10 +177,12 @@ class CVCrawler:
             elif is_sales_query and any(w in c_role for w in ["sales", "b2b", "account"]):
                 filtered_master.append(c)
 
-        if not filtered_master:
-            filtered_master = self.master_candidates
+        if filtered_master:
+            return filtered_master[:min(limit, len(filtered_master))]
 
-        return filtered_master[:min(limit, len(filtered_master))]
+        # If no candidates matched the requested role in master ledger, return the generated pool directly
+        return newly_sourced if newly_sourced else self.master_candidates[:min(limit, len(self.master_candidates))]
 
 cv_crawler = CVCrawler()
+
 

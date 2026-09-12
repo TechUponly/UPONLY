@@ -243,13 +243,7 @@
 
     <!-- PANE 2: CENTER MAIN CHAT HUB -->
     <main class="center-pane">
-      <!-- Workspace Top Navigation Tabs Bar -->
-      <div class="workspace-top-tabs">
-        <button type="button" class="top-tab-btn active" id="tab-chat-stream">💬 Chat Stream</button>
-        <button type="button" class="top-tab-btn" id="tab-candidate-ledger">📊 Candidate Search Ledger <span class="tab-badge" id="ledger-count-badge">0</span></button>
-      </div>
-
-      <!-- Active Agent Header -->
+      <!-- Active Agent Header & Workspace Navigation Tabs Bar -->
       <div class="chat-header" id="chat-header">
         <div class="chat-agent-info">
           <span class="agent-avatar red" id="chat-header-avatar">🔴</span>
@@ -258,7 +252,15 @@
             <span class="chat-header-role" id="chat-header-role">Chief Executive Orchestrator</span>
           </div>
         </div>
+
+        <!-- Workspace Top Navigation Tabs Bar -->
+        <div class="workspace-top-tabs">
+          <button type="button" class="top-tab-btn active" id="tab-chat-stream">💬 Chat Stream</button>
+          <button type="button" class="top-tab-btn" id="tab-candidate-ledger">📊 Candidate Ledger <span class="tab-badge" id="ledger-count-badge">0</span></button>
+        </div>
+
         <div class="server-status-pill">
+          <button type="button" class="btn-excel-header-shortcut" id="btn-header-export-excel" title="Export All Candidates to Master Excel (.xlsx)">📥 Export All Excel</button>
           <span class="status-dot"></span>
           <span id="current-engine-tag">Claude 3.5 Sonnet Connected</span>
           <button class="btn-settings-icon" id="btn-open-settings" title="Settings">⚙️</button>
@@ -269,6 +271,7 @@
       <div class="chat-thread" id="chat-thread">
         <!-- Messages rendered dynamically -->
       </div>
+
 
       <!-- Candidate Search Ledger (Tabular View Container) -->
       <div class="candidate-tabular-view" id="candidate-tabular-view" style="display: none;">
@@ -596,7 +599,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=3.2"></script>
 
 
 
