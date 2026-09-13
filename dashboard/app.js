@@ -1004,6 +1004,228 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // AGENT TRAINING & MEMORY MANAGER HUB
+  const trainAgentModal = document.getElementById("train-agent-modal");
+  const btnOpenTrainAgent = document.getElementById("btn-open-train-agent");
+  const btnCloseTrainModal = document.getElementById("btn-close-train-modal");
+
+  const trainTabDirectives = document.getElementById("train-tab-directives");
+  const trainTabMemory = document.getElementById("train-tab-memory");
+  const trainPaneDirectives = document.getElementById("train-pane-directives");
+  const trainPaneMemory = document.getElementById("train-pane-memory");
+
+  const trainModalAgentName = document.getElementById("train-modal-agent-name");
+  const trainAgentRole = document.getElementById("train-agent-role");
+  const trainSystemPrompt = document.getElementById("train-system-prompt");
+  const trainDirectivesForm = document.getElementById("train-directives-form");
+
+  const addMemoryKvForm = document.getElementById("add-memory-kv-form");
+  const newMemKey = document.getElementById("new-mem-key");
+  const newMemVal = document.getElementById("new-mem-val");
+  const memoryKvTbody = document.getElementById("memory-kv-tbody");
+  const memoryStatsText = document.getElementById("memory-stats-text");
+  const btnClearAllMemory = document.getElementById("btn-clear-all-memory");
+
+  const HIRING_PRESETS = {
+    telecaller: {
+      role: "Telecaller & Inside Sales Talent Acquisition Specialist",
+      prompt: `Rule 1: Always verify 10-digit valid phone numbers. Ensure candidate phone numbers are in valid +91 XXXXXXXXXX format.\nRule 2: Focus on candidate profiles with strong spoken fluency in English & Hindi, prior experience in BPO / outbound sales / telecalling, and immediate availability.\nRule 3: Ensure zero duplicate phone numbers or emails across candidate pools.\nRule 4: Target salary range ₹18,000 - ₹35,000 / month. Priority locations: Delhi NCR, Mumbai, Bangalore, Remote.`
+    },
+    python_dev: {
+      role: "Senior Python & AI Engineer Sourcing Specialist",
+      prompt: `Rule 1: Sourcing focus: 3+ years experience with Python, FastAPI, AsyncIO, PyTorch/TensorFlow, and LLM orchestration (LangChain, LlamaIndex).\nRule 2: Check for candidate phone numbers (10 digits starting after +91) and active GitHub / Portfolio links.\nRule 3: Deduplicate all candidates by full name, phone number, and email.\nRule 4: Target salary band ₹12 LPA - ₹25 LPA. Priority locations: Bangalore, Hyderabad, Pune, Remote.`
+    },
+    b2b_sales: {
+      role: "B2B Enterprise Sales & Key Account Sourcing Specialist",
+      prompt: `Rule 1: Candidate criteria: 2+ years of enterprise SaaS / B2B outbound lead generation, quota achievement record, and CRM proficiency (Salesforce / HubSpot).\nRule 2: Extract verified 10-digit phone numbers and professional LinkedIn profile handles.\nRule 3: Zero duplication policy - cross-reference existing ledger before saving cards.\nRule 4: Target salary band ₹6 LPA - ₹15 LPA + uncapped incentives. Locations: Gurgaon, Mumbai, Bangalore.`
+    },
+    reset_default: {
+      role: "Chief Talent Acquisition & HR AI Partner",
+      prompt: `Screen candidate profiles, evaluate technical competency, automate candidate communications, and schedule interviews. Verify 10-digit phone numbers and ensure duplicate-free profile records.`
+    }
+  };
+
+  async function openTrainAgentModal() {
+    const agentKey = activeAgentKey || "recruiting";
+    const agentInfo = AGENT_REGISTRY[agentKey] || { name: agentKey };
+    if (trainModalAgentName) trainModalAgentName.textContent = agentInfo.name;
+
+    try {
+      const res = await fetch(`/agents/${agentKey}/settings`);
+      if (res.ok) {
+        const data = await res.json();
+        if (trainAgentRole) trainAgentRole.value = data.role || agentInfo.role || "";
+        if (trainSystemPrompt) trainSystemPrompt.value = data.system_prompt || "";
+        renderMemoryTable(data.context || {});
+      }
+    } catch (err) {
+      console.warn("Could not fetch settings:", err);
+    }
+
+    if (trainAgentModal) trainAgentModal.classList.add("active");
+  }
+
+  function closeTrainAgentModal() {
+    if (trainAgentModal) trainAgentModal.classList.remove("active");
+  }
+
+  function renderMemoryTable(context) {
+    if (!memoryKvTbody) return;
+    memoryKvTbody.innerHTML = "";
+    const keys = Object.keys(context || {});
+
+    if (keys.length === 0) {
+      memoryKvTbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 16px;">No persistent memory keys stored yet.</td></tr>`;
+    } else {
+      keys.forEach(key => {
+        const tr = document.createElement("tr");
+        const val = typeof context[key] === 'object' ? JSON.stringify(context[key]) : context[key];
+        tr.innerHTML = `
+          <td style="color: #38bdf8; font-weight: 600;">${key}</td>
+          <td>${val}</td>
+          <td style="text-align: center;"><button class="btn-mem-del" data-key="${key}" title="Delete Key">🗑️</button></td>
+        `;
+        memoryKvTbody.appendChild(tr);
+      });
+
+      memoryKvTbody.querySelectorAll(".btn-mem-del").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const keyToDelete = btn.dataset.key;
+          await deleteMemoryKey(keyToDelete);
+        });
+      });
+    }
+
+    if (memoryStatsText) memoryStatsText.textContent = `Total Context Keys: ${keys.length}`;
+  }
+
+  async function deleteMemoryKey(key) {
+    const agentKey = activeAgentKey || "recruiting";
+    try {
+      const res = await fetch(`/agents/${agentKey}/memory/${encodeURIComponent(key)}`, { method: "DELETE" });
+      if (res.ok) {
+        const data = await res.json();
+        renderMemoryTable(data.context || {});
+      }
+    } catch (err) {
+      console.error("Failed to delete memory key:", err);
+    }
+  }
+
+  if (btnOpenTrainAgent) {
+    btnOpenTrainAgent.addEventListener("click", openTrainAgentModal);
+  }
+  if (btnCloseTrainModal) {
+    btnCloseTrainModal.addEventListener("click", closeTrainAgentModal);
+  }
+
+  if (trainTabDirectives && trainTabMemory) {
+    trainTabDirectives.addEventListener("click", () => {
+      trainTabDirectives.classList.add("active");
+      trainTabMemory.classList.remove("active");
+      trainPaneDirectives.style.display = "block";
+      trainPaneMemory.style.display = "none";
+    });
+
+    trainTabMemory.addEventListener("click", () => {
+      trainTabMemory.classList.add("active");
+      trainTabDirectives.classList.remove("active");
+      trainPaneMemory.style.display = "block";
+      trainPaneDirectives.style.display = "none";
+      openTrainAgentModal();
+    });
+  }
+
+  document.getElementById("preset-telecaller")?.addEventListener("click", () => {
+    if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.telecaller.role;
+    if (trainSystemPrompt) trainSystemPrompt.value = HIRING_PRESETS.telecaller.prompt;
+  });
+  document.getElementById("preset-python-dev")?.addEventListener("click", () => {
+    if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.python_dev.role;
+    if (trainSystemPrompt) trainSystemPrompt.value = HIRING_PRESETS.python_dev.prompt;
+  });
+  document.getElementById("preset-b2b-sales")?.addEventListener("click", () => {
+    if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.b2b_sales.role;
+    if (trainSystemPrompt) trainSystemPrompt.value = HIRING_PRESETS.b2b_sales.prompt;
+  });
+  document.getElementById("preset-reset-default")?.addEventListener("click", () => {
+    if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.reset_default.role;
+    if (trainSystemPrompt) trainSystemPrompt.value = HIRING_PRESETS.reset_default.prompt;
+  });
+
+  if (trainDirectivesForm) {
+    trainDirectivesForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const agentKey = activeAgentKey || "recruiting";
+      const payload = {
+        role: trainAgentRole ? trainAgentRole.value : "",
+        system_prompt: trainSystemPrompt ? trainSystemPrompt.value : ""
+      };
+
+      try {
+        const res = await fetch(`/agents/${agentKey}/settings`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          if (AGENT_REGISTRY[agentKey]) {
+            AGENT_REGISTRY[agentKey].role = payload.role;
+          }
+          if (chatHeaderRole) chatHeaderRole.textContent = payload.role;
+          alert(`✅ ${AGENT_REGISTRY[agentKey]?.name || agentKey} retrained successfully with new system directives!`);
+          closeTrainAgentModal();
+        } else {
+          alert("Failed to update agent directives.");
+        }
+      } catch (err) {
+        alert("Network error updating agent directives.");
+      }
+    });
+  }
+
+  if (addMemoryKvForm) {
+    addMemoryKvForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const key = newMemKey ? newMemKey.value.trim() : "";
+      const val = newMemVal ? newMemVal.value.trim() : "";
+      if (!key || !val) return;
+
+      const agentKey = activeAgentKey || "recruiting";
+      try {
+        const res = await fetch(`/agents/${agentKey}/memory`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key, value: val })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          newMemKey.value = "";
+          newMemVal.value = "";
+          renderMemoryTable(data.context || {});
+        }
+      } catch (err) {
+        console.error("Failed to add memory key:", err);
+      }
+    });
+  }
+
+  if (btnClearAllMemory) {
+    btnClearAllMemory.addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to clear all persistent memory for this agent?")) return;
+      const agentKey = activeAgentKey || "recruiting";
+      try {
+        const res = await fetch(`/agents/${agentKey}/memory`, { method: "DELETE" });
+        if (res.ok) {
+          renderMemoryTable({});
+        }
+      } catch (err) {
+        console.error("Failed to clear agent memory:", err);
+      }
+    });
+  }
+
   fetchMasterCandidateLedger();
 
   initHistories();

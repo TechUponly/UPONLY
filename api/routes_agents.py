@@ -103,6 +103,60 @@ class AgentMemoryRequest(BaseModel):
     key: str
     value: Any
 
+class AgentSettingsRequest(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    system_prompt: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+
+@router.get("/{agent_type}/settings")
+def get_agent_settings_endpoint(agent_type: str):
+    clean_type = agent_type.lower()
+    agent = AGENTS_MAP.get(clean_type)
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_type}' not found.")
+    mem = get_agent_memory(clean_type)
+    return {
+        "agent_id": clean_type,
+        "name": getattr(agent, "name", clean_type),
+        "role": getattr(agent, "role", ""),
+        "system_prompt": getattr(agent, "system_prompt", ""),
+        "tools": getattr(agent, "tools", []),
+        "context": mem.get_context()
+    }
+
+@router.post("/{agent_type}/settings")
+def update_agent_settings_endpoint(agent_type: str, request: AgentSettingsRequest):
+    clean_type = agent_type.lower()
+    agent = AGENTS_MAP.get(clean_type)
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_type}' not found.")
+    
+    if request.name:
+        agent.name = request.name
+    if request.role:
+        agent.role = request.role
+    if request.system_prompt is not None:
+        agent.system_prompt = request.system_prompt
+    
+    mem = get_agent_memory(clean_type)
+    if request.context is not None:
+        # replace or update context
+        mem.context = request.context
+        mem.save_to_disk()
+
+    return {
+        "status": "success",
+        "agent_id": clean_type,
+        "message": f"Settings and directives updated for agent '{clean_type}'.",
+        "settings": {
+            "name": agent.name,
+            "role": agent.role,
+            "system_prompt": getattr(agent, "system_prompt", ""),
+            "context": mem.get_context()
+        }
+    }
+
 @router.get("/{agent_type}/memory")
 def get_agent_memory_endpoint(agent_type: str):
     clean_type = agent_type.lower()
@@ -127,6 +181,20 @@ def update_agent_memory_endpoint(agent_type: str, request: AgentMemoryRequest):
         "status": "success",
         "agent_id": clean_type,
         "message": f"Memory context key '{request.key}' updated for agent '{clean_type}'.",
+        "context": mem.get_context()
+    }
+
+@router.delete("/{agent_type}/memory/{key}")
+def delete_agent_memory_key_endpoint(agent_type: str, key: str):
+    clean_type = agent_type.lower()
+    if clean_type not in AGENTS_MAP:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_type}' not found.")
+    mem = get_agent_memory(clean_type)
+    mem.delete_context(key)
+    return {
+        "status": "success",
+        "agent_id": clean_type,
+        "message": f"Key '{key}' deleted from memory of agent '{clean_type}'.",
         "context": mem.get_context()
     }
 

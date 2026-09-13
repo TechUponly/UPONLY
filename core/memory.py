@@ -63,6 +63,11 @@ class MemoryStore:
         self.context[key] = value
         self.save_to_disk()
 
+    def delete_context(self, key: str):
+        if key in self.context:
+            del self.context[key]
+            self.save_to_disk()
+
     def get_context(self, key: Optional[str] = None) -> Any:
         if key is None:
             return self.context

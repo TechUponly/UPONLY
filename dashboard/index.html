@@ -257,6 +257,7 @@
         <div class="workspace-top-tabs">
           <button type="button" class="top-tab-btn active" id="tab-chat-stream">💬 Chat Stream</button>
           <button type="button" class="top-tab-btn" id="tab-candidate-ledger">📊 Candidate Ledger <span class="tab-badge" id="ledger-count-badge">0</span></button>
+          <button type="button" class="top-tab-btn btn-train-shortcut" id="btn-open-train-agent" title="Train Agent & Manage Persistent Context Memory">🧠 Train Agent</button>
         </div>
 
         <div class="server-status-pill">
@@ -599,9 +600,82 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.3"></script>
+  <!-- AGENT TRAINING & PERSISTENT MEMORY MANAGER MODAL -->
+  <div class="modal-overlay" id="train-agent-modal">
+    <div class="modal-content modal-train-box" style="max-width: 820px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2>🧠 Train & Memory Manager — <span id="train-modal-agent-name">UPONLY Talent Acquisition Agent</span></h2>
+        <button class="btn-close-modal" id="btn-close-train-modal">✖ Close</button>
+      </div>
 
+      <!-- Training Hub Sub-Tabs -->
+      <div class="train-tab-bar">
+        <button type="button" class="train-tab-btn active" id="train-tab-directives">🎯 System Directives & Sourcing Criteria</button>
+        <button type="button" class="train-tab-btn" id="train-tab-memory">🧠 Persistent Context Memory</button>
+      </div>
 
+      <!-- TAB 1: Directives & Preset Sourcing Rubrics -->
+      <div id="train-pane-directives" class="train-pane active">
+        <p class="train-section-desc">Retrain the agent's behavior, sourcing rules, screening criteria, and location/salary bands live. Select a 1-click hiring preset below or customize instructions.</p>
+        
+        <div class="preset-chip-bar">
+          <span class="preset-label">⚡ 1-Click Sourcing Presets:</span>
+          <button type="button" class="preset-chip" id="preset-telecaller">📞 Telecaller Sourcing</button>
+          <button type="button" class="preset-chip" id="preset-python-dev">🐍 Python Dev Sourcing</button>
+          <button type="button" class="preset-chip" id="preset-b2b-sales">💼 B2B Sales Sourcing</button>
+          <button type="button" class="preset-chip" id="preset-reset-default">🔄 Reset Default</button>
+        </div>
+
+        <form id="train-directives-form" class="settings-form">
+          <div class="form-group">
+            <label for="train-agent-role">Agent Title / Role Definition:</label>
+            <input type="text" id="train-agent-role" placeholder="e.g. Chief Talent Acquisition & HR AI Partner">
+          </div>
+          <div class="form-group">
+            <label for="train-system-prompt">System Prompt & Sourcing Guidelines (Live Directives):</label>
+            <textarea id="train-system-prompt" rows="8" placeholder="Enter instructions, screening rules, salary bands, phone number verification criteria..."></textarea>
+          </div>
+          <button type="submit" class="btn-dispatch btn-save-training">💾 Save Directives & Retrain Agent 🚀</button>
+        </form>
+      </div>
+
+      <!-- TAB 2: Persistent Context Memory Manager -->
+      <div id="train-pane-memory" class="train-pane" style="display: none;">
+        <p class="train-section-desc">Manage key-value memory context items saved across sessions for this agent. Add custom context parameters or remove stale memory keys.</p>
+        
+        <!-- Add Memory KV Form -->
+        <form id="add-memory-kv-form" class="add-memory-kv-form" style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <input type="text" id="new-mem-key" placeholder="Key (e.g. min_experience)" style="flex: 1;" required>
+          <input type="text" id="new-mem-val" placeholder="Value (e.g. 3 years)" style="flex: 1;" required>
+          <button type="submit" class="btn-cam-action" style="white-space: nowrap;">➕ Add Key</button>
+        </form>
+
+        <!-- Memory KV Table -->
+        <div class="memory-kv-table-wrapper">
+          <table class="memory-kv-table">
+            <thead>
+              <tr>
+                <th>Context Key</th>
+                <th>Stored Value</th>
+                <th style="width: 80px; text-align: center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="memory-kv-tbody">
+              <!-- Memory rows rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <span class="memory-stats-text" id="memory-stats-text">Total Events: 0</span>
+          <button type="button" class="btn-close-inline-forgot" id="btn-clear-all-memory" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑️ Clear All Agent Memory</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js?v=3.4"></script>
 
 </body>
 </html>

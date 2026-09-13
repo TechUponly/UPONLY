@@ -1400,4 +1400,153 @@ body {
   background: #059669;
 }
 
+/* AGENT TRAINING & MEMORY HUB STYLES */
+.btn-train-shortcut {
+  background: rgba(139, 92, 246, 0.15) !important;
+  color: #a78bfa !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.btn-train-shortcut:hover {
+  background: rgba(139, 92, 246, 0.3) !important;
+  border-color: #a78bfa !important;
+}
+
+.modal-train-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.train-tab-bar {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #334155;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+}
+
+.train-tab-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.train-tab-btn.active, .train-tab-btn:hover {
+  background: #1e293b;
+  color: #38bdf8;
+}
+
+.train-section-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.preset-chip-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  background: #1e293b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.preset-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.preset-chip {
+  background: #0f172a;
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  padding: 5px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-chip:hover {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+.btn-save-training {
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.btn-save-training:hover {
+  filter: brightness(1.15);
+}
+
+.memory-kv-table-wrapper {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.memory-kv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.memory-kv-table th {
+  background: #1e293b;
+  color: #cbd5e1;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #334155;
+}
+
+.memory-kv-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #1e293b;
+  color: #e2e8f0;
+  font-family: monospace;
+}
+
+.memory-kv-table tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-mem-del {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.btn-mem-del:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.memory-stats-text {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 

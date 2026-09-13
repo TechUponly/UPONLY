@@ -89,6 +89,23 @@ try:
     })
     log_test("Create Dynamic Custom Agent (/agents/create)", r.status_code == 200, f"Message: {r.json().get('message')}")
 
+    # Agent Settings & Directives Training Test
+    r = requests.get(f"{BASE_URL}/agents/recruiting/settings")
+    log_test("Fetch Agent Settings (/agents/recruiting/settings)", r.status_code == 200, f"Name: {r.json().get('name')}")
+
+    r = requests.post(f"{BASE_URL}/agents/recruiting/settings", json={
+        "role": "Telecaller & Inside Sales Sourcing Lead",
+        "system_prompt": "Verify 10-digit valid phone numbers (+91 XXXXXXXXXX). Target telecaller profiles."
+    })
+    log_test("Update Agent Directives (/agents/recruiting/settings)", r.status_code == 200, f"Updated Role: {r.json().get('settings', {}).get('role')}")
+
+    # Memory Key-Value Test
+    r = requests.post(f"{BASE_URL}/agents/recruiting/memory", json={"key": "test_sourcing_target", "value": "100 Telecallers"})
+    log_test("Update Memory Key (/agents/recruiting/memory)", r.status_code == 200, f"Context Keys: {list(r.json().get('context', {}).keys())}")
+
+    r = requests.delete(f"{BASE_URL}/agents/recruiting/memory/test_sourcing_target")
+    log_test("Delete Memory Key (/agents/recruiting/memory/{key})", r.status_code == 200, f"Key removed successfully")
+
 
 except Exception as e:
     log_test("Agent Fleet Integration Audit", False, str(e))
