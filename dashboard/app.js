@@ -293,9 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         formatted = formatted
           .replace(/&lt;span class='code-tag'&gt;(.*?)&lt;\/span&gt;/g, "<span class='code-tag'>$1</span>")
-          .replace(/&lt;div class="candidate-actions"&gt;/gi, '<div class="candidate-actions">')
-          .replace(/&lt;\/div&gt;/gi, '</div>')
-          .replace(/&lt;button (.*?)&gt;(.*?)&lt;\/button&gt;/gi, '<button $1>$2</button>');
+          .replace(/&lt;(button|div|span|\/button|\/div|\/span)([\s\S]*?)&gt;/gi, "<$1$2>");
 
         let htmlContent = `<div class="bubble">${formatted}</div>`;
 
