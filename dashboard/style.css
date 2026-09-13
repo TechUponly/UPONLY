@@ -880,6 +880,10 @@ body {
   z-index: 100005 !important;
 }
 
+#cv-viewer-modal {
+  z-index: 100010 !important;
+}
+
 .modal-overlay.active {
   display: flex;
 }

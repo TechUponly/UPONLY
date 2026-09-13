@@ -784,53 +784,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!modal) return;
 
-    const candidateId = name.toLowerCase().replace(/\s+/g, "_");
-
-    modalName.textContent = `📄 Curriculum Vitae — ${name}`;
-    modalBody.innerHTML = `
-      <div class="cv-header-block">
-        <h3>${name}</h3>
-        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">${role} • ${location || "Navi Mumbai, Maharashtra"}</div>
-        <div style="font-size: 13px; color: #38bdf8; margin-top: 6px; font-weight: 600;">📞 Phone: <span style="color: #f3f4f6;">${phone || '+91 98201 44321'}</span> &nbsp;|&nbsp; 📧 Email: <span style="color: #f3f4f6;">${email || 'candidate@gmail.com'}</span></div>
-        <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${fitScore || '95%'} • Status: Verified Active Candidate</div>
-      </div>
-
-      <div class="cv-section-title">📌 Executive Summary</div>
-      <p style="margin-bottom: 12px;">Accomplished and results-driven specialist with extensive experience in ${role}. Proven track record in operational SLA compliance, CSAT optimization, multi-channel customer engagement, and high-performance workflow execution.</p>
-
-      <div class="cv-section-title">💼 Key Qualifications & Technical Competencies</div>
-      <ul style="margin-left: 20px; margin-bottom: 12px;">
-        <li><strong>Experience Overview</strong>: ${experience || "6+ years of relevant industry experience in high-volume enterprise environments."}</li>
-        <li><strong>Technical Stack & Skills</strong>: ${skills || "Salesforce, Zendesk, Genesys Cloud, Avaya, WFM, CRM Analytics, SLA Management."}</li>
-        <li><strong>Languages & Communication</strong>: English (Fluent/Native), Multilingual Capabilities.</li>
-        <li><strong>Quality & CSAT Scorecard</strong>: Maintained 98%+ CSAT rating and 94%+ First Call Resolution (FCR) average.</li>
-      </ul>
-
-      <div class="cv-section-title">🎓 Education & Professional Certifications</div>
-      <ul style="margin-left: 20px; margin-bottom: 12px;">
-        <li>Bachelor of Science in Information Systems / Business Administration</li>
-        <li>Certified Customer Operations Manager (CCOM) & Omnichannel WFM Specialist</li>
-      </ul>
-
-      <div class="cv-section-title">🔒 Verification & Security Metadata</div>
-      <div style="font-size: 11px; font-family: monospace; color: #64748b;">
-        Document Hash: sha256_up_${candidateId}_${Date.now()}<br>
-        Sourced via: UPONLY Autonomous Talent Acquisition Crawler
-      </div>
-    `;
-
-    btnDownload.onclick = () => window.downloadCandidateCV(candidateId);
-    btnSchedule.onclick = () => {
-      modal.classList.remove("active");
-      selectAgent("recruiting");
-      if (typeof showChatStreamView === "function") showChatStreamView();
-      if (chatInput) {
-        chatInput.value = `Schedule interview for ${name} (${phone || email})`;
-        chatForm.dispatchEvent(new Event("submit"));
-      }
-    };
-
+    // Show modal immediately
     modal.classList.add("active");
+
+    const safeName = (name || "Candidate").toString();
+    const safeRole = (role || "Specialist").toString();
+    const safeLocation = (location || "Navi Mumbai").toString();
+    const safePhone = (phone || "+91 98201 44321").toString();
+    const safeEmail = (email || "candidate@gmail.com").toString();
+    const safeFit = (fitScore || "95%").toString();
+    const safeExp = (experience || "Relevant Industry Experience").toString();
+    const safeSkills = (skills || "CRM, SLA Management, CSAT").toString();
+
+    const candidateId = safeName.toLowerCase().replace(/[^a-z0-9_]/g, "_");
+
+    if (modalName) modalName.textContent = `📄 Curriculum Vitae — ${safeName}`;
+    if (modalBody) {
+      modalBody.innerHTML = `
+        <div class="cv-header-block">
+          <h3>${safeName}</h3>
+          <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">${safeRole} • ${safeLocation}</div>
+          <div style="font-size: 13px; color: #38bdf8; margin-top: 6px; font-weight: 600;">📞 Phone: <span style="color: #f3f4f6;">${safePhone}</span> &nbsp;|&nbsp; 📧 Email: <span style="color: #f3f4f6;">${safeEmail}</span></div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${safeFit} • Status: Verified Active Candidate</div>
+        </div>
+
+        <div class="cv-section-title">📌 Executive Summary</div>
+        <p style="margin-bottom: 12px;">Accomplished and results-driven specialist with extensive experience in ${safeRole}. Proven track record in operational SLA compliance, CSAT optimization, multi-channel customer engagement, and high-performance workflow execution.</p>
+
+        <div class="cv-section-title">💼 Key Qualifications & Technical Competencies</div>
+        <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <li><strong>Experience Overview</strong>: ${safeExp}</li>
+          <li><strong>Technical Stack & Skills</strong>: ${safeSkills}</li>
+          <li><strong>Languages & Communication</strong>: English (Fluent/Native), Multilingual Capabilities.</li>
+          <li><strong>Quality & CSAT Scorecard</strong>: Maintained 98%+ CSAT rating and 94%+ First Call Resolution (FCR) average.</li>
+        </ul>
+
+        <div class="cv-section-title">🎓 Education & Professional Certifications</div>
+        <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <li>Bachelor of Science in Information Systems / Business Administration</li>
+          <li>Certified Customer Operations Manager (CCOM) & Omnichannel WFM Specialist</li>
+        </ul>
+
+        <div class="cv-section-title">🔒 Verification & Security Metadata</div>
+        <div style="font-size: 11px; font-family: monospace; color: #64748b;">
+          Document Hash: sha256_up_${candidateId}_${Date.now()}<br>
+          Sourced via: UPONLY Autonomous Talent Acquisition Crawler
+        </div>
+      `;
+    }
+
+    if (btnDownload) {
+      btnDownload.onclick = () => window.downloadCandidateCV(candidateId);
+    }
+    if (btnSchedule) {
+      btnSchedule.onclick = () => {
+        modal.classList.remove("active");
+        selectAgent("recruiting");
+        if (typeof showChatStreamView === "function") showChatStreamView();
+        if (chatInput) {
+          chatInput.value = `Schedule interview for ${safeName} (${safePhone || safeEmail})`;
+          chatForm.dispatchEvent(new Event("submit"));
+        }
+      };
+    }
   };
 
   window.downloadCandidateCV = function(candidateId) {
@@ -843,34 +859,35 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open(url, "_blank");
   };
 
-  // Event Delegation for Candidate Actions (View CV, Download CV, Export Master Excel)
-  if (chatThread) {
-    chatThread.addEventListener("click", (e) => {
-      const btnView = e.target.closest(".btn-cv-view");
-      if (btnView) {
-        const name = btnView.getAttribute("data-cv-name") || "Candidate";
-        const role = btnView.getAttribute("data-cv-role") || "Specialist";
-        const exp = btnView.getAttribute("data-cv-exp") || "Relevant Industry Experience";
-        const skills = btnView.getAttribute("data-cv-skills") || "CRM, SLA Management, CSAT";
-        const location = btnView.getAttribute("data-cv-location") || "Navi Mumbai";
-        const fit = btnView.getAttribute("data-cv-fit") || "95%";
-        const phone = btnView.getAttribute("data-cv-phone") || "+91 98201 44321";
-        const email = btnView.getAttribute("data-cv-email") || "candidate@gmail.com";
-        window.viewCandidateCV(name, role, exp, skills, location, fit, phone, email);
-      }
+  // Document-Level Global Event Delegation for Candidate Actions
+  document.addEventListener("click", (e) => {
+    const btnView = e.target.closest(".btn-cv-view");
+    if (btnView) {
+      e.preventDefault();
+      const name = btnView.getAttribute("data-cv-name") || "Candidate";
+      const role = btnView.getAttribute("data-cv-role") || "Specialist";
+      const exp = btnView.getAttribute("data-cv-exp") || "Relevant Industry Experience";
+      const skills = btnView.getAttribute("data-cv-skills") || "CRM, SLA Management, CSAT";
+      const location = btnView.getAttribute("data-cv-location") || "Navi Mumbai";
+      const fit = btnView.getAttribute("data-cv-fit") || "95%";
+      const phone = btnView.getAttribute("data-cv-phone") || "+91 98201 44321";
+      const email = btnView.getAttribute("data-cv-email") || "candidate@gmail.com";
+      window.viewCandidateCV(name, role, exp, skills, location, fit, phone, email);
+    }
 
-      const btnDownload = e.target.closest(".btn-cv-download");
-      if (btnDownload) {
-        const id = btnDownload.getAttribute("data-cv-id") || "candidate";
-        window.downloadCandidateCV(id);
-      }
+    const btnDownload = e.target.closest(".btn-cv-download");
+    if (btnDownload) {
+      e.preventDefault();
+      const id = btnDownload.getAttribute("data-cv-id") || "candidate";
+      window.downloadCandidateCV(id);
+    }
 
-      const btnExcel = e.target.closest(".btn-excel-export");
-      if (btnExcel) {
-        window.downloadMasterExcel();
-      }
-    });
-  }
+    const btnExcel = e.target.closest(".btn-excel-export");
+    if (btnExcel) {
+      e.preventDefault();
+      window.downloadMasterExcel();
+    }
+  });
 
 
 
