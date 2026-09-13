@@ -257,7 +257,7 @@
         <div class="workspace-top-tabs">
           <button type="button" class="top-tab-btn active" id="tab-chat-stream">💬 Chat Stream</button>
           <button type="button" class="top-tab-btn" id="tab-candidate-ledger">📊 Candidate Ledger <span class="tab-badge" id="ledger-count-badge">0</span></button>
-          <button type="button" class="top-tab-btn btn-train-shortcut" id="btn-open-train-agent" title="Train Agent & Manage Persistent Context Memory">🧠 Train Agent</button>
+          <button type="button" class="top-tab-btn btn-train-shortcut" id="btn-open-train-agent" title="Train Agent & Manage Persistent Context Memory" onclick="window.openTrainAgentModal && window.openTrainAgentModal()">🧠 Train Agent</button>
         </div>
 
         <div class="server-status-pill">
@@ -676,7 +676,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.5"></script>
+  <script src="app.js?v=3.6"></script>
 
 </body>
 </html>

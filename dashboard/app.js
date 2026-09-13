@@ -1065,13 +1065,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  async function openTrainAgentModal() {
+  window.openTrainAgentModal = async function() {
+    const modal = document.getElementById("train-agent-modal");
     const agentKey = activeAgentKey || "recruiting";
     const agentInfo = AGENT_REGISTRY[agentKey] || { name: agentKey };
     if (trainModalAgentName) trainModalAgentName.textContent = agentInfo.name;
 
+    // Instantly show modal UI without waiting for network request
+    if (modal) modal.classList.add("active");
+
     try {
-      const res = await fetch(`/agents/${agentKey}/settings`);
+      const res = await fetch(`${getApiBaseUrl()}/agents/${agentKey}/settings`);
       if (res.ok) {
         const data = await res.json();
         if (trainAgentRole) trainAgentRole.value = data.role || agentInfo.role || "";
@@ -1081,9 +1085,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.warn("Could not fetch settings:", err);
     }
-
-    if (trainAgentModal) trainAgentModal.classList.add("active");
-  }
+  };
 
   function closeTrainAgentModal() {
     if (trainAgentModal) trainAgentModal.classList.remove("active");
@@ -1122,7 +1124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function deleteMemoryKey(key) {
     const agentKey = activeAgentKey || "recruiting";
     try {
-      const res = await fetch(`/agents/${agentKey}/memory/${encodeURIComponent(key)}`, { method: "DELETE" });
+      const res = await fetch(`${getApiBaseUrl()}/agents/${agentKey}/memory/${encodeURIComponent(key)}`, { method: "DELETE" });
       if (res.ok) {
         const data = await res.json();
         renderMemoryTable(data.context || {});
@@ -1133,7 +1135,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (btnOpenTrainAgent) {
-    btnOpenTrainAgent.addEventListener("click", openTrainAgentModal);
+    btnOpenTrainAgent.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.openTrainAgentModal();
+    });
   }
   if (btnCloseTrainModal) {
     btnCloseTrainModal.addEventListener("click", closeTrainAgentModal);
@@ -1152,7 +1157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       trainTabDirectives.classList.remove("active");
       trainPaneMemory.style.display = "block";
       trainPaneDirectives.style.display = "none";
-      openTrainAgentModal();
+      window.openTrainAgentModal();
     });
   }
 
@@ -1183,7 +1188,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       try {
-        const res = await fetch(`/agents/${agentKey}/settings`, {
+        const res = await fetch(`${getApiBaseUrl()}/agents/${agentKey}/settings`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -1214,7 +1219,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const agentKey = activeAgentKey || "recruiting";
       try {
-        const res = await fetch(`/agents/${agentKey}/memory`, {
+        const res = await fetch(`${getApiBaseUrl()}/agents/${agentKey}/memory`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key, value: val })
@@ -1236,7 +1241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!confirm("Are you sure you want to clear all persistent memory for this agent?")) return;
       const agentKey = activeAgentKey || "recruiting";
       try {
-        const res = await fetch(`/agents/${agentKey}/memory`, { method: "DELETE" });
+        const res = await fetch(`${getApiBaseUrl()}/agents/${agentKey}/memory`, { method: "DELETE" });
         if (res.ok) {
           renderMemoryTable({});
         }
