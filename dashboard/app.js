@@ -342,6 +342,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderThread(agentKey);
     syncServerMemory(agentKey);
+
+    // If candidate tabular view is open, switch back to chat stream view for the selected agent
+    if (typeof showChatStreamView === "function") {
+      showChatStreamView();
+    }
   }
 
   function bindFleetClicks() {
@@ -816,8 +821,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnDownload.onclick = () => window.downloadCandidateCV(candidateId);
     btnSchedule.onclick = () => {
-      alert(`Interview Invitation dispatched to ${name} (${email || 'email'})! HR calendar link emailed.`);
       modal.classList.remove("active");
+      selectAgent("recruiting");
+      if (typeof showChatStreamView === "function") showChatStreamView();
+      if (chatInput) {
+        chatInput.value = `Schedule interview for ${name} (${phone || email})`;
+        chatForm.dispatchEvent(new Event("submit"));
+      }
     };
 
     modal.classList.add("active");
@@ -941,25 +951,35 @@ document.addEventListener("DOMContentLoaded", () => {
     candidateTableBody.innerHTML = html;
   }
 
-  if (tabChatStream && tabCandidateLedger) {
-    tabChatStream.addEventListener("click", () => {
-      tabChatStream.classList.add("active");
-      tabCandidateLedger.classList.remove("active");
-      if (chatHeader) chatHeader.style.display = "flex";
-      if (chatThread) chatThread.style.display = "flex";
-      if (chatForm) chatForm.style.display = "flex";
-      if (candidateTabularView) candidateTabularView.style.display = "none";
-    });
+  window.showChatStreamView = function() {
+    if (tabChatStream) tabChatStream.classList.add("active");
+    if (tabCandidateLedger) tabCandidateLedger.classList.remove("active");
+    if (chatHeader) chatHeader.style.display = "flex";
+    if (chatThread) chatThread.style.display = "flex";
+    if (chatForm) chatForm.style.display = "flex";
+    if (candidateTabularView) candidateTabularView.style.display = "none";
+  };
 
-    tabCandidateLedger.addEventListener("click", () => {
-      tabCandidateLedger.classList.add("active");
-      tabChatStream.classList.remove("active");
-      if (chatHeader) chatHeader.style.display = "none";
-      if (chatThread) chatThread.style.display = "none";
-      if (chatForm) chatForm.style.display = "none";
-      if (candidateTabularView) candidateTabularView.style.display = "flex";
-      fetchMasterCandidateLedger();
-    });
+  window.showCandidateLedgerView = function() {
+    if (tabCandidateLedger) tabCandidateLedger.classList.add("active");
+    if (tabChatStream) tabChatStream.classList.remove("active");
+    if (chatHeader) chatHeader.style.display = "flex"; // KEEP HEADER VISIBLE AT ALL TIMES
+    if (chatThread) chatThread.style.display = "none";
+    if (chatForm) chatForm.style.display = "none";
+    if (candidateTabularView) candidateTabularView.style.display = "flex";
+    fetchMasterCandidateLedger();
+  };
+
+  if (tabChatStream) {
+    tabChatStream.addEventListener("click", window.showChatStreamView);
+  }
+  if (tabCandidateLedger) {
+    tabCandidateLedger.addEventListener("click", window.showCandidateLedgerView);
+  }
+
+  const btnLedgerBackChat = document.getElementById("btn-ledger-back-chat");
+  if (btnLedgerBackChat) {
+    btnLedgerBackChat.addEventListener("click", window.showChatStreamView);
   }
 
   if (ledgerSearchInput) {
