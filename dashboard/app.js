@@ -760,10 +760,78 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  const pluginGridList = document.getElementById("plugin-grid-list");
+
+  async function fetchAndRenderPlugins() {
+    if (!pluginGridList) return;
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/plugins`);
+      if (res.ok) {
+        const data = await res.json();
+        const plugins = data.plugins || [];
+        renderPluginGrid(plugins);
+      }
+    } catch (err) {
+      console.warn("Could not fetch plugins:", err);
+    }
+  }
+
+  function renderPluginGrid(plugins) {
+    if (!pluginGridList) return;
+    let html = "";
+    plugins.forEach(p => {
+      const isActive = p.status === "ACTIVE";
+      const statusBadge = isActive
+        ? `<span class="plugin-status active">🟢 ACTIVE</span>`
+        : `<span class="plugin-status installed">⚪ INSTALLED</span>`;
+      const btnText = isActive ? "Deactivate" : "⚡ Activate Plugin";
+      const btnClass = isActive ? "btn-plugin-toggle active" : "btn-plugin-toggle";
+
+      html += `
+        <div class="plugin-card ${isActive ? 'card-active' : ''}">
+          <div class="plugin-card-header">
+            <div class="plugin-title-group">
+              <span class="plugin-icon">${p.icon || '🔌'}</span>
+              <div>
+                <h4 class="plugin-name">${escapeHtml(p.name)} <span class="plugin-version">v${escapeHtml(p.version)}</span></h4>
+                <span class="plugin-category">${escapeHtml(p.category || 'System Plugin')}</span>
+              </div>
+            </div>
+            ${statusBadge}
+          </div>
+          <p class="plugin-desc">${escapeHtml(p.description)}</p>
+          <button type="button" class="${btnClass}" data-plugin-id="${p.id}">${btnText}</button>
+        </div>
+      `;
+    });
+    pluginGridList.innerHTML = html;
+
+    pluginGridList.querySelectorAll(".btn-plugin-toggle").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const pluginId = btn.getAttribute("data-plugin-id");
+        try {
+          const res = await fetch(`${getApiBaseUrl()}/plugins/toggle`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ plugin_id: pluginId })
+          });
+          if (res.ok) {
+            fetchAndRenderPlugins();
+          }
+        } catch (err) {
+          console.error("Plugin toggle error:", err);
+        }
+      });
+    });
+  }
+
   btnOpenCreateAgent.onclick = () => createAgentModal.classList.add("active");
   btnCloseCreateModal.onclick = () => createAgentModal.classList.remove("active");
 
-  btnOpenPlugins.onclick = () => pluginModal.classList.add("active");
+  btnOpenPlugins.onclick = () => {
+    pluginModal.classList.add("active");
+    fetchAndRenderPlugins();
+  };
   btnClosePluginModal.onclick = () => pluginModal.classList.remove("active");
 
   // --- CANDIDATE CV VIEWER & DOWNLOAD HANDLERS ---

@@ -16,6 +16,27 @@ class LLMProvider:
             self.model_name = model_name or os.getenv("DEFAULT_MODEL", "claude-3-5-sonnet-20241022")
         elif self.provider_name == "gemini":
             self.model_name = model_name or "gemini-1.5-pro"
+        elif self.provider_name in ["deepseek", "deepseek_v4_pro"]:
+            self.provider_name = "deepseek"
+            self.model_name = model_name or "deepseek-v4-pro"
+        elif self.provider_name in ["kimi", "kimi_k3"]:
+            self.provider_name = "kimi"
+            self.model_name = model_name or "kimi-k3-multimodal"
+        elif self.provider_name in ["gemma", "gemma_4_31b"]:
+            self.provider_name = "gemma"
+            self.model_name = model_name or "gemma-4-31b"
+        elif self.provider_name in ["gpt_oss", "gpt_oss_fleet"]:
+            self.provider_name = "gpt_oss"
+            self.model_name = model_name or "gpt-oss-120b"
+        elif self.provider_name in ["minimax", "minimax_m3"]:
+            self.provider_name = "minimax"
+            self.model_name = model_name or "minimax-m3"
+        elif self.provider_name in ["nvidia", "nvidia_nemotron"]:
+            self.provider_name = "nvidia"
+            self.model_name = model_name or "nvidia-nemotron-70b"
+        elif self.provider_name in ["glm", "glm_5_2"]:
+            self.provider_name = "glm"
+            self.model_name = model_name or "glm-5.2"
         else:
             self.model_name = model_name or "gpt-4"
 

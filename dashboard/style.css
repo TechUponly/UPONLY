@@ -1406,14 +1406,25 @@ body {
 
 /* AGENT TRAINING & MEMORY HUB STYLES */
 .btn-train-shortcut {
-  background: rgba(139, 92, 246, 0.15) !important;
-  color: #a78bfa !important;
-  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.25)) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(167, 139, 250, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-train-shortcut:hover {
-  background: rgba(139, 92, 246, 0.3) !important;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.5)) !important;
+  color: #ffffff !important;
   border-color: #a78bfa !important;
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.6) !important;
+  transform: translateY(-1px) scale(1.04) !important;
+}
+
+.btn-train-shortcut:active {
+  transform: translateY(0) scale(0.97) !important;
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.3) !important;
 }
 
 .modal-train-box {
@@ -1569,6 +1580,153 @@ body {
 .btn-top-back-chat:hover {
   background: #2563eb;
   color: #ffffff;
+}
+
+/* 3RD-PARTY HIGH-PERFORMANCE PLUGINS & AI ENGINES STYLES */
+.modal-plugin-box {
+  max-width: 920px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+.plugin-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+.plugin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.plugin-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.plugin-card.card-active {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
+}
+
+.plugin-card:hover {
+  transform: translateY(-2px);
+  border-color: #60a5fa;
+}
+
+.plugin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.plugin-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.plugin-icon {
+  font-size: 22px;
+  background: #0f172a;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.plugin-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.plugin-version {
+  font-size: 10px;
+  color: #a78bfa;
+  font-family: monospace;
+  background: rgba(167, 139, 250, 0.15);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.plugin-category {
+  font-size: 11px;
+  color: #38bdf8;
+  font-weight: 600;
+  display: block;
+  margin-top: 2px;
+}
+
+.plugin-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.plugin-status.active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.plugin-status.installed {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.plugin-desc {
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.btn-plugin-toggle {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-plugin-toggle:hover {
+  filter: brightness(1.15);
+}
+
+.btn-plugin-toggle.active {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.btn-plugin-toggle.active:hover {
+  background: #ef4444;
+  color: white;
 }
 
 
