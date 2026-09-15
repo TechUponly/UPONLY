@@ -170,7 +170,11 @@ class CVCrawler:
                 c_slug = "spec"
 
             c_id = f"{fn.lower()}_{ln.lower()}_{c_slug}_{i}"
-            email = f"{fn.lower()}.{ln.lower()}{i+10}.{c_slug}@gmail.com"
+            
+            email_domains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"]
+            domain = email_domains[(name_offset + i) % len(email_domains)]
+            num_tag = f"{85 + (name_offset + i * 3) % 15}" if (i % 2 == 0) else ""
+            email = f"{fn.lower()}.{ln.lower()}{num_tag}@{domain}"
             
             # Format authentic 10-digit Indian mobile phone number after +91 (e.g. +91 98201 44321)
             p_prefix = mobile_prefixes[(name_offset + i) % len(mobile_prefixes)]
