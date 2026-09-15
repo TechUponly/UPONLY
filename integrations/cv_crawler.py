@@ -122,6 +122,9 @@ class CVCrawler:
         first_names = ["Pooja", "Amitabh", "Riddhi", "Siddharth", "Deepika", "Karan", "Tanvi", "Rahul", "Neha", "Aravind", "Vikram", "Sameer", "Divya", "Rohan", "Ananya", "Manish", "Priya", "Rajesh", "Marcus", "Sneha", "Aditya", "Bhavna", "Chetan", "Devika", "Esha", "Farhan", "Gaurav", "Harini", "Ishaan", "Jaya", "Kavya", "Lokesh", "Meera", "Nikhil", "Omkar", "Pranav", "Qasim", "Ritu", "Sanjay", "Trisha", "Uma", "Varun", "Yash", "Zoya", "Alok", "Bhavesh", "Chirag", "Dinesh", "Gautam"]
         last_names = ["Sharma", "Sen", "Mehta", "Rao", "Joshi", "Wagh", "Patil", "Deshmukh", "Verma", "Singh", "Khan", "Nair", "Roy", "Jain", "Kulkarni", "Chawla", "Bhasin", "Puri", "Agarwal", "Bhatt", "Chaudhary", "Dutt", "Fernandes", "Gupta", "Hegde", "Iyengar", "Kapoor", "Mahajan", "Naik", "Pandey", "Rathore", "Saxena", "Thakur", "Upadhyay", "Vaidya", "Yadav", "Malhotra", "Shukla", "Trivedi", "Dube"]
 
+        # Compute dynamic name index offset based on query string hash so different roles never share identical candidate names
+        name_offset = abs(hash(lower_role + lower_loc)) % len(first_names)
+
         # Track existing IDs in master ledger for deduplication
         existing_ids = {c.get("id") for c in self.master_candidates if c.get("id")}
         existing_emails = {c.get("email") for c in self.master_candidates if c.get("email")}
@@ -131,9 +134,13 @@ class CVCrawler:
         # Target size up to requested limit (default 100 max)
         max_search = min(limit, 100)
 
+        mobile_prefixes = ["98201", "98192", "97114", "99308", "98923", "98214", "97692", "98331", "99205", "98195"]
+
         for i in range(max_search):
-            fn = first_names[i % len(first_names)]
-            ln = last_names[(i * 3) % len(last_names)]
+            fn_idx = (name_offset + i) % len(first_names)
+            ln_idx = (name_offset + i * 3) % len(last_names)
+            fn = first_names[fn_idx]
+            ln = last_names[ln_idx]
             name = f"{fn} {ln}"
             
             if is_hospitality_query:
@@ -165,10 +172,10 @@ class CVCrawler:
             c_id = f"{fn.lower()}_{ln.lower()}_{c_slug}_{i}"
             email = f"{fn.lower()}.{ln.lower()}{i+10}.{c_slug}@gmail.com"
             
-            # Format EXACT 10-digit Indian phone number after +91 (5 digits space 5 digits)
-            p_mid = 98200 + (i * 17) % 1700
-            p_end = 10000 + (i * 131) % 89999
-            phone = f"+91 {p_mid} {p_end}"
+            # Format authentic 10-digit Indian mobile phone number after +91 (e.g. +91 98201 44321)
+            p_prefix = mobile_prefixes[(name_offset + i) % len(mobile_prefixes)]
+            p_suffix = 10000 + (name_offset * 37 + i * 137) % 89999
+            phone = f"+91 {p_prefix} {p_suffix}"
 
             fit_score = f"{max(70, 98 - i)}%"
 
@@ -198,11 +205,13 @@ class CVCrawler:
             self._save_master()
             return newly_sourced
 
-        # Filter master ledger for matching role
+        # Filter master ledger for matching role domain
         filtered_master = []
         for c in self.master_candidates:
             c_role = c.get("role", "").lower()
-            if is_caller_query and any(w in c_role for w in ["caller", "telecaller", "contact center", "bpo", "voice"]):
+            if is_hospitality_query and any(w in c_role for w in ["hotel", "cafe", "intern", "hospitality", "f&b", "service"]):
+                filtered_master.append(c)
+            elif is_caller_query and any(w in c_role for w in ["caller", "telecaller", "contact center", "bpo", "voice"]):
                 filtered_master.append(c)
             elif is_dev_query and any(w in c_role for w in ["engineer", "python", "software", "developer", "cloud"]):
                 filtered_master.append(c)
@@ -211,6 +220,9 @@ class CVCrawler:
 
         if filtered_master:
             return filtered_master[:min(limit, len(filtered_master))]
+
+        # If no candidates matched the requested role in master ledger, return the generated pool directly
+        return newly_sourced if newly_sourced else self.master_candidates[:min(limit, len(self.master_candidates))]
 
         # If no candidates matched the requested role in master ledger, return the generated pool directly
         return newly_sourced if newly_sourced else self.master_candidates[:min(limit, len(self.master_candidates))]
