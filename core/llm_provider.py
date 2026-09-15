@@ -214,16 +214,25 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         lower_prompt = clean_prompt.lower()
         stripped_prompt = re.sub(r"[^\w\s]", "", lower_prompt).strip()
 
+        is_recruiting = any(w in agent_role.lower() for w in ["talent", "recruiting", "hr", "hiring", "intern", "cafe", "hotel"]) or "recruiting" in (system_prompt or "").lower()
+        is_sales = "sales" in agent_role.lower()
+        is_content = "content" in agent_role.lower()
+        is_video = "video" in agent_role.lower() or "multimedia" in agent_role.lower()
+        is_finance = "finance" in agent_role.lower() or "p&l" in agent_role.lower()
+        is_business_head = "business head" in agent_role.lower() or "executive" in agent_role.lower()
+
         has_role_target = any(w in lower_prompt for w in [
             "candidate", "candidates", "cv", "cvs", "resume", "resumes", 
             "telecaller", "telecallers", "caller", "callers", "bpo",
-            "developer", "developers", "engineer", "engineers", "programmer"
+            "developer", "developers", "engineer", "engineers", "programmer",
+            "profile", "profiles", "intern", "interns", "staff", "employee", "people", "applicant", "applicants", "cafe", "hotel"
         ])
         has_action_verb = any(w in lower_prompt for w in [
-            "find", "search", "list", "source", "fetch", "get", "show", "need", "look for", "check", "run", "want", "hire"
+            "find", "search", "list", "source", "fetch", "get", "show", "need", "look for", "check", "run", "want", "hire",
+            "share", "send", "display", "give", "provide", "bring"
         ])
         explicit_phrase = any(w in lower_prompt for w in [
-            "telecaller", "telecallers", "caller list", "cv list", "resume list", "candidate list", "need callers", "need telecallers", "check now", "sourcing"
+            "telecaller", "telecallers", "caller list", "cv list", "resume list", "candidate list", "profile list", "share profiles", "share candidates", "show profiles", "share 10 profiles", "share 5 profiles", "share 20 profiles", "interns"
         ])
         is_informational = any(w in lower_prompt for w in [
             "tell me about", "how do you", "what is your", "explain", "understand", "remember", "guide", "process", "policy", "workflow"
@@ -232,15 +241,7 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         if is_informational and not explicit_phrase:
             is_candidate_search_query = False
         else:
-            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase
-
-
-        is_recruiting = any(w in agent_role.lower() for w in ["talent", "recruiting", "hr", "hiring"]) or "recruiting" in (system_prompt or "").lower()
-        is_sales = "sales" in agent_role.lower()
-        is_content = "content" in agent_role.lower()
-        is_video = "video" in agent_role.lower() or "multimedia" in agent_role.lower()
-        is_finance = "finance" in agent_role.lower() or "p&l" in agent_role.lower()
-        is_business_head = "business head" in agent_role.lower() or "executive" in agent_role.lower()
+            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase or (is_recruiting and stripped_prompt not in ["hi", "hello", "hey", "who are you", "what can you do", "help"])
 
         # 1. GREETINGS / INTRODUCTIONS ("hi", "hello", "hey", "who are you", "what can you do", "help")
         if stripped_prompt in ["hi", "hello", "hey", "who are you", "what can you do", "help", "start", "greetings", "hi there", "hello there", "what can you do for me"]:
@@ -287,7 +288,7 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                     f"💡 Type your prompt or instruction to begin."
                 )
 
-        # 2. CANDIDATE SOURCING / RESUME / CV SEARCH (TRIGGERED ONLY ON EXPLICIT SEARCH INTENT)
+        # 2. CANDIDATE SOURCING / RESUME / CV SEARCH (TRIGGERED ON SOURCING INTENT OR RECRUITING TASK)
         elif is_candidate_search_query:
             loc_match = "Navi Mumbai"
             if "navi" in lower_prompt or "mumbai" in lower_prompt:
@@ -301,14 +302,19 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             elif "remote" in lower_prompt or "global" in lower_prompt:
                 loc_match = "International Remote"
 
+            # Parse user requested candidate count (e.g. "share 10 profiles" -> 10 candidates)
+            limit_match = re.search(r'\b(\d+)\b', lower_prompt)
+            search_limit = int(limit_match.group(1)) if limit_match else 10
+            search_limit = max(1, min(search_limit, 20))
+
             role_match = clean_prompt
             from integrations.cv_crawler import cv_crawler
-            candidates = cv_crawler.search_candidates(location=loc_match, role=role_match)
+            candidates = cv_crawler.search_candidates(location=loc_match, role=role_match, limit=search_limit)
 
             content = (
                 f"🎯 **[UPONLY Talent Acquisition & Candidate Sourcing Engine]**\n\n"
                 f"🔍 **Deep Web & Multi-Portal Crawl Complete**: Indexed 145+ candidate profiles across Naukri India, LinkedIn Recruiter, Indeed, Monster & TimesJobs for query: **\"{clean_prompt}\"** (Location Focus: **{loc_match}**).\n\n"
-                f"Fetched **{len(candidates)} Max Available Verified Candidate CVs** with direct contact details (Email, 10-Digit Phone, LinkedIn):\n\n"
+                f"Fetched **{len(candidates)} Verified Candidate CVs** with direct contact details (Email, 10-Digit Phone, LinkedIn):\n\n"
             )
 
             for idx, c in enumerate(candidates, 1):

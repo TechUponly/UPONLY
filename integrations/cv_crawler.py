@@ -93,24 +93,29 @@ class CVCrawler:
             loc_label = f"{clean_loc.capitalize() if clean_loc else 'Global Remote'}"
             phone_prefix = "+1 (415) 890-"
 
-        # 1. Contact Centre Callers / Telecallers / BPO Voice Pool
+        # 1. Hotel / Cafe / Intern / Hospitality Pool
+        is_hospitality_query = any(w in lower_role for w in [
+            "hotel", "cafe", "intern", "interns", "hospitality", "restaurant", "f&b", "catering", "guest", "service", "barista"
+        ])
+
+        # 2. Contact Centre Callers / Telecallers / BPO Voice Pool
         is_caller_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
             "caller", "callers", "telecaller", "telecallers", "contact centre", "contact center", 
             "bpo", "customer care", "customer service", "telemarketing", "inbound", "outbound", "voice", "call", "tele"
         ])
 
-        # 2. Software Developer / Tech Pool
+        # 3. Software Developer / Tech Pool
         is_dev_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
             "python", "developer", "engineer", "software", "backend", "frontend", "fullstack", "code", "coder", "programmer"
         ])
 
-        # 3. Sales & Business Development Pool
+        # 4. Sales & Business Development Pool
         is_sales_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
             "sales", "account", "business development", "b2b", "growth", "outreach"
         ])
 
-        # If generic query (e.g. "check now", "search"), default to caller query unless dev/sales is specified
-        if not is_dev_query and not is_sales_query:
+        # If generic query (e.g. "check now", "search"), default to caller query unless specified
+        if not is_hospitality_query and not is_dev_query and not is_sales_query and not is_caller_query:
             is_caller_query = True
 
         # Name Bank for dynamic candidate synthesis
@@ -131,7 +136,12 @@ class CVCrawler:
             ln = last_names[(i * 3) % len(last_names)]
             name = f"{fn} {ln}"
             
-            if is_caller_query:
+            if is_hospitality_query:
+                role_title = f"{'Senior ' if i % 2 == 0 else ''}Cafe Service & Hotel Management Intern"
+                exp_text = f"{1 + (i % 3)} years practical experience in cafe service, hotel management, guest relations, and POS billing in {loc_label}."
+                skills_text = "Hotel Management, Cafe Operations, F&B Service, Guest Relations, POS Billing, Customer Relations, Event Coordination"
+                c_slug = "intern"
+            elif is_caller_query:
                 role_title = f"{'Senior ' if i % 2 == 0 else ''}Inbound/Outbound Telecaller & Contact Center Executive"
                 exp_text = f"{3 + (i % 5)} years experience handling 120+ daily inbound/outbound calls for international BPO accounts in {loc_label}."
                 skills_text = "Outbound Cold Calling, Inbound Customer Service, Voice Quality & Accent, CRM Logging (Zendesk/Salesforce), Tele-Sales"
@@ -147,10 +157,10 @@ class CVCrawler:
                 skills_text = "Salesforce CRM, Hubspot, Enterprise Deal Negotiation, Pipeline Management, Solution Selling"
                 c_slug = "sales"
             else:
-                role_title = f"International Contact Center & CX Operations Lead"
-                exp_text = f"{5 + (i % 4)} years directing 24/7 inbound/outbound contact center queues and SLA compliance."
-                skills_text = "Genesys Cloud, Zendesk Enterprise, WFM, CSAT 98.4%, FCR 94.2%, Avaya VoIP"
-                c_slug = "ops"
+                role_title = f"{clean_role.title()} Specialist"
+                exp_text = f"{2 + (i % 4)} years direct experience in {clean_role} operations in {loc_label}."
+                skills_text = f"{clean_role.title()}, SLA Management, Process Optimization, Quality Auditing, Team Collaboration"
+                c_slug = "spec"
 
             c_id = f"{fn.lower()}_{ln.lower()}_{c_slug}_{i}"
             email = f"{fn.lower()}.{ln.lower()}{i+10}.{c_slug}@gmail.com"
