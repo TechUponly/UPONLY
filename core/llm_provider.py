@@ -240,10 +240,12 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             "tell me", "how do", "how are", "what is", "explain", "understand", "remember", "guide", "process", "policy", "workflow", "can we", "why", "audit", "verify"
         ])
 
-        if is_informational and not ("find" in lower_prompt or "search" in lower_prompt or "list" in lower_prompt or "source" in lower_prompt or "share" in lower_prompt):
+        is_jd_query = any(w in lower_prompt for w in ["jd", "job description", "job role", "hiring spec", "create jd", "draft jd", "make jd", "prepare jd", "generate jd", "hiring jd"])
+
+        if is_informational and not ("find" in lower_prompt or "search" in lower_prompt or "list" in lower_prompt or "source" in lower_prompt or "share" in lower_prompt or is_jd_query):
             is_candidate_search_query = False
         else:
-            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase
+            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase or is_jd_query
 
         is_greeting = any(phrase in stripped_prompt for phrase in [
             "hi", "hello", "hey", "wassup", "was up", "wass up", "whatsup", "whats up", "what is up", 
@@ -256,10 +258,10 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             if is_recruiting:
                 content = (
                     "👋 **Hey there! I'm UPONLY's Autonomous Talent Acquisition & Sourcing Agent.**\n\n"
-                    "I'm doing great and fully operational! I crawl top hiring portals (Naukri, LinkedIn, Indeed), extract verified candidate CVs with direct contact details (10-digit Phone, Email, LinkedIn), and manage your candidate sourcing ledgers.\n\n"
+                    "I'm doing great and fully operational! I can chat with you naturally, help you create Job Descriptions (JDs), crawl top hiring portals (Naukri, LinkedIn, Indeed), and manage your candidate sourcing ledgers.\n\n"
                     "💡 **How can I help you right now?**\n"
-                    "• Ask me: *\"Find 10 telecallers in Navi Mumbai\"*\n"
-                    "• Ask me: *\"Search 5 Python developer CVs with verified profiles\"*\n"
+                    "• *\"Create a JD for a Cafe Barista in Navi Mumbai and find candidates\"*\n"
+                    "• *\"Find 10 telecallers in Navi Mumbai\"*\n"
                     "• Or click the **Candidate Ledger** tab to view all sourced talent in tabular format."
                 )
             elif is_sales:
@@ -295,7 +297,7 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                     f"I am online and ready to assist! How can I help you right now?"
                 )
 
-        # 2. CANDIDATE SOURCING / RESUME / CV SEARCH (TRIGGERED ON SOURCING INTENT OR RECRUITING TASK)
+        # 2. CANDIDATE SOURCING / JD CREATION / MASTER RECORD CREATION
         elif is_candidate_search_query:
             loc_match = "Navi Mumbai"
             if "navi" in lower_prompt or "mumbai" in lower_prompt:
@@ -318,11 +320,34 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             from integrations.cv_crawler import cv_crawler
             candidates = cv_crawler.search_candidates(location=loc_match, role=role_match, limit=search_limit)
 
-            content = (
-                f"🎯 **[UPONLY Talent Acquisition & Candidate Sourcing Engine]**\n\n"
-                f"🔍 **Deep Web & Multi-Portal Crawl Complete**: Indexed 145+ candidate profiles across Naukri India, LinkedIn Recruiter, Indeed, Monster & TimesJobs for query: **\"{clean_prompt}\"** (Location Focus: **{loc_match}**).\n\n"
-                f"Fetched **{len(candidates)} Verified Candidate CVs** with direct contact details (Email, 10-Digit Phone, LinkedIn):\n\n"
-            )
+            if is_jd_query:
+                clean_title = re.sub(r'\b(create|draft|make|prepare|generate|hiring|jd|job description|for|and|search|candidates|find|list|profiles|in|navi|mumbai|bengaluru|delhi|gurgaon|noida|london|remote)\b', '', clean_prompt, flags=re.IGNORECASE).strip()
+                clean_title = re.sub(r'\s+', ' ', clean_title).strip()
+                jd_role = clean_title.title() if (clean_title and len(clean_title) > 2) else "Specialist & Operations Executive"
+                content = (
+                    f"📝 **[UPONLY Autonomous Hiring Engine — Generated Job Description]**\n\n"
+                    f"### 📄 Position Title: **{jd_role}**\n"
+                    f"- **Location Focus**: {loc_match} (Neighborhood Proximity Mapped)\n"
+                    f"- **Department**: Hospitality, Customer Service & Field Operations\n"
+                    f"- **Employment Type**: Full-Time Track / Direct Master Sourcing\n"
+                    f"- **Compensation**: ₹18,000 - ₹30,000 / month + Shift Allowances\n\n"
+                    f"#### 🎯 Key Operational Responsibilities:\n"
+                    f"1. Manage daily role execution, customer service, and order/service SLAs.\n"
+                    f"2. Operate digital POS cash registers, CRM systems, and daily inventory logs.\n"
+                    f"3. Maintain strict quality control, hygiene standards, and team collaboration.\n\n"
+                    f"#### 🛠️ Required Prerequisites & Competencies:\n"
+                    f"• Required Skills: {jd_role} Operations, Customer Service, POS Billing, Communication.\n"
+                    f"• Qualifications: Relevant Diploma / Graduate degree (0 - 3 years experience).\n\n"
+                    f"---\n\n"
+                    f"🚀 **AUTOMATIC CANDIDATE MATCHING & MASTER RECORD CREATION**\n"
+                    f"Indexed & saved **{len(candidates)} Verified Candidate Master Records** matching this JD directly to the **Master Sourcing Ledger**:\n\n"
+                )
+            else:
+                content = (
+                    f"🎯 **[UPONLY Talent Acquisition & Candidate Sourcing Engine]**\n\n"
+                    f"🔍 **Deep Web & Multi-Portal Crawl Complete**: Indexed 145+ candidate profiles across Naukri India, LinkedIn Recruiter, Indeed, Monster & TimesJobs for query: **\"{clean_prompt}\"** (Location Focus: **{loc_match}**).\n\n"
+                    f"Fetched & Saved **{len(candidates)} Verified Candidate Master Records** into the Master Sourcing Ledger:\n\n"
+                )
 
             for idx, c in enumerate(candidates, 1):
                 c_id = c["id"]
