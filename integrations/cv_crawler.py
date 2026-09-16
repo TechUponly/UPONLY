@@ -183,6 +183,10 @@ class CVCrawler:
 
             fit_score = f"{max(70, 98 - i)}%"
 
+            from integrations.email_connector import email_connector
+            email_check = email_connector.verify_email_deliverability(email)
+            email_status = f"🟢 DELIVERED ({email_check['mx_record']} • {email_check['latency_ms']})" if email_check["deliverable"] else "🔴 BOUNCED"
+
             candidate = {
                 "id": c_id,
                 "name": name,
@@ -190,6 +194,7 @@ class CVCrawler:
                 "location": loc_label,
                 "phone": phone,
                 "email": email,
+                "email_status": email_status,
                 "linkedin": f"https://linkedin.com/in/{fn.lower()}-{ln.lower()}-{c_slug}",
                 "experience": exp_text,
                 "skills": skills_text,

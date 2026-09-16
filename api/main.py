@@ -120,6 +120,21 @@ Verified Candidate Reference ID: UPONLY-CV-{abs(hash(clean_name)) % 1000000}
 import io
 import csv
 
+from pydantic import BaseModel
+
+class EmailDropVerifyRequest(BaseModel):
+    email: str
+
+@app.post("/api/verify-email-drop")
+def verify_email_drop_post(req: EmailDropVerifyRequest):
+    from integrations.email_connector import email_connector
+    return email_connector.verify_email_deliverability(req.email)
+
+@app.get("/api/verify-email-drop/{email:path}")
+def verify_email_drop_get(email: str):
+    from integrations.email_connector import email_connector
+    return email_connector.verify_email_deliverability(email)
+
 @app.get("/api/master-candidates")
 def get_master_candidates_json():
     from integrations.cv_crawler import cv_crawler, deduplicate_candidates

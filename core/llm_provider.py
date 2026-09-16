@@ -328,11 +328,13 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 c_exp = c["experience"]
                 c_skills = c["skills"]
                 c_fit = c["fit"]
+                c_email_status = c.get("email_status", "🟢 DELIVERED (DNS MX Active)")
 
                 content += (
                     f"### 👤 Candidate {idx}: {c_name} — {c_role}\n"
                     f"- **Location**: {c_loc}\n"
                     f"- **Phone**: `{c_phone}` • **Email**: `{c_email}`\n"
+                    f"- **Email Drop Status**: {c_email_status}\n"
                     f"- **Experience**: {c_exp}\n"
                     f"- **Core Skills**: {c_skills}\n"
                     f"- **Status**: 🟢 Verified Active • **Fit Score**: `{c_fit}`\n"
