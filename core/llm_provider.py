@@ -330,11 +330,15 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 c_fit = c["fit"]
                 c_email_status = c.get("email_status", "🟢 DELIVERED (DNS MX Active)")
 
+                c_verifier = c.get("verifier_checks", "")
+                verifier_str = f"- **Verifier Checks**:\n{c_verifier}\n" if c_verifier else ""
+
                 content += (
                     f"### 👤 Candidate {idx}: {c_name} — {c_role}\n"
                     f"- **Location**: {c_loc}\n"
                     f"- **Phone**: `{c_phone}` • **Email**: `{c_email}`\n"
                     f"- **Email Drop Status**: {c_email_status}\n"
+                    f"{verifier_str}"
                     f"- **Experience**: {c_exp}\n"
                     f"- **Core Skills**: {c_skills}\n"
                     f"- **Status**: 🟢 Verified Active • **Fit Score**: `{c_fit}`\n"
