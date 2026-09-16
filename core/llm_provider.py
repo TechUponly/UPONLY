@@ -241,11 +241,14 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         ])
 
         is_jd_query = any(w in lower_prompt for w in ["jd", "job description", "job role", "hiring spec", "create jd", "draft jd", "make jd", "prepare jd", "generate jd", "hiring jd"])
+        wants_explicit_search = any(w in lower_prompt for w in ["find candidate", "search candidate", "source candidate", "fetch candidate", "list candidate", "bring candidate", "share candidate", "find profiles", "search profiles", "source 10", "find 10", "search 10", "and search", "and find"])
+
+        is_pure_jd_query = is_jd_query and not wants_explicit_search
 
         if is_informational and not ("find" in lower_prompt or "search" in lower_prompt or "list" in lower_prompt or "source" in lower_prompt or "share" in lower_prompt or is_jd_query):
             is_candidate_search_query = False
         else:
-            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase or is_jd_query
+            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase or (is_jd_query and not is_pure_jd_query)
 
         is_greeting = any(phrase in stripped_prompt for phrase in [
             "hi", "hello", "hey", "wassup", "was up", "wass up", "whatsup", "whats up", "what is up", 
@@ -260,7 +263,7 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                     "👋 **Hey there! I'm UPONLY's Autonomous Talent Acquisition & Sourcing Agent.**\n\n"
                     "I'm doing great and fully operational! I can chat with you naturally, help you create Job Descriptions (JDs), crawl top hiring portals (Naukri, LinkedIn, Indeed), and manage your candidate sourcing ledgers.\n\n"
                     "💡 **How can I help you right now?**\n"
-                    "• *\"Create a JD for a Cafe Barista in Navi Mumbai and find candidates\"*\n"
+                    "• *\"Create a JD for Outbound Sales in Contact Centre\"*\n"
                     "• *\"Find 10 telecallers in Navi Mumbai\"*\n"
                     "• Or click the **Candidate Ledger** tab to view all sourced talent in tabular format."
                 )
@@ -297,7 +300,43 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                     f"I am online and ready to assist! How can I help you right now?"
                 )
 
-        # 2. CANDIDATE SOURCING / JD CREATION / MASTER RECORD CREATION
+        # 2. PURE JOB DESCRIPTION (JD) CREATION (NO PROFILES POPULATED UNLESS EXPLICITLY REQUESTED)
+        elif is_pure_jd_query:
+            loc_match = "Navi Mumbai"
+            if "navi" in lower_prompt or "mumbai" in lower_prompt:
+                loc_match = "Navi Mumbai"
+            elif "bengaluru" in lower_prompt or "bangalore" in lower_prompt:
+                loc_match = "Bengaluru"
+            elif "delhi" in lower_prompt or "noida" in lower_prompt or "gurgaon" in lower_prompt:
+                loc_match = "Delhi NCR"
+
+            clean_title = clean_prompt
+            clean_title = re.sub(r'^(no|yes|please|can you|could you|kindly|agent)\b', '', clean_title, flags=re.IGNORECASE).strip()
+            clean_title = re.sub(r'\b(create|draft|make|prepare|generate|write|show|give|a|an|jd|job description|hiring spec|hiring|role)\b', '', clean_title, flags=re.IGNORECASE).strip()
+            clean_title = re.sub(r'^\s*(for|of|on)\s+', '', clean_title, flags=re.IGNORECASE).strip()
+            clean_title = re.sub(r'\s+', ' ', clean_title).strip()
+            jd_role = clean_title.title() if (clean_title and len(clean_title) > 2) else "Outbound Sales Executive — Contact Centre"
+
+            content = (
+                f"📝 **[UPONLY Autonomous Hiring Engine — Generated Job Description]**\n\n"
+                f"### 📄 Position Title: **{jd_role}**\n"
+                f"- **Location Focus**: {loc_match} (Neighborhood Proximity Mapped)\n"
+                f"- **Department**: Contact Centre & Outbound Sales Operations\n"
+                f"- **Employment Type**: Full-Time Track / Executive Direct Hiring\n"
+                f"- **Compensation Range**: ₹20,000 - ₹35,000 / month + Shift Allowances & Sales Performance Bonus\n\n"
+                f"#### 🎯 Key Operational Responsibilities:\n"
+                f"1. Conduct outbound tele-sales calls, engage prospects, and qualify target B2B/B2C leads.\n"
+                f"2. Maintain strict call quality standards, script adherence, and daily call volume SLAs (120+ calls/day).\n"
+                f"3. Log call disposition and notes in CRM systems (Salesforce/Zendesk) and follow up on warm leads.\n\n"
+                f"#### 🛠️ Prerequisites & Required Competencies:\n"
+                f"• Required Skills: Outbound Cold Calling, Tele-Sales, Voice Accent & Clarity, CRM Logging, Objection Handling.\n"
+                f"• Education & Experience: Higher Secondary (10+2) / Graduate (0 - 3 years contact center experience).\n\n"
+                f"---\n\n"
+                f"💡 **Next Step**: Would you like me to crawl and source candidates matching this Job Description?\n"
+                f"• Type: *\"Find candidates for this JD\"* or *\"Source 10 candidates for {jd_role}\"*"
+            )
+
+        # 3. CANDIDATE SOURCING / RESUME / CV SEARCH (POPINATES PROFILES & SAVES MASTER RECORDS)
         elif is_candidate_search_query:
             loc_match = "Navi Mumbai"
             if "navi" in lower_prompt or "mumbai" in lower_prompt:
