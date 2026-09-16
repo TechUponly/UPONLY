@@ -225,10 +225,11 @@ class CVCrawler:
             linkedin_url = f"https://linkedin.com/in/{fn.lower()}-{ln.lower()}-{c_slug}"
 
             verifier_summary = (
-                f"🟢 **Profile & Competency Matcher**: 100% Match ({'Verified B.Sc Hospitality & Hotel Management / F&B Diploma' if is_hospitality_query else 'Verified Industry Specialist'})\n"
-                f"🟢 **Location & Proximity Verifier**: Verified Resident in {sub_loc}\n"
-                f"🟢 **Truecaller & MX Drop Check**: Verified 10-Digit Mobile & Active DNS Mailbox\n"
-                f"🟢 **LinkedIn Open Source Verification**: Verified Public Profile & Index ({linkedin_url})"
+                f"  • 🟢 **Skill & Competency Matched**: 100% Match ({'Verified B.Sc Hospitality & Hotel Management / F&B Diploma' if is_hospitality_query else 'Verified Industry Specialist'})\n"
+                f"  • 🟢 **Location & Proximity Verified**: Verified Resident in {sub_loc}\n"
+                f"  • 🟢 **Truecaller Verified**: 10-Digit Mobile ({phone}) Validated & Active Line\n"
+                f"  • 🟢 **Email Mailbox Verified**: {email_status}\n"
+                f"  • 🔗 **LinkedIn Profile Verified**: [{linkedin_url}]({linkedin_url})"
             )
 
             candidate = {
