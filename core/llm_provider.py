@@ -245,22 +245,28 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
         else:
             is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase
 
-        # 1. GREETINGS / INTRODUCTIONS ("hi", "hello", "hey", "who are you", "what can you do", "help")
-        if stripped_prompt in ["hi", "hello", "hey", "who are you", "what can you do", "help", "start", "greetings", "hi there", "hello there", "what can you do for me"]:
+        is_greeting = any(phrase in stripped_prompt for phrase in [
+            "hi", "hello", "hey", "wassup", "was up", "wass up", "whatsup", "whats up", "what is up", 
+            "sup", "yo", "greetings", "good morning", "good afternoon", "good evening", "how are you", 
+            "how are u", "who are you", "what can you do", "help", "start"
+        ]) or stripped_prompt in ["he wass up", "wassup", "whats up", "sup", "yo", "hi", "hello", "hey"]
+
+        # 1. GREETINGS / CASUAL CHAT INTRODUCTIONS
+        if is_greeting:
             if is_recruiting:
                 content = (
-                    "👋 **Hello! I am UPONLY's Autonomous Talent Acquisition & Sourcing Agent.**\n\n"
-                    "I crawl open candidate databases, extract CVs with verified contact details (10-digit Phone, Email, LinkedIn), screen profiles, and manage candidate sourcing ledgers.\n\n"
-                    "💡 **How can I help you today?** You can ask me to:\n"
-                    "• *\"Find telecallers in Navi Mumbai\"*\n"
-                    "• *\"Search 100 Python developer CVs\"*\n"
+                    "👋 **Hey there! I'm UPONLY's Autonomous Talent Acquisition & Sourcing Agent.**\n\n"
+                    "I'm doing great and fully operational! I crawl top hiring portals (Naukri, LinkedIn, Indeed), extract verified candidate CVs with direct contact details (10-digit Phone, Email, LinkedIn), and manage your candidate sourcing ledgers.\n\n"
+                    "💡 **How can I help you right now?**\n"
+                    "• Ask me: *\"Find 10 telecallers in Navi Mumbai\"*\n"
+                    "• Ask me: *\"Search 5 Python developer CVs with verified profiles\"*\n"
                     "• Or click the **Candidate Ledger** tab to view all sourced talent in tabular format."
                 )
             elif is_sales:
                 content = (
-                    "💼 **Greetings! I am your B2B Sales & Pipeline Intelligence Partner.**\n\n"
+                    "💼 **Hey there! 👋 I am your B2B Sales & Pipeline Intelligence Partner.**\n\n"
                     "I qualify target lead cohorts, draft outreach emails, and optimize sales pipelines.\n\n"
-                    "💡 How can I assist your sales team today?"
+                    "💡 How can I assist your sales team right now?"
                 )
             elif is_content:
                 content = (
@@ -285,9 +291,8 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 )
             else:
                 content = (
-                    f"🤖 **Hello! I am UPONLY's {agent_role}.**\n\n"
-                    f"I am fully online and connected to the UPONLY Business Operating System. I am ready to process your operational directives step-by-step.\n\n"
-                    f"💡 Type your prompt or instruction to begin."
+                    f"👋 **Hey there! I am UPONLY's {agent_role}.**\n\n"
+                    f"I am online and ready to assist! How can I help you right now?"
                 )
 
         # 2. CANDIDATE SOURCING / RESUME / CV SEARCH (TRIGGERED ON SOURCING INTENT OR RECRUITING TASK)
@@ -424,20 +429,13 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 "• *\"Search 5 Python developers with verified profiles\"*"
             )
 
-        # 8. GENERAL DYNAMIC FALLBACK
+        # 8. GENERAL CONVERSATIONAL CHAT RESPONSE
         else:
             content = (
-                f"🤖 **[UPONLY {agent_role} Execution Engine]**\n\n"
-                f"Processed directive: **\"{clean_prompt}\"**\n\n"
-                f"### 📋 Strategic Execution Summary:\n"
-                f"1. **Requirement Analysis**:\n"
-                f"   - Evaluated parameters for: *{clean_prompt}*.\n"
-                f"   - Referenced live enterprise SOPs and active agent memory.\n\n"
-                f"2. **Execution Steps**:\n"
-                f"   - Ran multi-step reasoning loop as **{agent_role}**.\n"
-                f"   - Verified data integrity across connected microservices.\n\n"
-                f"3. **Result**:\n"
-                f"   - Operational goal for *{clean_prompt}* completed with status `COMPLETED`."
+                f"👋 **Hello! I am your {agent_role} in UPONLY OS.**\n\n"
+                f"I've received your prompt: *\"{clean_prompt}\"*.\n\n"
+                f"I am fully online and ready to collaborate! Whether you need candidate sourcing, workflow automation, outreach drafting, or enterprise analysis, feel free to tell me what you'd like to do.\n\n"
+                f"💡 *Tip: Try a command like:* **\"Find 10 telecallers in Navi Mumbai\"** *or ask me any questions!*"
             )
 
         return {
