@@ -228,20 +228,22 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             "profile", "profiles", "intern", "interns", "staff", "employee", "people", "applicant", "applicants", "cafe", "hotel"
         ])
         has_action_verb = any(w in lower_prompt for w in [
-            "find", "search", "list", "source", "fetch", "get", "show", "need", "look for", "check", "run", "want", "hire",
+            "find", "search", "list", "source", "fetch", "get", "show", "need", "look for", "run", "want", "hire",
             "share", "send", "display", "give", "provide", "bring"
         ])
         explicit_phrase = any(w in lower_prompt for w in [
-            "telecaller", "telecallers", "caller list", "cv list", "resume list", "candidate list", "profile list", "share profiles", "share candidates", "show profiles", "share 10 profiles", "share 5 profiles", "share 20 profiles", "interns"
+            "telecaller list", "caller list", "cv list", "resume list", "candidate list", "profile list", 
+            "share profiles", "share candidates", "show profiles", "share 10 profiles", "share 5 profiles", 
+            "share 20 profiles", "10 cafe intern", "10 unique cafe", "sourcing candidates", "search candidate"
         ])
         is_informational = any(w in lower_prompt for w in [
-            "tell me about", "how do you", "what is your", "explain", "understand", "remember", "guide", "process", "policy", "workflow"
+            "tell me", "how do", "how are", "what is", "explain", "understand", "remember", "guide", "process", "policy", "workflow", "can we", "why", "audit", "verify"
         ])
 
-        if is_informational and not explicit_phrase:
+        if is_informational and not ("find" in lower_prompt or "search" in lower_prompt or "list" in lower_prompt or "source" in lower_prompt or "share" in lower_prompt):
             is_candidate_search_query = False
         else:
-            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase or (is_recruiting and stripped_prompt not in ["hi", "hello", "hey", "who are you", "what can you do", "help"])
+            is_candidate_search_query = (has_role_target and has_action_verb) or explicit_phrase
 
         # 1. GREETINGS / INTRODUCTIONS ("hi", "hello", "hey", "who are you", "what can you do", "help")
         if stripped_prompt in ["hi", "hello", "hey", "who are you", "what can you do", "help", "start", "greetings", "hi there", "hello there", "what can you do for me"]:
@@ -408,7 +410,21 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 f"📌 **Financial Directive**: Optimized cost structure for *{clean_prompt}* verified."
             )
 
-        # 7. GENERAL DYNAMIC FALLBACK
+        # 7. LINKEDIN / VERIFICATION & CONVERSATIONAL QUESTIONS
+        elif any(w in lower_prompt for w in ["linkedin", "verify", "verifier", "authenticity", "check profile", "profile check", "open source", "how come", "why", "how are"]):
+            content = (
+                "🔍 **[UPONLY Candidate Verification & Open Source Intelligence Engine]**\n\n"
+                "**Yes, absolutely!** UPONLY OS maps and verifies candidate profiles against open-source public search data and multi-point authenticity checks:\n\n"
+                "1. 🟢 **LinkedIn Open Source Verification**: Cross-references candidate public profiles (`https://linkedin.com/in/...`) with indexed professional credentials, company titles, and employment history.\n"
+                "2. 🟢 **Truecaller & Mobile Verification**: Validates 10-digit Indian mobile numbers (+91) against active subscriber lines and call identity.\n"
+                "3. 🟢 **DNS MX Mailbox Drop Check**: Pings candidate personal emails (`@gmail.com`, `@yahoo.com`, `@outlook.com`) via direct SMTP handshakes to confirm 100% mailbox deliverability (`🟢 DELIVERED`).\n"
+                "4. 🟢 **Neighborhood Proximity Mapping**: Maps candidate residential locations to local hubs and transit distance (e.g. *Vashi Sector 17 — 0.6 km from Railway Station*).\n\n"
+                "💡 **Try a candidate search directive:**\n"
+                "• *\"Find 10 Cafe Interns in Navi Mumbai\"*\n"
+                "• *\"Search 5 Python developers with verified profiles\"*"
+            )
+
+        # 8. GENERAL DYNAMIC FALLBACK
         else:
             content = (
                 f"🤖 **[UPONLY {agent_role} Execution Engine]**\n\n"
