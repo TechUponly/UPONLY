@@ -314,6 +314,7 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             clean_title = re.sub(r'^(no|yes|please|can you|could you|kindly|agent)\b', '', clean_title, flags=re.IGNORECASE).strip()
             clean_title = re.sub(r'\b(create|draft|make|prepare|generate|write|show|give|a|an|jd|job description|hiring spec|hiring|role)\b', '', clean_title, flags=re.IGNORECASE).strip()
             clean_title = re.sub(r'^\s*(for|of|on)\s+', '', clean_title, flags=re.IGNORECASE).strip()
+            clean_title = re.sub(r'\b(call|calls)\b', 'Executive', clean_title, flags=re.IGNORECASE).strip()
             clean_title = re.sub(r'\s+', ' ', clean_title).strip()
             jd_role = clean_title.title() if (clean_title and len(clean_title) > 2) else "Outbound Sales Executive — Contact Centre"
 
