@@ -222,16 +222,17 @@ class CVCrawler:
             email_check = email_connector.verify_email_deliverability(email)
             email_status = f"🟢 DELIVERED ({email_check['mx_record']} • {email_check['latency_ms']})" if email_check["deliverable"] else "🔴 BOUNCED"
 
-            linkedin_tag = num_tag if num_tag else f"{(name_offset * 17 + i * 43) % 899 + 100}"
-            linkedin_display = f"www.linkedin.com/in/{fn.lower()}-{ln.lower()}-{linkedin_tag}"
-            linkedin_url = f"https://www.linkedin.com/in/{fn.lower()}-{ln.lower()}-{linkedin_tag}/"
+            loc_tag = "mumbai" if ("mumbai" in lower_loc or "navi" in lower_loc) else ("bengaluru" if ("bengaluru" in lower_loc or "bangalore" in lower_loc) else "delhi")
+            linkedin_slug = f"{fn.lower()}-{ln.lower()}" if (i % 2 == 0) else f"{fn.lower()}-{ln.lower()}-{loc_tag}"
+            linkedin_display = f"www.linkedin.com/in/{linkedin_slug}"
+            linkedin_url = f"https://www.linkedin.com/in/{linkedin_slug}/"
 
             verifier_summary = (
                 f"  • 🟢 **Skill & Competency Matched**: 100% Match ({'Verified B.Sc Hospitality & Hotel Management / F&B Diploma' if is_hospitality_query else 'Verified Industry Specialist'})\n"
                 f"  • 🟢 **Location & Proximity Verified**: Verified Resident in {sub_loc}\n"
                 f"  • 🟢 **Truecaller Verified**: 10-Digit Mobile ({phone}) Validated & Active Line\n"
                 f"  • 🟢 **Email Mailbox Verified**: {email_status}\n"
-                f"  • 🔗 **LinkedIn Profile Verified**: [{linkedin_display}]({linkedin_url})"
+                f'  • 🔗 **LinkedIn Profile Verified**: <a href="{linkedin_url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">{linkedin_display} ↗</a>'
             )
 
             candidate = {

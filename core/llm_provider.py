@@ -404,16 +404,17 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
 
                 c_verifier = c.get("verifier_checks", "")
                 verifier_str = f"- **Verifier Audits**:\n{c_verifier}\n" if c_verifier else ""
-                linkedin_link = f"[{c_linkedin}]({c_linkedin})"
+                linkedin_disp = c_linkedin.replace("https://", "").replace("http://", "").rstrip("/")
+                linkedin_anchor = f'<a href="{c_linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600; text-decoration: underline;">🔗 {linkedin_disp} ↗</a>'
 
                 content += (
                     f"### 👤 Candidate {idx}: {c_name} — {c_role}\n"
-                    f"- **Location**: {c_loc} [🟢 Location Verified]\n"
-                    f"- **Phone**: `{c_phone}` [🟢 Truecaller Verified] • **Email**: `{c_email}` [🟢 Email Verified]\n"
-                    f"- **LinkedIn ID**: 🔗 {linkedin_link} *(Click to redirect to LinkedIn profile)*\n"
+                    f"- **Location**: {c_loc}\n"
+                    f"- **Phone**: `{c_phone}` • **Email**: `{c_email}`\n"
+                    f"- **LinkedIn Profile**: {linkedin_anchor}\n"
                     f"{verifier_str}"
                     f"- **Experience**: {c_exp}\n"
-                    f"- **Core Skills**: {c_skills} [🟢 Skill Matched]\n"
+                    f"- **Core Skills**: {c_skills}\n"
                     f"- **Status**: 🟢 Verified Active • **Fit Score**: `{c_fit}`\n"
                     f'<div class="candidate-actions">'
                     f'<button class="btn-cv-view" data-cv-name="{c_name}" data-cv-role="{c_role}" data-cv-phone="{c_phone}" data-cv-email="{c_email}" data-cv-linkedin="{c_linkedin}" data-cv-exp="{c_exp}" data-cv-skills="{c_skills}" data-cv-location="{c_loc}" data-cv-fit="{c_fit}" data-cv-id="{c_id}">👁️ View Full CV</button>'
