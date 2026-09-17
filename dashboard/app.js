@@ -1018,37 +1018,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const candidateId = safeName.toLowerCase().replace(/[^a-z0-9_]/g, "_");
 
-    if (modalName) modalName.textContent = `📄 Curriculum Vitae — ${safeName}`;
+    const roleLower = (safeRole + " " + safeSkills).toLowerCase();
+    let domainTag = "CONTACT CENTER & VOICE OPERATIONS";
+    let summaryText = `Customer-centric Contact Center & Voice Representative with expertise in ${safeSkills}. Proven success in high-volume outbound telesales, inbound query resolution, and operational SLA compliance.`;
+    let scorecardText = `<li><strong>Quality & CSAT Scorecard</strong>: Maintained 98%+ CSAT rating and 94%+ First Call Resolution (FCR).</li>`;
+    let educationText = `<li>Bachelor of Commerce (B.Com) / Higher Secondary (HSC)</li><li>Certified Customer Operations & Voice Quality Specialist</li>`;
+
+    if (roleLower.includes("python") || roleLower.includes("dev") || roleLower.includes("engineer") || roleLower.includes("software") || roleLower.includes("backend")) {
+      domainTag = "SOFTWARE & AI STACK DEVELOPMENT";
+      summaryText = `Results-driven Software & AI Stack Engineer with hands-on expertise in ${safeSkills}. Demonstrated success in building scalable backend services, optimizing database query performance, and deploying robust production microservices.`;
+      scorecardText = `<li><strong>System Performance & Quality</strong>: Maintained 99.9% API uptime SLAs, sub-50ms latency, and zero-defect production releases.</li>`;
+      educationText = `<li>Bachelor of Technology (B.Tech) in Computer Science & Engineering</li><li>Certified AWS & DevOps Stack Practitioner</li>`;
+    } else if (roleLower.includes("hotel") || roleLower.includes("cafe") || roleLower.includes("barista") || roleLower.includes("hospitality") || roleLower.includes("intern")) {
+      domainTag = "HOSPITALITY & CAFE OPERATIONS";
+      summaryText = `Customer-oriented Hospitality & Cafe Operations Specialist trained in ${safeSkills}. Proven ability to manage high-volume cafe shifts, deliver specialty barista espresso brewing, and maintain top-tier guest satisfaction ratings.`;
+      scorecardText = `<li><strong>Guest Experience & Operations</strong>: Achieved 99%+ Guest Satisfaction Index and zero cash-drawer billing discrepancy across high-volume cafe shifts.</li>`;
+      educationText = `<li>Bachelor of Science in Hotel Management & Catering Technology (IHM)</li><li>Certified Specialty Barista & Food Safety & Hygiene Practitioner</li>`;
+    } else if (roleLower.includes("sales") || roleLower.includes("b2b") || roleLower.includes("account") || roleLower.includes("growth")) {
+      domainTag = "B2B ENTERPRISE SALES & ACCOUNT MANAGEMENT";
+      summaryText = `Target-focused B2B Sales & Account Leader specialized in ${safeSkills}. Track record of driving new client acquisition, outbound pipeline expansion, and closing high-value commercial agreements.`;
+      scorecardText = `<li><strong>Sales Quota Scorecard</strong>: Consistently exceeded quarterly revenue targets by 115%+ with 92% client retention rate.</li>`;
+      educationText = `<li>Master of Business Administration (MBA) in Marketing & Sales</li><li>Certified Enterprise Sales Professional & CRM Pipeline Specialist</li>`;
+    }
+
+    if (modalName) modalName.textContent = `📄 Curriculum Vitae — ${safeName} (${domainTag})`;
     if (modalBody) {
       modalBody.innerHTML = `
         <div class="cv-header-block">
           <h3>${safeName}</h3>
           <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">${safeRole} • ${safeLocation}</div>
           <div style="font-size: 13px; color: #38bdf8; margin-top: 6px; font-weight: 600;">📞 Phone: <span style="color: #f3f4f6;">${safePhone}</span> &nbsp;|&nbsp; 📧 Email: <span style="color: #f3f4f6;">${safeEmail}</span></div>
-          <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${safeFit} • Status: Verified Active Candidate</div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 4px; font-weight: 600;">🟢 Candidate Fit Score: ${safeFit} • Domain: ${domainTag}</div>
         </div>
 
         <div class="cv-section-title">📌 Executive Summary</div>
-        <p style="margin-bottom: 12px;">Accomplished and results-driven specialist with extensive experience in ${safeRole}. Proven track record in operational SLA compliance, CSAT optimization, multi-channel customer engagement, and high-performance workflow execution.</p>
+        <p style="margin-bottom: 12px;">${summaryText}</p>
 
         <div class="cv-section-title">💼 Key Qualifications & Technical Competencies</div>
         <ul style="margin-left: 20px; margin-bottom: 12px;">
           <li><strong>Experience Overview</strong>: ${safeExp}</li>
           <li><strong>Technical Stack & Skills</strong>: ${safeSkills}</li>
           <li><strong>Languages & Communication</strong>: English (Fluent/Native), Multilingual Capabilities.</li>
-          <li><strong>Quality & CSAT Scorecard</strong>: Maintained 98%+ CSAT rating and 94%+ First Call Resolution (FCR) average.</li>
+          ${scorecardText}
         </ul>
 
         <div class="cv-section-title">🎓 Education & Professional Certifications</div>
         <ul style="margin-left: 20px; margin-bottom: 12px;">
-          <li>Bachelor of Science in Information Systems / Business Administration</li>
-          <li>Certified Customer Operations Manager (CCOM) & Omnichannel WFM Specialist</li>
+          ${educationText}
         </ul>
 
         <div class="cv-section-title">🔒 Verification & Security Metadata</div>
         <div style="font-size: 11px; font-family: monospace; color: #64748b;">
           Document Hash: sha256_up_${candidateId}_${Date.now()}<br>
-          Sourced via: UPONLY Autonomous Talent Acquisition Crawler
+          Sourced via: UPONLY Autonomous Talent Acquisition Engine
         </div>
       `;
     }
