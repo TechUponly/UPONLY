@@ -319,25 +319,38 @@ class CVCrawler:
             "sales", "account", "business development", "b2b", "growth", "outreach"
         ])
 
-        if not is_hospitality_query and not is_dev_query and not is_sales_query and not is_caller_query:
-            is_caller_query = True
+        is_generic_query = not (is_hospitality_query or is_dev_query or is_sales_query or is_caller_query)
 
         # Select primary real candidate pool matching domain
-        if is_hospitality_query:
+        if is_dev_query:
+            base_pool = GITHUB_DEV_POOL
+            default_portal = "GitHub"
+        elif is_hospitality_query:
             base_pool = INTERNSHALA_INTERN_POOL
             default_portal = "Internshala"
         elif is_caller_query:
             base_pool = WORKINDIA_TELECALLER_POOL
             default_portal = "WorkIndia"
-        elif is_dev_query:
-            base_pool = GITHUB_DEV_POOL
-            default_portal = "GitHub"
         elif is_sales_query:
             base_pool = NAUKRI_SALES_POOL
             default_portal = "Naukri"
         else:
-            base_pool = WORKINDIA_TELECALLER_POOL
-            default_portal = "WorkIndia"
+            # For generic queries, interleave profiles across all portals so search output is balanced and diverse
+            base_pool = [
+                GITHUB_DEV_POOL[0],
+                WORKINDIA_TELECALLER_POOL[0],
+                INTERNSHALA_INTERN_POOL[0],
+                NAUKRI_SALES_POOL[0],
+                GITHUB_DEV_POOL[1],
+                WORKINDIA_TELECALLER_POOL[1],
+                INTERNSHALA_INTERN_POOL[1],
+                NAUKRI_SALES_POOL[1],
+                GITHUB_DEV_POOL[2],
+                WORKINDIA_TELECALLER_POOL[2],
+                INTERNSHALA_INTERN_POOL[2],
+                WORKINDIA_TELECALLER_POOL[3]
+            ]
+            default_portal = "Multi-Portal Sourced Index"
 
         # City & Neighborhood mapping
         if "navi" in lower_loc or "mumbai" in lower_loc:

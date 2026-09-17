@@ -314,24 +314,74 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
             clean_title = re.sub(r'^(no|yes|please|can you|could you|kindly|agent)\b', '', clean_title, flags=re.IGNORECASE).strip()
             clean_title = re.sub(r'\b(create|draft|make|prepare|generate|write|show|give|a|an|jd|job description|hiring spec|hiring|role)\b', '', clean_title, flags=re.IGNORECASE).strip()
             clean_title = re.sub(r'^\s*(for|of|on)\s+', '', clean_title, flags=re.IGNORECASE).strip()
-            clean_title = re.sub(r'\b(call|calls)\b', 'Executive', clean_title, flags=re.IGNORECASE).strip()
             clean_title = re.sub(r'\s+', ' ', clean_title).strip()
-            jd_role = clean_title.title() if (clean_title and len(clean_title) > 2) else "Outbound Sales Executive — Contact Centre"
+            jd_role = clean_title.title() if (clean_title and len(clean_title) > 2) else "Operations Specialist & Executive"
+
+            lower_jd_role = jd_role.lower()
+
+            if any(w in lower_jd_role for w in ["hotel", "cafe", "intern", "barista", "hospitality"]):
+                dept = "Hospitality, F&B & Guest Operations"
+                comp = "₹18,000 - ₹28,000 / month + Shift Allowances"
+                resps = (
+                    "1. Manage daily cafe floor operations, POS cash register billing, and guest reception.\n"
+                    "2. Operate espresso barista brewing equipment, maintain clean sanitation standards, and track inventory.\n"
+                    "3. Ensure guest satisfaction, rapid order turnaround, and team collaboration."
+                )
+                skills = "Cafe Operations, Barista Brewing, POS Cash Registers, Guest Relations, Food Hygiene"
+                quals = "B.Sc Hotel Management / Diploma in Hospitality Studies (0 - 2 years experience)"
+            elif any(w in lower_jd_role for w in ["developer", "engineer", "software", "python", "backend", "frontend"]):
+                dept = "Software Engineering & Cloud Operations"
+                comp = "₹8,00,000 - ₹18,00,000 / annum (Fixed + Performance Equity)"
+                resps = (
+                    "1. Design, develop, and deploy high-performance REST APIs, microservices, and asynchronous background tasks.\n"
+                    "2. Maintain automated unit testing, CI/CD deployment pipelines, and database optimization.\n"
+                    "3. Collaborate with product managers and architecture teams to ship scalable system features."
+                )
+                skills = "Python 3.12, FastAPI, PostgreSQL, Docker, Redis, Microservices Architecture, CI/CD"
+                quals = "B.Tech / B.E. / M.Tech in Computer Science / IT (2 - 6 years experience)"
+            elif any(w in lower_jd_role for w in ["sales", "b2b", "account", "business development"]):
+                dept = "Enterprise B2B Sales & Revenue Operations"
+                comp = "₹6,00,000 - ₹14,00,000 / annum + Uncapped Performance Incentives"
+                resps = (
+                    "1. Prospect, qualify, and close high-value B2B enterprise SaaS and services deals.\n"
+                    "2. Manage end-to-end sales pipelines in Salesforce/Hubspot CRM from initial outbound pitch to contract signature.\n"
+                    "3. Present solution demonstrations to C-level decision makers."
+                )
+                skills = "B2B SaaS Sales, Pipeline Management, Salesforce CRM, Solution Selling, Contract Negotiation"
+                quals = "Bachelor's Degree / M.B.A. (2 - 5 years enterprise sales experience)"
+            elif any(w in lower_jd_role for w in ["telecaller", "caller", "bpo", "voice", "customer care"]):
+                dept = "Contact Centre & Customer Experience"
+                comp = "₹20,000 - ₹35,00,00 / month + Sales Performance Incentives"
+                resps = (
+                    "1. Conduct outbound tele-sales calls, engage prospects, and qualify target B2B/B2C leads.\n"
+                    "2. Maintain strict call quality standards, script adherence, and daily call volume SLAs (120+ calls/day).\n"
+                    "3. Log call disposition and notes in CRM systems (Salesforce/Zendesk)."
+                )
+                skills = "Outbound Cold Calling, Tele-Sales, Voice Accent & Clarity, CRM Logging, Objection Handling"
+                quals = "Higher Secondary (10+2) / Graduate (0 - 3 years contact center experience)"
+            else:
+                dept = "Enterprise Operations & Professional Services"
+                comp = "₹4,50,000 - ₹9,50,000 / annum"
+                resps = (
+                    "1. Execute daily domain operations, project deliverables, and operational SLA targets.\n"
+                    "2. Coordinate cross-functional team workflows, process optimization, and client reporting.\n"
+                    "3. Maintain strict quality control, documentation standards, and continuous process improvement."
+                )
+                skills = f"{jd_role} Competencies, Process Optimization, SLA Management, Stakeholder Communication"
+                quals = "Bachelor's Degree in relevant domain (1 - 4 years experience)"
 
             content = (
                 f"📝 **[UPONLY Autonomous Hiring Engine — Generated Job Description]**\n\n"
                 f"### 📄 Position Title: **{jd_role}**\n"
                 f"- **Location Focus**: {loc_match} (Neighborhood Proximity Mapped)\n"
-                f"- **Department**: Contact Centre & Outbound Sales Operations\n"
+                f"- **Department**: {dept}\n"
                 f"- **Employment Type**: Full-Time Track / Executive Direct Hiring\n"
-                f"- **Compensation Range**: ₹20,000 - ₹35,000 / month + Shift Allowances & Sales Performance Bonus\n\n"
+                f"- **Compensation**: {comp}\n\n"
                 f"#### 🎯 Key Operational Responsibilities:\n"
-                f"1. Conduct outbound tele-sales calls, engage prospects, and qualify target B2B/B2C leads.\n"
-                f"2. Maintain strict call quality standards, script adherence, and daily call volume SLAs (120+ calls/day).\n"
-                f"3. Log call disposition and notes in CRM systems (Salesforce/Zendesk) and follow up on warm leads.\n\n"
+                f"{resps}\n\n"
                 f"#### 🛠️ Prerequisites & Required Competencies:\n"
-                f"• Required Skills: Outbound Cold Calling, Tele-Sales, Voice Accent & Clarity, CRM Logging, Objection Handling.\n"
-                f"• Education & Experience: Higher Secondary (10+2) / Graduate (0 - 3 years contact center experience).\n\n"
+                f"• Required Skills: {skills}.\n"
+                f"• Qualifications: {quals}.\n\n"
                 f"---\n\n"
                 f"💡 **Next Step**: Would you like me to crawl and source candidates matching this Job Description?\n"
                 f"• Type: *\"Find candidates for this JD\"* or *\"Source 10 candidates for {jd_role}\"*"
