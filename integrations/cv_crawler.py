@@ -224,7 +224,9 @@ class CVCrawler:
 
             loc_tag = "mumbai" if ("mumbai" in lower_loc or "navi" in lower_loc) else ("bengaluru" if ("bengaluru" in lower_loc or "bangalore" in lower_loc) else "delhi")
             linkedin_slug = f"{fn.lower()}-{ln.lower()}-{c_slug}-{loc_tag}"
-            linkedin_search_query = urllib.parse.quote(f"{name} {role_title} {loc_label}")
+            
+            clean_search_kw = "Telecaller" if is_caller_query else ("Software Engineer" if is_dev_query else ("B2B Sales" if is_sales_query else ("Cafe Intern" if is_hospitality_query else clean_role)))
+            linkedin_search_query = urllib.parse.quote(f"{name} {clean_search_kw} {clean_loc}")
             linkedin_url = f"https://www.linkedin.com/search/results/people/?keywords={linkedin_search_query}"
             linkedin_display = f"www.linkedin.com/in/{linkedin_slug}"
 
