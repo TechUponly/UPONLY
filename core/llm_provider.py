@@ -389,6 +389,37 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
 
         # 3. CANDIDATE SOURCING / RESUME / CV SEARCH (POPINATES PROFILES & SAVES MASTER RECORDS)
         elif is_candidate_search_query:
+            # Check if the candidate search query is underspecified/vague (e.g. "search candidates" without specifying a role)
+            has_specific_domain = any(w in lower_prompt for w in [
+                "telecaller", "telecallers", "caller", "callers", "bpo", "voice", "customer care", "telemarketing",
+                "developer", "developers", "engineer", "engineers", "programmer", "python", "java", "react", "fullstack", "backend", "frontend", "coder",
+                "sales", "b2b", "account executive", "business development", "outreach", "prospect",
+                "intern", "interns", "cafe", "hotel", "barista", "hospitality", "service intern", "restaurant"
+            ])
+
+            if not has_specific_domain and not is_jd_query:
+                content = (
+                    "🎯 **[UPONLY Autonomous Hiring Engine — Candidate Search Clarification]**\n\n"
+                    "To get your candidate search right — **which specific candidate profile or role are you looking for?**\n\n"
+                    "Please select one of our verified sourcing portals or specify your custom role & target location:\n\n"
+                    "1. 📞 **Outbound Telecallers & BPO Voice Executives** (*WorkIndia Verified Candidate Network*)\n"
+                    "2. ☕ **Cafe Floor, Barista & Hotel Management Interns** (*Internshala Verified Applicant Pool*)\n"
+                    "3. 💻 **Python, Microservices & Cloud Software Engineers** (*GitHub Open Source Extract*)\n"
+                    "4. 💼 **Senior B2B SaaS Sales & Account Executives** (*Naukri Verified Talent Index*)\n\n"
+                    "💡 **Quick Examples**:\n"
+                    "• *\"Find 5 Python developers in Navi Mumbai\"*\n"
+                    "• *\"Source 10 telecallers in Vashi Sector 17\"*\n"
+                    "• *\"Search cafe interns in Belapur\"*\n"
+                    "• *\"Find B2B sales executives in Gurgaon\"*"
+                )
+                return {
+                    "status": "success",
+                    "provider": self.provider_name,
+                    "model": self.model_name,
+                    "content": content,
+                    "tool_calls": []
+                }
+
             loc_match = "Navi Mumbai"
             if "navi" in lower_prompt or "mumbai" in lower_prompt:
                 loc_match = "Navi Mumbai"

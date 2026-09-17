@@ -13,18 +13,31 @@ MASTER_FILE.parent.mkdir(parents=True, exist_ok=True)
 def deduplicate_candidates(candidates_list):
     if not candidates_list:
         return []
-    seen = set()
+    seen_ids = set()
+    seen_names = set()
+    seen_emails = set()
+    seen_phones = set()
     unique = []
     for c in candidates_list:
+        c_id = (c.get("id") or "").strip().lower()
         name_clean = (c.get("name") or "").strip().lower()
         email_clean = (c.get("email") or "").strip().lower()
-        phone_clean = (c.get("phone") or "").replace(" ", "").strip()
-        c_id = (c.get("id") or "").strip()
+        phone_clean = (c.get("phone") or "").replace(" ", "").replace("+", "").strip()
         
-        fingerprint = (name_clean, phone_clean) if name_clean and phone_clean else (email_clean or c_id)
-        if fingerprint and fingerprint not in seen:
-            seen.add(fingerprint)
-            unique.append(c)
+        if c_id and c_id in seen_ids:
+            continue
+        if name_clean and name_clean in seen_names:
+            continue
+        if email_clean and email_clean in seen_emails:
+            continue
+        if phone_clean and phone_clean in seen_phones:
+            continue
+
+        if c_id: seen_ids.add(c_id)
+        if name_clean: seen_names.add(name_clean)
+        if email_clean: seen_emails.add(email_clean)
+        if phone_clean: seen_phones.add(phone_clean)
+        unique.append(c)
     return unique
 
 
