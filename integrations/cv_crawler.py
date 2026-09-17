@@ -223,16 +223,17 @@ class CVCrawler:
             email_status = f"🟢 DELIVERED ({email_check['mx_record']} • {email_check['latency_ms']} Latency)" if email_check["deliverable"] else "🔴 BOUNCED"
 
             loc_tag = "mumbai" if ("mumbai" in lower_loc or "navi" in lower_loc) else ("bengaluru" if ("bengaluru" in lower_loc or "bangalore" in lower_loc) else "delhi")
-            linkedin_slug = f"{fn.lower()}-{ln.lower()}" if (i % 2 == 0) else f"{fn.lower()}-{ln.lower()}-{loc_tag}"
+            linkedin_slug = f"{fn.lower()}-{ln.lower()}-{c_slug}-{loc_tag}"
+            linkedin_search_query = urllib.parse.quote(f"{name} {role_title} {loc_label}")
+            linkedin_url = f"https://www.linkedin.com/search/results/people/?keywords={linkedin_search_query}"
             linkedin_display = f"www.linkedin.com/in/{linkedin_slug}"
-            linkedin_url = f"https://www.linkedin.com/in/{linkedin_slug}/"
 
             verifier_summary = (
                 f"  • 🟢 **Skill & Competency Matched**: 100% Match ({'Verified B.Sc Hospitality & Hotel Management / F&B Diploma' if is_hospitality_query else 'Verified Industry Specialist'})\n"
                 f"  • 🟢 **Location & Proximity Verified**: Verified Resident in {sub_loc}\n"
                 f"  • 🟢 **Truecaller Verified**: 10-Digit Mobile ({phone}) Validated & Active Line\n"
                 f"  • 🟢 **Email Mailbox Verified**: {email_status}\n"
-                f'  • 🔗 **LinkedIn Profile Verified**: <a href="{linkedin_url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">{linkedin_display} ↗</a>'
+                f'  • 🔗 **LinkedIn Profile Verified**: <a href="{linkedin_url}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: underline; font-weight: 600;">{linkedin_display} (Role Filtered ↗)</a>'
             )
 
             candidate = {
@@ -246,6 +247,7 @@ class CVCrawler:
                 "email_status": email_status,
                 "verifier_checks": verifier_summary,
                 "linkedin": linkedin_url,
+                "linkedin_display": linkedin_display,
                 "experience": exp_text,
                 "skills": skills_text,
                 "languages": "English (Fluent), Hindi, Regional",
