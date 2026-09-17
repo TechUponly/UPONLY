@@ -813,12 +813,52 @@
       <div id="train-pane-directives" class="train-pane active">
         <p class="train-section-desc">Retrain the agent's behavior, sourcing rules, screening criteria, and location/salary bands live. Select a 1-click hiring preset below or customize instructions.</p>
         
-        <div class="preset-chip-bar">
-          <span class="preset-label">⚡ 1-Click Sourcing Presets:</span>
-          <button type="button" class="preset-chip" id="preset-telecaller">📞 Telecaller Sourcing</button>
-          <button type="button" class="preset-chip" id="preset-python-dev">🐍 Python Dev Sourcing</button>
-          <button type="button" class="preset-chip" id="preset-b2b-sales">💼 B2B Sales Sourcing</button>
+        <div class="preset-chip-bar" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px;">
+          <span class="preset-label" style="font-weight: 700; color: #94a3b8; font-size: 13px;">⚡ 1-Click Sourcing Presets:</span>
+          <button type="button" class="preset-chip" id="preset-telecaller">📞 Telecallers (WorkIndia)</button>
+          <button type="button" class="preset-chip" id="preset-cafe-intern">☕ Cafe Interns (Internshala)</button>
+          <button type="button" class="preset-chip" id="preset-python-dev">🐍 Python Devs (GitHub)</button>
+          <button type="button" class="preset-chip" id="preset-b2b-sales">💼 B2B Sales (Naukri)</button>
+          <span id="custom-preset-chips-wrapper" style="display: inline-flex; gap: 8px; flex-wrap: wrap;"></span>
+          <button type="button" class="preset-chip" id="btn-toggle-add-preset" style="background: rgba(37, 99, 235, 0.2); border-color: rgba(96, 165, 250, 0.4); color: #60a5fa; font-weight: 700;">➕ Add Sourcing Role / Preset</button>
           <button type="button" class="preset-chip" id="preset-reset-default">🔄 Reset Default</button>
+        </div>
+
+        <!-- Add Custom Sourcing Role / Preset Card -->
+        <div id="add-preset-card" class="add-preset-card" style="display: none; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(96, 165, 250, 0.4); border-radius: 12px; padding: 16px; margin: 12px 0 20px 0; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; color: #60a5fa; font-size: 15px; font-weight: 700;">➕ Create New Custom Sourcing Profile & Role Preset</h4>
+            <button type="button" class="btn-close-modal" id="btn-close-add-preset" style="padding: 2px 8px; font-size: 12px; background: #334155; border: none; color: #fff; border-radius: 4px; cursor: pointer;">✖ Cancel</button>
+          </div>
+          <form id="create-preset-form">
+            <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Preset Badge Name / Icon:</label>
+                <input type="text" id="new-preset-name" placeholder="e.g. 📊 Data Analyst Sourcing" required style="width: 100%; padding: 8px 12px; border-radius: 6px; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 13px;">
+              </div>
+              <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Target Role Title Definition:</label>
+                <input type="text" id="new-preset-role" placeholder="e.g. Senior Data Analyst & BI Specialist" required style="width: 100%; padding: 8px 12px; border-radius: 6px; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 13px;">
+              </div>
+              <div style="flex: 1; min-width: 180px;">
+                <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Target Sourcing Portal:</label>
+                <select id="new-preset-portal" style="width: 100%; padding: 8px 12px; border-radius: 6px; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 13px;">
+                  <option value="GitHub">GitHub (Open Source Developers)</option>
+                  <option value="Internshala">Internshala (Interns & Trainees)</option>
+                  <option value="WorkIndia">WorkIndia (Telecallers & Field Execs)</option>
+                  <option value="Naukri">Naukri (Enterprise B2B & Sales)</option>
+                  <option value="Multi-Portal">Multi-Portal Deep Search</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Live System Directives & Sourcing Criteria:</label>
+              <textarea id="new-preset-directives" rows="3" placeholder="Enter screening rules, required skills, salary bands, location focus, phone verification criteria..." required style="width: 100%; padding: 8px 12px; border-radius: 6px; background: #1e293b; border: 1px solid #475569; color: #fff; font-family: inherit; font-size: 13px;"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button type="submit" class="btn-dispatch" style="padding: 8px 16px; font-size: 13px; font-weight: 600; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer;">💾 Save Custom Sourcing Preset 🚀</button>
+            </div>
+          </form>
         </div>
 
         <form id="train-directives-form" class="settings-form">

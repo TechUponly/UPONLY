@@ -1288,6 +1288,10 @@ document.addEventListener("DOMContentLoaded", () => {
       role: "Telecaller & Inside Sales Talent Acquisition Specialist",
       prompt: `Rule 1: Always verify 10-digit valid phone numbers. Ensure candidate phone numbers are in valid +91 XXXXXXXXXX format.\nRule 2: Focus on candidate profiles with strong spoken fluency in English & Hindi, prior experience in BPO / outbound sales / telecalling, and immediate availability.\nRule 3: Ensure zero duplicate phone numbers or emails across candidate pools.\nRule 4: Target salary range ₹18,000 - ₹35,000 / month. Priority locations: Delhi NCR, Mumbai, Bangalore, Remote.`
     },
+    cafe_intern: {
+      role: "Cafe Service, Barista & Hotel Management Intern Specialist",
+      prompt: `Rule 1: Focus on hotel management diploma interns, barista espresso trainees, and quick-service cafe associates.\nRule 2: Verify candidate education (IHM / DY Patil / Rizvi Diploma) and cafe experience.\nRule 3: Ensure 10-digit mobile line validation and mailbox deliverability.\nRule 4: Target stipend band ₹18,000 - ₹28,000 / month. Priority locations: Navi Mumbai, Belapur, Vashi, Mumbai.`
+    },
     python_dev: {
       role: "Senior Python & AI Engineer Sourcing Specialist",
       prompt: `Rule 1: Sourcing focus: 3+ years experience with Python, FastAPI, AsyncIO, PyTorch/TensorFlow, and LLM orchestration (LangChain, LlamaIndex).\nRule 2: Check for candidate phone numbers (10 digits starting after +91) and active GitHub / Portfolio links.\nRule 3: Deduplicate all candidates by full name, phone number, and email.\nRule 4: Target salary band ₹12 LPA - ₹25 LPA. Priority locations: Bangalore, Hyderabad, Pune, Remote.`
@@ -1301,6 +1305,115 @@ document.addEventListener("DOMContentLoaded", () => {
       prompt: `Screen candidate profiles, evaluate technical competency, automate candidate communications, and schedule interviews. Verify 10-digit phone numbers and ensure duplicate-free profile records.`
     }
   };
+
+  // --- CUSTOM SOURCING ROLE & PRESET ENGINE ---
+  function getCustomPresets() {
+    try {
+      const stored = localStorage.getItem("uponly_custom_sourcing_presets_v2");
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCustomPresets(presets) {
+    try {
+      localStorage.setItem("uponly_custom_sourcing_presets_v2", JSON.stringify(presets));
+    } catch (e) {}
+  }
+
+  function renderCustomPresetChips() {
+    const wrapper = document.getElementById("custom-preset-chips-wrapper");
+    if (!wrapper) return;
+    wrapper.innerHTML = "";
+    const customList = getCustomPresets();
+    customList.forEach((preset, index) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "preset-chip custom-preset-chip";
+      chip.style.borderColor = "rgba(52, 211, 153, 0.5)";
+      chip.style.color = "#34d399";
+      chip.style.background = "rgba(16, 185, 129, 0.15)";
+      chip.style.fontWeight = "600";
+      chip.innerHTML = `${preset.name} <span class="btn-del-preset" data-preset-idx="${index}" title="Delete Preset" style="margin-left: 6px; color: #f87171; cursor: pointer; font-weight: 700;">✖</span>`;
+      
+      chip.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-del-preset")) {
+          e.stopPropagation();
+          deleteCustomPreset(index);
+          return;
+        }
+        if (trainAgentRole) trainAgentRole.value = preset.role;
+        if (trainSystemPrompt) trainSystemPrompt.value = preset.directives;
+      });
+
+      wrapper.appendChild(chip);
+    });
+  }
+
+  function deleteCustomPreset(index) {
+    const list = getCustomPresets();
+    if (index >= 0 && index < list.length) {
+      list.splice(index, 1);
+      saveCustomPresets(list);
+      renderCustomPresetChips();
+    }
+  }
+
+  // Initial render of saved custom presets
+  renderCustomPresetChips();
+
+  // Preset Card Toggle listeners
+  const btnToggleAddPreset = document.getElementById("btn-toggle-add-preset");
+  const btnCloseAddPreset = document.getElementById("btn-close-add-preset");
+  const addPresetCard = document.getElementById("add-preset-card");
+  const createPresetForm = document.getElementById("create-preset-form");
+
+  if (btnToggleAddPreset && addPresetCard) {
+    btnToggleAddPreset.addEventListener("click", () => {
+      addPresetCard.style.display = addPresetCard.style.display === "none" ? "block" : "none";
+    });
+  }
+
+  if (btnCloseAddPreset && addPresetCard) {
+    btnCloseAddPreset.addEventListener("click", () => {
+      addPresetCard.style.display = "none";
+    });
+  }
+
+  if (createPresetForm) {
+    createPresetForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const pName = document.getElementById("new-preset-name")?.value.trim() || "";
+      const pRole = document.getElementById("new-preset-role")?.value.trim() || "";
+      const pPortal = document.getElementById("new-preset-portal")?.value || "GitHub";
+      const pDirectives = document.getElementById("new-preset-directives")?.value.trim() || "";
+
+      if (!pName || !pRole || !pDirectives) return;
+
+      const fullDirectives = `Portal Focus: ${pPortal}\nRole Definition: ${pRole}\nDirectives: ${pDirectives}`;
+
+      const list = getCustomPresets();
+      list.push({
+        name: pName,
+        role: pRole,
+        portal: pPortal,
+        directives: fullDirectives
+      });
+
+      saveCustomPresets(list);
+      renderCustomPresetChips();
+
+      // Automatically fill live directive fields
+      if (trainAgentRole) trainAgentRole.value = pRole;
+      if (trainSystemPrompt) trainSystemPrompt.value = fullDirectives;
+
+      // Reset & hide add preset form card
+      createPresetForm.reset();
+      if (addPresetCard) addPresetCard.style.display = "none";
+      alert(`🎉 Custom Sourcing Preset "${pName}" saved successfully!`);
+    });
+  }
 
   window.openTrainAgentModal = async function() {
     const modal = document.getElementById("train-agent-modal");
@@ -1401,6 +1514,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("preset-telecaller")?.addEventListener("click", () => {
     if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.telecaller.role;
     if (trainSystemPrompt) trainSystemPrompt.value = HIRING_PRESETS.telecaller.prompt;
+  });
+  document.getElementById("preset-cafe-intern")?.addEventListener("click", () => {
+    if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.cafe_intern.role;
+    if (trainSystemPrompt) trainSystemPrompt.value = HIRING_PRESETS.cafe_intern.prompt;
   });
   document.getElementById("preset-python-dev")?.addEventListener("click", () => {
     if (trainAgentRole) trainAgentRole.value = HIRING_PRESETS.python_dev.role;
