@@ -402,13 +402,18 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 c_fit = c["fit"]
                 c_email_status = c.get("email_status", "🟢 DELIVERED (DNS MX Active)")
 
+                c_source_portal = c.get("source_portal", "WorkIndia / Open Source")
+                c_portal_url = c.get("portal_url", c_linkedin)
+                portal_anchor = f'<a href="{c_portal_url}" target="_blank" rel="noopener noreferrer" style="color: #34d399; font-weight: 600; text-decoration: underline;">🏷️ {c_source_portal} Profile Record ↗</a>'
+
                 c_verifier = c.get("verifier_checks", "")
                 verifier_str = f"- **Verifier Audits**:\n{c_verifier}\n" if c_verifier else ""
                 linkedin_disp = c.get("linkedin_display") or c_linkedin.replace("https://", "").replace("http://", "").rstrip("/")
-                linkedin_anchor = f'<a href="{c_linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600; text-decoration: underline;">🔗 {linkedin_disp} (Role Filtered ↗)</a>'
+                linkedin_anchor = f'<a href="{c_linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600; text-decoration: underline;">🔗 {linkedin_disp} (Name Filtered ↗)</a>'
 
                 content += (
                     f"### 👤 Candidate {idx}: {c_name} — {c_role}\n"
+                    f"- **Sourced From**: {portal_anchor}\n"
                     f"- **Location**: {c_loc}\n"
                     f"- **Phone**: `{c_phone}` • **Email**: `{c_email}`\n"
                     f"- **LinkedIn Profile**: {linkedin_anchor}\n"
