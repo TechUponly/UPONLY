@@ -68,7 +68,7 @@ WORKINDIA_TELECALLER_POOL = [
         "source_portal": "WorkIndia",
         "portal_url": "https://www.workindia.in/candidate/rohan-salunkhe-caller-belapur",
         "linkedin_url": "https://www.linkedin.com/in/rohan-salunkhe-caller",
-        "phone": "+91 98192 73412",
+        "phone": "+91 98192 10482",
         "email": "rohan.salunkhe88@outlook.com",
         "experience": "4 years experience at Concentrix India & Teleperformance. Expert in high-volume outbound lead conversion and inbound query resolution in CBD Belapur Station Hub.",
         "skills": "Inbound Customer Service, Outbound Sales, Dialpad, Salesforce Logging, Script Adherence, 97% CSAT",
@@ -468,12 +468,15 @@ class CVCrawler:
             linkedin_url = profile_template.get("linkedin_url") or f"https://www.linkedin.com/in/{fn.lower()}-{ln.lower()}-{c_slug}"
             linkedin_display = f"www.linkedin.com/in/{fn.lower()}-{ln.lower()}-{c_slug}"
 
+            from integrations.phone_verifier import phone_verifier
+            phone_check = phone_verifier.verify_phone_number(phone, cand_name)
+
             verifier_summary = (
                 f"  • 🏷️ **Sourcing Portal**: {source_portal} ({source_name})\n"
                 f"  • 🔗 **Direct Portal Record**: <a href=\"{portal_url}\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: #60a5fa; text-decoration: underline; font-weight: 600;\">{portal_url} ↗</a>\n"
                 f"  • 🟢 **Skill & Competency Matched**: 100% Match ({profile_template.get('education', 'Verified Qualification')})\n"
                 f"  • 🟢 **Location & Proximity Verified**: Verified Resident in {sub_loc}\n"
-                f"  • 🟢 **Truecaller Verified**: 10-Digit Mobile ({phone}) Validated & Active Line\n"
+                f"  • {phone_check['badge_color']} **Telecom & Subscriber Verification**: {phone_check['detail']}\n"
                 f"  • 🟢 **Email Mailbox Verified**: {email_status}\n"
                 f"  • 🔗 **Direct LinkedIn Profile**: <a href=\"{linkedin_url}\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: #60a5fa; text-decoration: underline; font-weight: 600;\">{linkedin_display} (Direct Profile ↗)</a>"
             )
