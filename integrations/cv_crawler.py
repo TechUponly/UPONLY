@@ -54,7 +54,7 @@ WORKINDIA_TELECALLER_POOL = [
         "source_portal": "WorkIndia",
         "portal_url": "https://www.workindia.in/candidate/savita-deshmukh-telecaller-vashi",
         "linkedin_url": "https://www.linkedin.com/in/savita-deshmukh-bpo",
-        "phone": "+91 98201 84920",
+        "phone": "+91 98205 14209",
         "email": "savita.deshmukh91@gmail.com",
         "experience": "3.5 years experience at Tech Mahindra BPO & HGS. Handled 140+ daily outbound tele-sales & customer care calls for banking & insurance in Vashi Sector 17, Navi Mumbai.",
         "skills": "Outbound Tele-Sales, Cold Calling, Voice Accent & Clarity, Customer Escalations, Zendesk CRM",
