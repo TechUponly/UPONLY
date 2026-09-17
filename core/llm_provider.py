@@ -490,7 +490,7 @@ Think step-by-step. Analyze requirements, formulate execution plan, call require
                 c_verifier = c.get("verifier_checks", "")
                 verifier_str = f"- **Verifier Audits**:\n{c_verifier}\n" if c_verifier else ""
                 linkedin_disp = c.get("linkedin_display") or c_linkedin.replace("https://", "").replace("http://", "").rstrip("/")
-                linkedin_anchor = f'<a href="{c_linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600; text-decoration: underline;">🔗 {linkedin_disp} (Name Filtered ↗)</a>'
+                linkedin_anchor = f'<a href="{c_linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600; text-decoration: underline;">🔗 {linkedin_disp} (Direct Candidate Profile ↗)</a>'
 
                 content += (
                     f"### 👤 Candidate {idx}: {c_name} — {c_role}\n"
