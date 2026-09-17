@@ -84,6 +84,7 @@ def download_candidate_cv(candidate_name: str):
         email = cand.get("email", "candidate@gmail.com")
         exp = cand.get("experience", "")
         skills = cand.get("skills", "")
+        formatted_skills = skills.replace(', ', '\n• ')
         fit = cand.get("fit", "95%")
         linkedin = cand.get("linkedin", "")
         
@@ -105,7 +106,7 @@ EXPERIENCE OVERVIEW:
 {exp}
 
 CORE COMPETENCIES & TECHNICAL STACK:
-• {skills.replace(', ', '\n• ')}
+• {formatted_skills}
 
 VERIFICATION & AUTHENTICITY METADATA:
 • Skill & Competency: 100% Matched
