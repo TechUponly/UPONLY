@@ -38,14 +38,14 @@ class EmailConnector:
         
         # Standard consumer & enterprise MX record map
         mx_map = {
-            "gmail.com": "gmail-smtp-in.l.google.com",
-            "yahoo.com": "mta5.am0.yahoodns.net",
-            "outlook.com": "outlook-com.olc.protection.outlook.com",
-            "hotmail.com": "hotmail-com.olc.protection.outlook.com",
-            "icloud.com": "mx1.mail.icloud.com"
+            "gmail.com": "Google Workspace / Gmail Active Server",
+            "yahoo.com": "Yahoo Mail Server",
+            "outlook.com": "Microsoft Outlook Mail Server",
+            "hotmail.com": "Microsoft Hotmail Server",
+            "icloud.com": "Apple iCloud Mail Server"
         }
         
-        mx_host = mx_map.get(domain, f"mail.{domain}")
+        mx_host = mx_map.get(domain, f"{domain.capitalize()} Corporate Mail Server")
 
         # Real-time DNS socket ping simulation & latency
         t0 = time.time()

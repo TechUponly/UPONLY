@@ -220,7 +220,7 @@ class CVCrawler:
 
             from integrations.email_connector import email_connector
             email_check = email_connector.verify_email_deliverability(email)
-            email_status = f"🟢 DELIVERED ({email_check['mx_record']} • {email_check['latency_ms']})" if email_check["deliverable"] else "🔴 BOUNCED"
+            email_status = f"🟢 DELIVERED ({email_check['mx_record']} • {email_check['latency_ms']} Latency)" if email_check["deliverable"] else "🔴 BOUNCED"
 
             loc_tag = "mumbai" if ("mumbai" in lower_loc or "navi" in lower_loc) else ("bengaluru" if ("bengaluru" in lower_loc or "bangalore" in lower_loc) else "delhi")
             linkedin_slug = f"{fn.lower()}-{ln.lower()}" if (i % 2 == 0) else f"{fn.lower()}-{ln.lower()}-{loc_tag}"

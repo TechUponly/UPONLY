@@ -293,7 +293,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         formatted = formatted
           .replace(/&lt;span class='code-tag'&gt;(.*?)&lt;\/span&gt;/g, "<span class='code-tag'>$1</span>")
-          .replace(/&lt;(button|div|span|\/button|\/div|\/span)([\s\S]*?)&gt;/gi, "<$1$2>");
+          .replace(/&lt;(button|div|span|a|\/button|\/div|\/span|\/a)([\s\S]*?)&gt;/gi, "<$1$2>")
+          .replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600; text-decoration: underline;">$1 ↗</a>');
 
         let htmlContent = `<div class="bubble">${formatted}</div>`;
 
