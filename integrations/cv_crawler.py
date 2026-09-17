@@ -372,8 +372,8 @@ class CVCrawler:
         lower_role = clean_role.lower()
 
         # Determine target role domain pool
-        is_hospitality_query = any(w in lower_role for w in [
-            "hotel", "cafe", "intern", "interns", "hospitality", "restaurant", "f&b", "catering", "guest", "service", "barista"
+        is_hospitality_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
+            "hotel", "cafe", "hospitality", "restaurant", "f&b", "catering", "guest", "barista"
         ])
 
         is_caller_query = any(re.search(r'\b' + re.escape(w) + r'\b', lower_role) for w in [
@@ -513,6 +513,14 @@ class CVCrawler:
             self._save_master()
             return newly_sourced
 
-        return self.master_candidates[:min(limit, len(self.master_candidates))]
+        matching_domain = [
+            c for c in self.master_candidates
+            if (is_caller_query and "WorkIndia" in c.get("source_portal", "")) or \
+               (is_dev_query and ("GitHub" in c.get("source_portal", "") or "Naukri" in c.get("source_portal", ""))) or \
+               (is_hospitality_query and "Internshala" in c.get("source_portal", "")) or \
+               (is_sales_query and "Naukri" in c.get("source_portal", "")) or \
+               is_generic_query
+        ]
+        return (matching_domain if matching_domain else self.master_candidates)[:min(limit, len(self.master_candidates))]
 
 cv_crawler = CVCrawler()
