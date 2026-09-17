@@ -391,18 +391,21 @@ class CVCrawler:
 
         is_generic_query = not (is_hospitality_query or is_dev_query or is_sales_query or is_caller_query)
 
-        # Select primary real candidate pool matching domain
+        from integrations.open_source_crawler import open_source_crawler
+
+        # Select primary real candidate pool matching domain & trigger live API extractors
         if is_dev_query:
-            base_pool = GITHUB_DEV_POOL
-            default_portal = "GitHub"
+            live_devs = open_source_crawler.extract_github_developers(f"{clean_role} {clean_loc}", limit=limit)
+            base_pool = live_devs if live_devs else GITHUB_DEV_POOL
+            default_portal = "GitHub API"
         elif is_hospitality_query:
-            base_pool = INTERNSHALA_INTERN_POOL
+            base_pool = open_source_crawler.extract_internshala_interns(clean_loc, limit=limit)
             default_portal = "Internshala"
         elif is_caller_query:
-            base_pool = WORKINDIA_TELECALLER_POOL
+            base_pool = open_source_crawler.extract_workindia_telecallers(clean_loc, limit=limit)
             default_portal = "WorkIndia"
         elif is_sales_query:
-            base_pool = NAUKRI_SALES_POOL
+            base_pool = open_source_crawler.extract_naukri_sales(clean_loc, limit=limit)
             default_portal = "Naukri"
         else:
             base_pool = [
