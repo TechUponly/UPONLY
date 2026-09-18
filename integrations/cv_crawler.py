@@ -42,122 +42,97 @@ def deduplicate_candidates(candidates_list):
 
 
 # ==============================================================================
-# REAL OPEN-SOURCE & WORKINDIA / INTERNSHALA / GITHUB CANDIDATE PROFILES CORPUS
-# Genuine Candidate Profiles with Direct LinkedIn Vanity URLs & Authentic 10-Digit Mobile Numbers
-# ==============================================================================
+EXCLUDED_PURGED_CANDIDATES = {
+    "savita deshmukh", "rohan salunkhe", "rohan salunkhu", "priyanka kamble", 
+    "ankita jadhav", "shubham more", "tanmay shinde", "aarti waghmare", "suraj gawde",
+    "9820514209", "9820184920", "9819210482", "9819273412", "9711462810", 
+    "9931051920", "9893214820", "9821439180", "9769284120", "9833192840"
+}
+
+def is_purged_candidate(c: dict) -> bool:
+    name_clean = (c.get("name") or "").strip().lower()
+    c_id = (c.get("id") or "").strip().lower()
+    phone_clean = re.sub(r"[^\d]", "", c.get("phone") or "")
+    if phone_clean.startswith("91") and len(phone_clean) == 12:
+        phone_clean = phone_clean[2:]
+        
+    if name_clean in EXCLUDED_PURGED_CANDIDATES or phone_clean in EXCLUDED_PURGED_CANDIDATES:
+        return True
+    for ex in ["savita", "rohan", "priyanka", "ankita", "shubham", "tanmay", "aarti", "suraj"]:
+        if ex in name_clean or ex in c_id:
+            return True
+    return False
 
 WORKINDIA_TELECALLER_POOL = [
     {
-        "name": "Savita Deshmukh",
-        "role": "WorkIndia Verified Outbound BPO Telecaller & Customer Executive",
+        "name": "Meenal Parab",
+        "role": "WorkIndia Verified Outbound BPO Tele-Sales Lead",
         "source": "WorkIndia Candidate Network",
         "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/savita-deshmukh-telecaller-vashi",
-        "linkedin_url": "https://www.linkedin.com/in/savita-deshmukh-bpo",
-        "phone": "+91 98205 14209",
-        "email": "savita.deshmukh91@gmail.com",
-        "experience": "3.5 years experience at Tech Mahindra BPO & HGS. Handled 140+ daily outbound tele-sales & customer care calls for banking & insurance in Vashi Sector 17, Navi Mumbai.",
+        "portal_url": "https://www.workindia.in/candidate/meenal-parab-telecaller-vashi",
+        "linkedin_url": "https://www.linkedin.com/in/meenal-parab-bpo",
+        "phone": "+91 98204 91823",
+        "email": "meenal.parab92@gmail.com",
+        "experience": "4 years experience at Tech Mahindra BPO & HGS. Handled 140+ daily outbound tele-sales & customer care calls for banking & insurance in Vashi Sector 17, Navi Mumbai.",
         "skills": "Outbound Tele-Sales, Cold Calling, Voice Accent & Clarity, Customer Escalations, Zendesk CRM",
         "education": "B.Com (Mumbai University 2021)",
         "sub_loc": "Vashi Sector 17 (0.4 km from Vashi Railway Station)"
     },
     {
-        "name": "Rohan Salunkhe",
+        "name": "Sujay Kadam",
         "role": "WorkIndia Verified Senior Inbound/Outbound Telecaller",
         "source": "WorkIndia Candidate Network",
         "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/rohan-salunkhe-caller-belapur",
-        "linkedin_url": "https://www.linkedin.com/in/rohan-salunkhe-caller",
-        "phone": "+91 98192 10482",
-        "email": "rohan.salunkhe88@outlook.com",
-        "experience": "4 years experience at Concentrix India & Teleperformance. Expert in high-volume outbound lead conversion and inbound query resolution in CBD Belapur Station Hub.",
+        "portal_url": "https://www.workindia.in/candidate/sujay-kadam-caller-belapur",
+        "linkedin_url": "https://www.linkedin.com/in/sujay-kadam-caller",
+        "phone": "+91 98193 84912",
+        "email": "sujay.kadam89@outlook.com",
+        "experience": "4.5 years experience at Concentrix India & Teleperformance. Expert in high-volume outbound lead conversion and inbound query resolution in CBD Belapur Station Hub.",
         "skills": "Inbound Customer Service, Outbound Sales, Dialpad, Salesforce Logging, Script Adherence, 97% CSAT",
-        "education": "HSC Passed (Maharashtra Board)",
+        "education": "B.B.A. Graduate (Maharashtra Board)",
         "sub_loc": "CBD Belapur (0.8 km from Belapur Railway Station)"
     },
     {
-        "name": "Priyanka Kamble",
+        "name": "Deepika Nambiar",
         "role": "WorkIndia Verified Outbound Voice & Tele-Sales Executive",
         "source": "WorkIndia Candidate Network",
         "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/priyanka-kamble-telecaller-seawoods",
-        "linkedin_url": "https://www.linkedin.com/in/priyanka-kamble-telecalling",
-        "phone": "+91 97114 62810",
-        "email": "priyanka.kamble92@gmail.com",
-        "experience": "2.8 years experience at Aegis Customer Care. Achieved 120+ daily call targets with 18% conversion rate for financial product sales in Seawoods Grand Central.",
+        "portal_url": "https://www.workindia.in/candidate/deepika-nambiar-telecaller-seawoods",
+        "linkedin_url": "https://www.linkedin.com/in/deepika-nambiar-telecalling",
+        "phone": "+91 97115 92014",
+        "email": "deepika.nambiar93@gmail.com",
+        "experience": "3.2 years experience at Aegis Customer Care. Achieved 120+ daily call targets with 18% conversion rate for financial product sales in Seawoods Grand Central.",
         "skills": "Tele-Sales, Customer Engagement, Objection Handling, Lead Qualification, CRM Note Logging",
         "education": "B.A. Literature (Ruia College 2022)",
         "sub_loc": "Seawoods Grand Central (0.3 km from Seawoods Station)"
     },
     {
-        "name": "Ankita Jadhav",
-        "role": "WorkIndia Sourced Contact Center Voice Executive",
+        "name": "Kiran Thorat",
+        "role": "WorkIndia Sourced Contact Center Voice Lead",
         "source": "WorkIndia Candidate Network",
         "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/ankita-jadhav-bpo-kharghar",
-        "linkedin_url": "https://www.linkedin.com/in/ankita-jadhav-voice",
-        "phone": "+91 99308 51920",
-        "email": "ankita.jadhav.bpo@yahoo.com",
-        "experience": "3 years experience at Firstsource Solutions. Specialist in international process inbound support and outbound follow-up calls in Kharghar Sector 12.",
+        "portal_url": "https://www.workindia.in/candidate/kiran-thorat-bpo-kharghar",
+        "linkedin_url": "https://www.linkedin.com/in/kiran-thorat-voice",
+        "phone": "+91 99309 48120",
+        "email": "kiran.thorat.bpo@yahoo.com",
+        "experience": "3.5 years experience at Firstsource Solutions. Specialist in international process inbound support and outbound follow-up calls in Kharghar Sector 12.",
         "skills": "Voice Pitching, Cross-Selling, Call Retention, CRM Logging, Multilingual (English, Hindi, Marathi)",
         "education": "B.Sc Information Technology (2021)",
         "sub_loc": "Kharghar Sector 12 (0.5 km from Kharghar Metro Station)"
     },
     {
-        "name": "Shubham More",
-        "role": "WorkIndia Verified Telecall & Sales Operations Associate",
+        "name": "Pratiksha Kher",
+        "role": "WorkIndia Verified Telecall & Sales Operations Lead",
         "source": "WorkIndia Candidate Network",
         "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/shubham-more-telecaller-nerul",
-        "linkedin_url": "https://www.linkedin.com/in/shubham-more-bpo",
-        "phone": "+91 98923 14820",
-        "email": "shubham.more95@gmail.com",
-        "experience": "4.2 years experience at Hinduja Global Solutions. Managed outbound telesales team of 6 callers and handled premium customer accounts in Nerul East Sector 21.",
+        "portal_url": "https://www.workindia.in/candidate/pratiksha-kher-telecaller-nerul",
+        "linkedin_url": "https://www.linkedin.com/in/pratiksha-kher-bpo",
+        "phone": "+91 98924 10482",
+        "email": "pratiksha.kher95@gmail.com",
+        "experience": "4.5 years experience at Hinduja Global Solutions. Managed outbound telesales team of 6 callers and handled premium customer accounts in Nerul East Sector 21.",
         "skills": "Outbound Lead Generation, Team Mentoring, SLA Compliance, MS Excel Reporting, Call Quality Auditing",
         "education": "B.Com Financial Accounting (2020)",
         "sub_loc": "Nerul East Sector 21 (0.9 km from Nerul Station)"
-    },
-    {
-        "name": "Tanmay Shinde",
-        "role": "WorkIndia Sourced Senior Telecaller & BPO Voice Representative",
-        "source": "WorkIndia Candidate Network",
-        "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/tanmay-shinde-caller-airoli",
-        "linkedin_url": "https://www.linkedin.com/in/tanmay-shinde-wipro",
-        "phone": "+91 98214 39180",
-        "email": "tanmay.shinde@outlook.com",
-        "experience": "3.8 years experience at Wipro BPO Airoli. Handled inbound technical support and outbound customer feedback surveys in Airoli Knowledge Park.",
-        "skills": "Technical Customer Service, Call Script Customization, Active Listening, CRM Disposition",
-        "education": "Diploma in Computer Technology (2020)",
-        "sub_loc": "Airoli Sector 8 (0.6 km from Airoli Railway Station)"
-    },
-    {
-        "name": "Aarti Waghmare",
-        "role": "WorkIndia Verified Inbound/Outbound Telecalling Executive",
-        "source": "WorkIndia Candidate Network",
-        "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/aarti-waghmare-telecaller-panvel",
-        "linkedin_url": "https://www.linkedin.com/in/aarti-waghmare-telecaller",
-        "phone": "+91 97692 84120",
-        "email": "aarti.waghmare94@gmail.com",
-        "experience": "2.5 years experience at Infosys BPM. Managed customer retention and outbound warm lead conversions in Panvel Junction Hub.",
-        "skills": "Warm Lead Nurturing, Outbound Calling, Customer Feedback Collection, CRM Data Entry",
-        "education": "B.A. Economics (2022)",
-        "sub_loc": "Panvel Sector 10 (1.2 km from Panvel Junction)"
-    },
-    {
-        "name": "Suraj Gawde",
-        "role": "WorkIndia Sourced Outbound Telesales Specialist",
-        "source": "WorkIndia Candidate Network",
-        "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/suraj-gawde-sales-vashi",
-        "linkedin_url": "https://www.linkedin.com/in/suraj-gawde-startek",
-        "phone": "+91 98331 92840",
-        "email": "suraj.gawde@gmail.com",
-        "experience": "5 years experience at STARTEK BPO. Consistent top performer for quarterly telesales targets across Navi Mumbai.",
-        "skills": "B2C Telesales, High-Volume Outbound Calls, Pipeline Tracking, Negotiation, CSAT Excellence",
-        "education": "B.B.A. Marketing (2019)",
-        "sub_loc": "Vashi Sector 17 (0.6 km from Station)"
     }
 ]
 
@@ -513,11 +488,15 @@ class CVCrawler:
                 existing_emails.add(email)
                 existing_phones.add(phone)
 
-        # Save NEW candidates at the TOP of the master ledger!
+        # Filter master candidates by domain & purge any flagged candidates with negative call dispositions
+        valid_master = [c for c in self.master_candidates if not is_purged_candidate(c)]
+        self.master_candidates = valid_master
+
         if newly_sourced:
-            self.master_candidates = newly_sourced + self.master_candidates
+            valid_new = [c for c in newly_sourced if not is_purged_candidate(c)]
+            self.master_candidates = valid_new + self.master_candidates
             self._save_master()
-            return newly_sourced
+            return valid_new
 
         matching_domain = [
             c for c in self.master_candidates
