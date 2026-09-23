@@ -223,8 +223,9 @@ Verified Candidate Reference ID: UPONLY-CV-{abs(hash(name)) % 1000000}
 def download_real_candidate_cv(candidate_name: str):
     from fastapi.responses import RedirectResponse
     from pathlib import Path
+    import urllib.request
     
-    clean_id = candidate_name.lower().strip()
+    clean_id = candidate_name.lower().strip().replace(" ", "_")
     
     from integrations.cv_crawler import cv_crawler
     candidates = cv_crawler.get_master_candidates()
@@ -237,14 +238,59 @@ def download_real_candidate_cv(candidate_name: str):
             cand = c
             break
 
-    # Check local saved resume file
-    resume_file = Path(__file__).resolve().parent.parent / "data" / "resumes" / f"{clean_id}_Real_CV.pdf"
-    if resume_file.exists():
-        with open(resume_file, "rb") as f:
-            return Response(content=f.read(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={clean_id}_Real_Resume.pdf"})
+    resumes_dir = Path(__file__).resolve().parent.parent / "data" / "resumes"
+    resumes_dir.mkdir(parents=True, exist_ok=True)
 
+    # 1. Check local saved PDF resume file
+    pdf_file = resumes_dir / f"{clean_id}_Real_CV.pdf"
+    if pdf_file.exists():
+        with open(pdf_file, "rb") as f:
+            return Response(content=f.read(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={clean_id}_Original_Resume.pdf"})
+
+    # 2. Check local saved TXT/MD real resume file
+    txt_file = resumes_dir / f"{clean_id}_Real_CV.txt"
+    if not txt_file.exists():
+        txt_file = resumes_dir / f"{clean_id}_Real_CV.md"
+    
+    if txt_file.exists():
+        with open(txt_file, "r", encoding="utf-8", errors="ignore") as f:
+            return Response(content=f.read(), media_type="text/plain; charset=utf-8", headers={"Content-Disposition": f"attachment; filename={clean_id}_Original_Resume.txt"})
+
+    # 3. On-the-fly download from candidate real_cv_url if present
     if cand and cand.get("real_cv_url") and cand["real_cv_url"].startswith("http"):
-        return RedirectResponse(url=cand["real_cv_url"], status_code=307)
+        url = cand["real_cv_url"]
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                content_type = resp.headers.get_content_type()
+                raw_bytes = resp.read()
+                if "pdf" in content_type.lower() or raw_bytes.startswith(b"%PDF"):
+                    saved_path = resumes_dir / f"{clean_id}_Real_CV.pdf"
+                    with open(saved_path, "wb") as f:
+                        f.write(raw_bytes)
+                    return Response(content=raw_bytes, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={clean_id}_Original_Resume.pdf"})
+                else:
+                    text_str = raw_bytes.decode("utf-8", errors="ignore")
+                    saved_path = resumes_dir / f"{clean_id}_Real_CV.txt"
+                    with open(saved_path, "w", encoding="utf-8") as f:
+                        f.write(text_str)
+                    return Response(content=text_str, media_type="text/plain; charset=utf-8", headers={"Content-Disposition": f"attachment; filename={clean_id}_Original_Resume.txt"})
+        except Exception:
+            return RedirectResponse(url=url, status_code=307)
+
+    # 4. On-the-fly GitHub & Open Source Real CV Harvesting
+    try:
+        from integrations.open_source_crawler import open_source_crawler
+        harvested = open_source_crawler.extract_github_developers(query=clean_id, limit=1)
+        if harvested and harvested[0].get("real_cv_url"):
+            h_url = harvested[0]["real_cv_url"]
+            req = urllib.request.Request(h_url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                raw_bytes = resp.read()
+                text_str = raw_bytes.decode("utf-8", errors="ignore")
+                return Response(content=text_str, media_type="text/plain; charset=utf-8", headers={"Content-Disposition": f"attachment; filename={clean_id}_Original_Resume.txt"})
+    except Exception:
+        pass
 
     # Fallback to dynamic CV generator
     return download_candidate_cv(candidate_name)
