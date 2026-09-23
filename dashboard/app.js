@@ -1000,6 +1000,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalName = document.getElementById("cv-modal-name");
     const modalBody = document.getElementById("cv-modal-body");
     const btnDownload = document.getElementById("btn-modal-download-cv");
+    const btnRealDownload = document.getElementById("btn-modal-download-real-cv");
     const btnSchedule = document.getElementById("btn-modal-schedule-interview");
 
     if (!modal) return;
@@ -1078,6 +1079,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnDownload) {
       btnDownload.onclick = () => window.downloadCandidateCV(candidateId);
     }
+    if (btnRealDownload) {
+      btnRealDownload.onclick = () => window.downloadRealCandidateCV(candidateId);
+    }
     if (btnSchedule) {
       btnSchedule.onclick = () => {
         modal.classList.remove("active");
@@ -1093,6 +1097,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.downloadCandidateCV = function(candidateId) {
     const url = `${getApiBaseUrl()}/api/download-cv/${candidateId}`;
+    window.open(url, "_blank");
+  };
+
+  window.downloadRealCandidateCV = function(candidateId) {
+    const url = `${getApiBaseUrl()}/api/download-real-cv/${candidateId}`;
     window.open(url, "_blank");
   };
 
@@ -1122,6 +1131,13 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const id = btnDownload.getAttribute("data-cv-id") || "candidate";
       window.downloadCandidateCV(id);
+    }
+
+    const btnReal = e.target.closest(".btn-cv-real");
+    if (btnReal) {
+      e.preventDefault();
+      const id = btnReal.getAttribute("data-cv-id") || "candidate";
+      window.downloadRealCandidateCV(id);
     }
 
     const btnExcel = e.target.closest(".btn-excel-export");
@@ -1202,6 +1218,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="table-action-group">
               <button class="table-btn-cv table-btn-view btn-cv-view" data-cv-name="${escapeHtml(c.name)}" data-cv-role="${escapeHtml(c.role)}" data-cv-phone="${escapeHtml(c.phone)}" data-cv-email="${escapeHtml(c.email)}" data-cv-linkedin="${escapeHtml(c.linkedin)}" data-cv-exp="${escapeHtml(c.experience)}" data-cv-skills="${escapeHtml(c.skills)}" data-cv-location="${escapeHtml(c.location)}" data-cv-fit="${escapeHtml(c.fit)}" data-cv-id="${escapeHtml(c.id)}">👁️ CV</button>
               <button class="table-btn-cv table-btn-dl btn-cv-download" data-cv-id="${escapeHtml(c.id)}">📥 DL</button>
+              <button class="table-btn-cv table-btn-real btn-cv-real" data-cv-id="${escapeHtml(c.id)}" style="background: #2563eb; color: #ffffff;">📄 Real CV</button>
             </div>
           </td>
         </tr>
@@ -1272,6 +1289,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (btnDownload) {
         const id = btnDownload.getAttribute("data-cv-id") || "candidate";
         window.downloadCandidateCV(id);
+      }
+
+      const btnReal = e.target.closest(".btn-cv-real");
+      if (btnReal) {
+        const id = btnReal.getAttribute("data-cv-id") || "candidate";
+        window.downloadRealCandidateCV(id);
       }
     });
   }

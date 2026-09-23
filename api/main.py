@@ -219,6 +219,37 @@ Verified Candidate Reference ID: UPONLY-CV-{abs(hash(name)) % 1000000}
     )
 
 
+@app.get("/api/download-real-cv/{candidate_name}")
+def download_real_candidate_cv(candidate_name: str):
+    from fastapi.responses import RedirectResponse
+    from pathlib import Path
+    
+    clean_id = candidate_name.lower().strip()
+    
+    from integrations.cv_crawler import cv_crawler
+    candidates = cv_crawler.get_master_candidates()
+    
+    cand = None
+    for c in candidates:
+        c_id = (c.get("id") or "").lower()
+        c_name = (c.get("name") or "").lower().replace(" ", "_")
+        if c_id == clean_id or c_name == clean_id or clean_id in c_id or c_id in clean_id:
+            cand = c
+            break
+
+    # Check local saved resume file
+    resume_file = Path(__file__).resolve().parent.parent / "data" / "resumes" / f"{clean_id}_Real_CV.pdf"
+    if resume_file.exists():
+        with open(resume_file, "rb") as f:
+            return Response(content=f.read(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={clean_id}_Real_Resume.pdf"})
+
+    if cand and cand.get("real_cv_url") and cand["real_cv_url"].startswith("http"):
+        return RedirectResponse(url=cand["real_cv_url"], status_code=307)
+
+    # Fallback to dynamic CV generator
+    return download_candidate_cv(candidate_name)
+
+
 import io
 import csv
 

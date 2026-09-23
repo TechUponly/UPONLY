@@ -52,6 +52,7 @@ class OpenSourceCrawlerEngine:
                             c_id = f"github_{username.lower()}"
                             phone = f"+91 98201 {10000 + (abs(hash(username)) % 89999)}"
                             linkedin = f"https://www.linkedin.com/in/{username.lower()}"
+                            real_cv = f"https://github.com/{username}"
 
                             results.append({
                                 "id": c_id,
@@ -63,6 +64,7 @@ class OpenSourceCrawlerEngine:
                                 "source": "GitHub Open Source REST API",
                                 "source_portal": "GitHub API",
                                 "portal_url": profile_url,
+                                "real_cv_url": real_cv,
                                 "linkedin": linkedin,
                                 "education": "B.Tech in Computer Science & Engineering",
                                 "experience": f"Author of {repos} open-source repositories. Bio: {bio}",

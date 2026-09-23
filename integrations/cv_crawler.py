@@ -449,9 +449,12 @@ class CVCrawler:
             from integrations.phone_verifier import phone_verifier
             phone_check = phone_verifier.verify_phone_number(phone, cand_name)
 
+            real_cv_url = profile_template.get("real_cv_url") or profile_template.get("portal_url") or f"/api/download-real-cv/{c_id}"
+
             verifier_summary = (
                 f"  • 🏷️ **Sourcing Portal**: {source_portal} ({source_name})\n"
                 f"  • 🔗 **Direct Portal Record**: <a href=\"{portal_url}\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: #60a5fa; text-decoration: underline; font-weight: 600;\">{portal_url} ↗</a>\n"
+                f"  • 📄 **Original Candidate Resume**: <a href=\"{real_cv_url}\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: #38bdf8; text-decoration: underline; font-weight: 600;\">View Original CV Document (PDF / Open Source ↗)</a>\n"
                 f"  • 🟢 **Skill & Competency Matched**: 100% Match ({profile_template.get('education', 'Verified Qualification')})\n"
                 f"  • 🟢 **Location & Proximity Verified**: Verified Resident in {sub_loc}\n"
                 f"  • {phone_check['badge_color']} **Telecom & Subscriber Verification**: {phone_check['detail']}\n"
@@ -471,6 +474,7 @@ class CVCrawler:
                 "source": source_name,
                 "source_portal": source_portal,
                 "portal_url": portal_url,
+                "real_cv_url": real_cv_url,
                 "education": profile_template.get("education", "Higher Secondary / Graduate"),
                 "verifier_checks": verifier_summary,
                 "linkedin": linkedin_url,
