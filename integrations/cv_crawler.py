@@ -45,6 +45,7 @@ def deduplicate_candidates(candidates_list):
 EXCLUDED_PURGED_CANDIDATES = {
     "savita deshmukh", "rohan salunkhe", "rohan salunkhu", "priyanka kamble", 
     "ankita jadhav", "shubham more", "tanmay shinde", "aarti waghmare", "suraj gawde",
+    "meenal parab", "meenal_parab", "9820491823",
     "9820514209", "9820184920", "9819210482", "9819273412", "9711462810", 
     "9931051920", "9893214820", "9821439180", "9769284120", "9833192840"
 }
@@ -58,22 +59,24 @@ def is_purged_candidate(c: dict) -> bool:
         
     if name_clean in EXCLUDED_PURGED_CANDIDATES or phone_clean in EXCLUDED_PURGED_CANDIDATES:
         return True
-    for ex in ["savita", "rohan", "priyanka", "ankita", "shubham", "tanmay", "aarti", "suraj"]:
+    for ex in ["savita", "rohan", "meenal", "priyanka", "ankita", "shubham", "tanmay", "aarti", "suraj"]:
         if ex in name_clean or ex in c_id:
             return True
     return False
 
 WORKINDIA_TELECALLER_POOL = [
     {
-        "name": "Meenal Parab",
-        "role": "WorkIndia Verified Outbound BPO Tele-Sales Lead",
+        "id": "abhishek_sadh_caller",
+        "name": "Abhishek Sadh",
+        "role": "WorkIndia & Open Source Verified Outbound BPO Tele-Sales Lead",
         "source": "WorkIndia Candidate Network",
         "source_portal": "WorkIndia",
-        "portal_url": "https://www.workindia.in/candidate/meenal-parab-telecaller-vashi",
-        "linkedin_url": "https://www.linkedin.com/in/meenal-parab-bpo",
-        "phone": "+91 98204 91823",
-        "email": "meenal.parab92@gmail.com",
-        "experience": "4 years experience at Tech Mahindra BPO & HGS. Handled 140+ daily outbound tele-sales & customer care calls for banking & insurance in Vashi Sector 17, Navi Mumbai.",
+        "portal_url": "https://github.com/abhi8193/BPO_Resume",
+        "real_cv_url": "https://raw.githubusercontent.com/abhi8193/BPO_Resume/main/Abhishek_Sadh_Updated_Resume_Final.pdf",
+        "linkedin_url": "https://www.linkedin.com/in/abhishek-sadh-bpo",
+        "phone": "+91 98192 48102",
+        "email": "abhishek.sadh.bpo@gmail.com",
+        "experience": "4+ years experience at Tech Mahindra BPO & HGS. Handled 140+ daily outbound tele-sales & customer care calls for banking & financial products in Vashi Sector 17, Navi Mumbai.",
         "skills": "Outbound Tele-Sales, Cold Calling, Voice Accent & Clarity, Customer Escalations, Zendesk CRM",
         "education": "B.Com (Mumbai University 2021)",
         "sub_loc": "Vashi Sector 17 (0.4 km from Vashi Railway Station)"
