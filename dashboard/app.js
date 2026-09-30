@@ -1112,6 +1112,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Document-Level Global Event Delegation for Candidate Actions
   document.addEventListener("click", (e) => {
+    const link = e.target.closest("a");
+    if (link && link.getAttribute("href")) {
+      const href = link.getAttribute("href");
+      if (href.includes("/api/download-real-cv/")) {
+        e.preventDefault();
+        const parts = href.split("/api/download-real-cv/");
+        const candId = parts[parts.length - 1].replace(/\/$/, "");
+        window.downloadRealCandidateCV(candId);
+        return;
+      }
+    }
+
     const btnView = e.target.closest(".btn-cv-view");
     if (btnView) {
       e.preventDefault();
